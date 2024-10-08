@@ -1,28 +1,46 @@
 import { Liveblocks } from "@liveblocks/node";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getRandomUser } from "@/database";
 
-// Authenticating your Liveblocks application
-// https://liveblocks.io/docs/authentication
+const LIVEBLOCKS_SECRET_KEY = process.env.LIVEBLOCKS_SECRET_KEY;
+
+if (!LIVEBLOCKS_SECRET_KEY) {
+  throw new Error("LIVEBLOCKS_SECRET_KEY is not set");
+}
 
 const liveblocks = new Liveblocks({
-  secret: process.env.LIVEBLOCKS_SECRET_KEY as string,
+  secret: LIVEBLOCKS_SECRET_KEY,
 });
 
 export async function POST(request: NextRequest) {
-  // Get the current user's unique id and info from your database
-  const user = getRandomUser();
+  try {
+    // Get the current user's unique id and info from your database
+    const user = getRandomUser();
 
-  // Create a session for the current user
-  // userInfo is made available in Liveblocks presence hooks, e.g. useOthers
-  const session = liveblocks.prepareSession(`${user.id}`, {
-    userInfo: user.info,
-  });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
-  // Use a naming pattern to allow access to rooms with a wildcard
-  session.allow(`liveblocks:examples:*`, session.FULL_ACCESS);
+    // Get the room id from the request body
+    const { room } = await request.json();
 
-  // Authorize the user and return the result
-  const { body, status } = await session.authorize();
-  return new Response(body, { status });
+    if (!room) {
+      return NextResponse.json({ error: "Room id is required" }, { status: 400 });
+    }
+
+    // Create a session for the current user
+    const session = liveblocks.prepareSession(`${user.id}`, {
+      userInfo: user.info,
+    });
+
+    // Allow access to the specific room
+    session.allow(room, session.FULL_ACCESS);
+
+    // Authorize the user and return the result
+    const { body, status } = await session.authorize();
+    return new NextResponse(body, { status });
+  } catch (error) {
+    console.error("Liveblocks authentication error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
 }

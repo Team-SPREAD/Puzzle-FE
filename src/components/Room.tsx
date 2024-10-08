@@ -5,22 +5,29 @@ import { useSearchParams } from "next/navigation";
 import { ReactNode, useMemo } from "react";
 import { LiveMap } from "@liveblocks/core";
 import { Loading } from "@/components/Loading";
+import { defaultUserPreferences, Tldraw } from "tldraw";
+import { StorageTldraw } from "./StorageTldraw";
 
-export function Room({ children }: { children: ReactNode }) {
-  const roomId = useExampleRoomId(
-    "liveblocks:examples:nextjs-tldraw-whiteboard-storage"
-  );
+interface RoomProps {
+  roomId: string;
+}
+
+const Room = ({ roomId }: RoomProps) => {
+  const exampleRoomId = useExampleRoomId(roomId);
+
 
   return (
     <RoomProvider
-      id={roomId}
+      id={exampleRoomId}
       initialPresence={{ presence: undefined }}
       initialStorage={{ records: new LiveMap() }}
     >
-      <ClientSideSuspense fallback={<Loading />}>{children}</ClientSideSuspense>
+      <ClientSideSuspense fallback={<Loading />}>{()=><StorageTldraw />}</ClientSideSuspense>
     </RoomProvider>
   );
-}
+};
+
+export default Room;
 
 /**
  * This function is used when deploying an example on liveblocks.io.
