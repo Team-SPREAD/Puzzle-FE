@@ -1,12 +1,13 @@
-"use client";
+'use client';
 
-import "tldraw/tldraw.css";
-import { Tldraw, TLComponents, useEditor, track } from "tldraw";
-import { useStorageStore } from "./useStorageStore";
-import { useSelf } from "@liveblocks/react/suspense";
+import 'tldraw/tldraw.css';
+import { Tldraw, TLComponents, useEditor, track } from 'tldraw';
+import { useStorageStore } from './useStorageStore';
+import { useSelf } from '@liveblocks/react/suspense';
 import { useEffect, useState } from 'react';
-import { Avatars } from "./Avatars";
-import { Badge } from "./Badge";
+import { Avatars } from './Avatars';
+import { Badge } from './Badge';
+import RightNav from './Layout/RightNav';
 
 const TopMenu = () => (
   <div>
@@ -18,11 +19,16 @@ const TopMenu = () => (
 
     <div className="flex justify-between items-center p-2 bg-white shadow-md">
       <div className="flex space-x-2 flex-grow">
-        {['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '🔚'].map((icon, index) => (
-          <button key={index} className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-full text-xl">
-            {icon}
-          </button>
-        ))}
+        {['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '🔚'].map(
+          (icon, index) => (
+            <button
+              key={index}
+              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-full text-xl"
+            >
+              {icon}
+            </button>
+          ),
+        )}
         <button className="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-md text-2xl">
           +
         </button>
@@ -33,14 +39,15 @@ const TopMenu = () => (
     </div>
 
     <div className="text-start py-4 bg-gray-100">
-      <h2 className="text-xl font-bold ml-3">1.펜도구 텍스트를 이용하여 자신을 표현하세요</h2>
+      <h2 className="text-xl font-bold ml-3">
+        1.펜도구 텍스트를 이용하여 자신을 표현하세요
+      </h2>
     </div>
-
   </div>
 );
 
 const DownMenu = () => (
-  <div 
+  <div
     className="
       absolute bottom-4 left-1/2 transform -translate-x-1/2 
       bg-blue-500 hover:bg-blue-600 
@@ -55,7 +62,6 @@ const DownMenu = () => (
     <span className="text-lg font-semibold">puzzle</span>
   </div>
 );
-
 
 const LeftSidebar = track(() => {
   const editor = useEditor();
@@ -87,40 +93,6 @@ const LeftSidebar = track(() => {
   );
 });
 
-const RightSidebar = () => {
-  const [time, setTime] = useState(300); // 5 minutes in seconds
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && time > 0) {
-      interval = setInterval(() => setTime((prevTime) => prevTime - 1), 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, time]);
-
-  const togglePlay = () => setIsPlaying(!isPlaying);
-
-  return (
-    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 bg-white p-4 rounded-lg shadow-md">
-      <div className="text-2xl font-bold">{`${Math.floor(time / 60)}:${(time % 60).toString().padStart(2, '0')}`}</div>
-      <button onClick={togglePlay} className="p-2 bg-blue-500 text-white rounded-full">
-        {isPlaying ? '⏸️' : '▶️'}
-      </button>
-      <div className="w-32 h-16 bg-gray-200 rounded flex items-center justify-center">
-        🎵
-      </div>
-      <div className="grid grid-cols-2 gap-2">
-        {['🦆', '🔔', '👏', '📢', '🎺', '🥁'].map((effect, index) => (
-          <button key={index} className="p-2 bg-gray-100 text-sm rounded">
-            {effect}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 export function StorageTldraw() {
   const id = useSelf((me) => me.id);
   const info = useSelf((me) => me.info);
@@ -137,18 +109,12 @@ export function StorageTldraw() {
     <div className="h-screen w-screen flex flex-col">
       <TopMenu />
       <div className="flex-1 relative">
-        <Tldraw
-          store={store}
-          components={components}
-          autoFocus
-          hideUi
-        >
+        <Tldraw store={store} components={components} autoFocus hideUi>
           <LeftSidebar />
-          <RightSidebar />
+          <RightNav />
           <DownMenu />
         </Tldraw>
       </div>
-
     </div>
   );
 }
