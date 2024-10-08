@@ -18,6 +18,9 @@ declare global {
         avatar: string;
       }; // Accessible through `user.info`
     };
-    RoomEvent: { type: 'PLAY'; soundId: number };
+    RoomEvent:
+      | { type: 'PLAY'; soundId: number }
+      | { type: 'AUDIO_PLAY' }
+      | { type: 'AUDIO_PAUSE' };
   }
 }
