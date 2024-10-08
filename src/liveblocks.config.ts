@@ -1,6 +1,4 @@
-import { LiveMap } from "@liveblocks/core";
-
-export type PresenceStates = "playing" | "seeking" | "paused";
+import { LiveMap } from '@liveblocks/core';
 
 declare global {
   interface Liveblocks {
@@ -20,5 +18,6 @@ declare global {
         avatar: string;
       }; // Accessible through `user.info`
     };
+    RoomEvent: { type: 'PLAY'; soundId: number };
   }
 }
