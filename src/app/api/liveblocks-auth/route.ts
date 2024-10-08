@@ -1,11 +1,11 @@
-import { Liveblocks } from "@liveblocks/node";
-import { NextRequest, NextResponse } from "next/server";
-import { getRandomUser } from "@/database";
+import { Liveblocks } from '@liveblocks/node';
+import { NextRequest, NextResponse } from 'next/server';
+import { getRandomUser } from '@/database';
 
 const LIVEBLOCKS_SECRET_KEY = process.env.LIVEBLOCKS_SECRET_KEY;
 
 if (!LIVEBLOCKS_SECRET_KEY) {
-  throw new Error("LIVEBLOCKS_SECRET_KEY is not set");
+  throw new Error('LIVEBLOCKS_SECRET_KEY is not set');
 }
 
 const liveblocks = new Liveblocks({
@@ -18,14 +18,17 @@ export async function POST(request: NextRequest) {
     const user = getRandomUser();
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Get the room id from the request body
     const { room } = await request.json();
 
     if (!room) {
-      return NextResponse.json({ error: "Room id is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Room id is required' },
+        { status: 400 },
+      );
     }
 
     // Create a session for the current user
@@ -40,7 +43,10 @@ export async function POST(request: NextRequest) {
     const { body, status } = await session.authorize();
     return new NextResponse(body, { status });
   } catch (error) {
-    console.error("Liveblocks authentication error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error('Liveblocks authentication error:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 },
+    );
   }
 }
