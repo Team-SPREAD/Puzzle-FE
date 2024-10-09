@@ -1,6 +1,7 @@
 import { SoundData } from '@/lib/sound-data';
 import SoundBox from './SoundBox';
 import AudioPlayer from './AudioPlayer';
+
 export default function RightNav() {
   return (
     <div className="fixed right-4 w-[240px] h-[640px] p-5 shadow-xl rounded-[4px] border-[1px] border-[#F0F0F0]">
