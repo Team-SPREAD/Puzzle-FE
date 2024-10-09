@@ -2,7 +2,7 @@
 import { ClientSideSuspense, RoomProvider } from '@liveblocks/react/suspense';
 import { useSearchParams } from 'next/navigation';
 import { ReactNode, useMemo } from 'react';
-import { LiveMap } from '@liveblocks/core';
+import { LiveObject } from '@liveblocks/core';
 import { Loading } from '@/components/Loading';
 import Canvas from './Canvas';
 
@@ -14,7 +14,12 @@ const Room = ({ roomId }: RoomProps) => {
   const exampleRoomId = useExampleRoomId(roomId);
 
   return (
-    <RoomProvider id={exampleRoomId}>
+    <RoomProvider
+      id={exampleRoomId}
+      initialStorage={{
+        time: new LiveObject({ time: 300 }),
+      }}
+    >
       <ClientSideSuspense fallback={<Loading />}>
         {() => <Canvas />}
       </ClientSideSuspense>
