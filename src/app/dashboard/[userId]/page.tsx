@@ -13,40 +13,47 @@ export default function DashboardPage() {
     const userInfo = useUserInfoStore();
     useAuth();
 
-    const [isDashboardPersonal, setIsDashboardPersonal] = useState(true);
+    const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
     const [buttonColor, setButtonColor] = useState('');
 
     useEffect(() => {
         setButtonColor(generateRandomColor());
     }, []);
 
-    const personalProjects = userInfo.projects.filter(p => !p.teamId);
-    const teamProjects = userInfo.projects.filter(p => p.teamId);
+    const filteredProjects = selectedTeamId === null
+        ? userInfo.projects // 개인 대시보드: 모든 프로젝트 표시
+        : userInfo.projects.filter(p => p.teamId === selectedTeamId);
+
+    const dashboardTitle = selectedTeamId === null
+        ? "개인 대시보드"
+        : userInfo.teams.find(t => t.id === selectedTeamId)?.name || "팀 대시보드";
 
     return (
         <div className="flex h-screen bg-gray-100">
             <TeamMembersBar
-                teamMembers={userInfo.teams.flatMap(t => t.members)}
+                teamMembers={selectedTeamId
+                    ? userInfo.teams.find(t => t.id === selectedTeamId)?.members || []
+                    : []}
                 buttonColor={buttonColor}
             />
             <Sidebar
-                setIsDashboardPersonal={setIsDashboardPersonal}
+                selectedTeamId={selectedTeamId}
+                setSelectedTeamId={setSelectedTeamId}
                 buttonColor={buttonColor}
+                favoriteProjects={userInfo.projects.filter(p => p.isFavorite)}
+                teams={userInfo.teams}
             />
             <div className="flex flex-col flex-1">
                 <Header
-                    isDashboardPersonal={isDashboardPersonal}
+                    isDashboardPersonal={selectedTeamId === null}
                     buttonColor={buttonColor}
                     userName={userInfo.name}
                 />
                 <main className="flex-1 p-6 overflow-auto">
-                    <h1 className="text-2xl font-bold mb-4">
-                        {isDashboardPersonal ? "개인 대시보드" : "팀 대시보드"}
-                    </h1>
+                    <h1 className="text-2xl font-bold mb-4">{dashboardTitle}</h1>
                     <ProjectGrid
-                        projects={isDashboardPersonal ? personalProjects : teamProjects}
+                        projects={filteredProjects}
                         buttonColor={buttonColor}
-                        rooms={[...userInfo.hostingRooms, ...userInfo.joinedRooms]}
                     />
                 </main>
             </div>

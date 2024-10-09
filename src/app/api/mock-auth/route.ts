@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 
 // 프로젝트 데이터를 모방합니다.
 const mockProjects = [
-  { id: 'proj1', name: 'Project A', teamId: 'Spread', isFavorite: true },
-  { id: 'proj2', name: 'Project B', teamId: 'Dopamain', isFavorite: false },
+  { id: 'proj1', name: 'Spread A', teamId: 'Spread', isFavorite: true },
+  { id: 'proj2', name: 'Dopamain B', teamId: 'Dopamain', isFavorite: false },
   { id: 'proj3', name: 'Personal Project 1', teamId: null, isFavorite: true },
-  { id: 'proj4', name: 'Project C', teamId: 'RentIt', isFavorite: false },
+  { id: 'proj4', name: 'RentIt C', teamId: 'RentIt', isFavorite: false },
   { id: 'proj5', name: 'Personal Project 2', teamId: null, isFavorite: false },
 ];
 

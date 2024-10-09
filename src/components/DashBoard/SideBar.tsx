@@ -1,37 +1,32 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import useUserInfoStore from "@/hooks/useUserInfoStore";
 
 interface SidebarProps {
-    setIsDashboardPersonal: (isPersonal: boolean) => void;
+    selectedTeamId: string | null;
+    setSelectedTeamId: (teamId: string | null) => void;
     buttonColor: string;
+    favoriteProjects: { id: string; name: string; isFavorite: boolean; }[];
+    teams: { id: string; name: string; }[];
 }
 
-export default function Sidebar({ setIsDashboardPersonal, buttonColor }: SidebarProps) {
+export default function Sidebar({ selectedTeamId, setSelectedTeamId, buttonColor, favoriteProjects, teams }: SidebarProps) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
-    const userInfo = useUserInfoStore();
-    const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
     const handleTeamSelect = (teamId: string | null) => {
-        setSelectedTeam(teamId);
-        setIsDashboardPersonal(teamId === null);
+        setSelectedTeamId(teamId);
         setIsDropdownOpen(false);
     };
 
     const toggleFavorite = (projectId: string) => {
         // 즐겨찾기 토글 로직을 구현합니다.
-        // 예: userInfo.toggleProjectFavorite(projectId);
         console.log(`Toggle favorite for project ${projectId}`);
     };
-
-    const favoriteProjects = userInfo.projects.filter(project => project.isFavorite);
 
     return (
         <div className="w-64 bg-white shadow-md flex flex-col">
             <Link href="/" className="text-xl font-bold p-4">Logo</Link>
             
-            {/* 팀 만들기 버튼 */}
             <div className="p-4">
                 <button 
                     style={{backgroundColor: buttonColor}}
@@ -41,13 +36,12 @@ export default function Sidebar({ setIsDashboardPersonal, buttonColor }: Sidebar
                 </button>
             </div>
 
-            {/* 드롭다운 메뉴 */}
             <div className="p-4">
                 <button 
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="w-full text-left px-4 py-2 bg-gray-200 rounded-md"
                 >
-                    {selectedTeam ? userInfo.teams.find(t => t.id === selectedTeam)?.name : 'Home'}
+                    {selectedTeamId ? teams.find(t => t.id === selectedTeamId)?.name : '개인 대시보드'}
                 </button>
                 {isDropdownOpen && (
                     <div className="mt-2 bg-white rounded-md shadow-lg">
@@ -55,9 +49,9 @@ export default function Sidebar({ setIsDashboardPersonal, buttonColor }: Sidebar
                             onClick={() => handleTeamSelect(null)}
                             className="w-full text-left px-4 py-2 hover:bg-gray-100"
                         >
-                            Home
+                            개인 대시보드
                         </button>
-                        {userInfo.teams.map(team => (
+                        {teams.map(team => (
                             <button 
                                 key={team.id}
                                 onClick={() => handleTeamSelect(team.id)}
@@ -70,7 +64,6 @@ export default function Sidebar({ setIsDashboardPersonal, buttonColor }: Sidebar
                 )}
             </div>
 
-            {/* 즐겨찾기 프로젝트 토글 섹션 */}
             <div className="p-4 flex-1">
                 <button 
                     onClick={() => setIsFavoritesOpen(!isFavoritesOpen)}
