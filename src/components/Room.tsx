@@ -1,12 +1,10 @@
-"use client";
-
-import { ClientSideSuspense, RoomProvider } from "@liveblocks/react/suspense";
-import { useSearchParams } from "next/navigation";
-import { ReactNode, useMemo } from "react";
-import { LiveMap } from "@liveblocks/core";
-import { Loading } from "@/components/Loading";
-import { defaultUserPreferences, Tldraw } from "tldraw";
-import { StorageTldraw } from "./StorageTldraw";
+'use client';
+import { ClientSideSuspense, RoomProvider } from '@liveblocks/react/suspense';
+import { useSearchParams } from 'next/navigation';
+import { ReactNode, useMemo } from 'react';
+import { LiveMap } from '@liveblocks/core';
+import { Loading } from '@/components/Loading';
+import Canvas from './Canvas';
 
 interface RoomProps {
   roomId: string;
@@ -15,14 +13,11 @@ interface RoomProps {
 const Room = ({ roomId }: RoomProps) => {
   const exampleRoomId = useExampleRoomId(roomId);
 
-
   return (
-    <RoomProvider
-      id={exampleRoomId}
-      initialPresence={{ presence: undefined }}
-      initialStorage={{ records: new LiveMap() }}
-    >
-      <ClientSideSuspense fallback={<Loading />}>{()=><StorageTldraw />}</ClientSideSuspense>
+    <RoomProvider id={exampleRoomId}>
+      <ClientSideSuspense fallback={<Loading />}>
+        {() => <Canvas />}
+      </ClientSideSuspense>
     </RoomProvider>
   );
 };
@@ -35,7 +30,7 @@ export default Room;
  */
 function useExampleRoomId(roomId: string) {
   const params = useSearchParams();
-  const exampleId = params?.get("exampleId");
+  const exampleId = params?.get('exampleId');
 
   const exampleRoomId = useMemo(() => {
     return exampleId ? `${roomId}-${exampleId}` : roomId;
