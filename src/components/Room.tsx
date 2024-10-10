@@ -1,10 +1,13 @@
 'use client';
-import { ClientSideSuspense, RoomProvider } from '@liveblocks/react/suspense';
-import { useSearchParams } from 'next/navigation';
+
 import { ReactNode, useMemo } from 'react';
-import { LiveObject } from '@liveblocks/core';
+import { useSearchParams } from 'next/navigation';
+import { RoomProvider } from "@/liveblocks.config";
+import { ClientSideSuspense } from "@liveblocks/react";
+import { LiveList, LiveMap, LiveObject } from "@liveblocks/client";
+import { Layer } from "@/lib/types";
 import { Loading } from '@/components/Loading';
-import Canvas from './Canvas';
+import Canvas from '@/components/Canvas/Canvas';
 
 interface RoomProps {
   roomId: string;
@@ -16,9 +19,20 @@ const Room = ({ roomId }: RoomProps) => {
   return (
     <RoomProvider
       id={exampleRoomId}
+      initialPresence={{
+        selection: [],
+        cursor: null,
+        pencilDraft: null,
+        penColor: null,
+        currentProcess: 1,
+      }}
       initialStorage={{
         time: new LiveObject({ time: 300 }),
+        layers: new LiveMap<string, LiveObject<Layer>>(),
+        layerIds: new LiveList([]),
+        person: new LiveObject({ name: "Marie", age: 30 }),
       }}
+
     >
       <ClientSideSuspense fallback={<Loading />}>
         {() => <Canvas />}

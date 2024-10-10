@@ -1,4 +1,4 @@
-import { SoundType } from './type';
+import { SoundType } from './types';
 
 export const SoundData: SoundType[] = [
   {
