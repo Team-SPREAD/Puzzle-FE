@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 // 프로젝트 데이터를 모방합니다.
 const mockProjects = [
@@ -50,32 +50,23 @@ const mockUsers = [
   },
 ];
 
-export async function POST(request: Request) {
-  const { userId } = await request.json()
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const { userId } = await request.json() as { userId: string };
 
-  // 비동기 처리를 모방하기 위해 setTimeout을 사용합니다.
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const user = mockUsers.find(u => u._id === userId);
+  const user = mockUsers.find(u => u._id === userId);
 
-      if (user) {
-        // 사용자를 찾았다면, 토큰을 생성하고 사용자 정보와 함께 반환합니다.
-        const token = 'mock_token_' + user._id; // 실제 구현에서는 더 안전한 방식으로 토큰을 생성해야 합니다.
-        
-        // 사용자의 프로젝트와 팀 정보를 가져옵니다.
-        const userProjects = mockProjects.filter(p => user.projects.includes(p.id));
-        const userTeams = mockTeams.filter(t => user.teams.includes(t.id));
+  if (user) {
+    const token = 'mock_token_' + user._id;
+    const userProjects = mockProjects.filter(p => user.projects.includes(p.id));
+    const userTeams = mockTeams.filter(t => user.teams.includes(t.id));
 
-        resolve(NextResponse.json({
-          ...user,
-          token,
-          projects: userProjects,
-          teams: userTeams,
-        }));
-      } else {
-        // 사용자를 찾지 못했다면 에러를 반환합니다.
-        resolve(NextResponse.json({ error: 'User not found' }, { status: 404 }));
-      }
-    }, 300); // 300ms의 지연을 추가하여 실제 API 호출을 모방합니다.
-  });
+    return NextResponse.json({
+      ...user,
+      token,
+      projects: userProjects,
+      teams: userTeams,
+    });
+  } else {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  }
 }
