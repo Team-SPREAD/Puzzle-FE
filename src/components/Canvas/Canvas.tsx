@@ -49,7 +49,7 @@ import ToolsBar from "@/components/ToolsBar";
 import Cursors from "@/components/Cursors";
 import useUserInfoStore from "@/hooks/useUserInfoStore";
 import RightNav from "../Layout/RightNav";
-import { Avatars } from "../Avatars";
+
 
 const MAX_LAYERS = 100;
 
@@ -495,7 +495,7 @@ const Canvas = () => {
   return (
     <div className="w-full h-full relative bg-surface-canvas touch-none">
       <div className="w-40 h-20 absolute top-4 right-0 z-10">
-        <Avatars />
+        아바타
       </div>
       <div className="w-fit h-fit absolute top-16 left-40 z-10">
         <RightNav />
