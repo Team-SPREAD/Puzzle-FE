@@ -67,7 +67,7 @@ export default function AudioPlayer() {
     }
   });
   return (
-    <div>
+    <div className="border-b border-[#E9E9E9]">
       <div className="flex mt-6 items-center">
         <button
           onClick={handlePlayPause}

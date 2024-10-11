@@ -29,7 +29,7 @@ export default function SoundBox({ url, id, name, imgUrl }: SoundBoxProps) {
     }
   };
   return (
-    <div>
+    <div className="border-b border-[#E9E9E9]">
       <button
         onClick={() => {
           broadcast({ type: 'PLAY', soundId: id });

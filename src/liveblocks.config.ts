@@ -3,12 +3,12 @@ import {
   LiveMap,
   LiveObject,
   createClient,
-} from "@liveblocks/client";
-import { createRoomContext } from "@liveblocks/react";
-import { Color, Layer, Point } from "@/lib/types";
+} from '@liveblocks/client';
+import { createRoomContext } from '@liveblocks/react';
+import { Color, Layer, Point, UserInfo } from '@/lib/types';
 
 const client = createClient({
-  authEndpoint: "/api/liveblocks-auth",
+  authEndpoint: '/api/liveblocks-auth',
   throttle: 16,
 });
 
@@ -21,8 +21,11 @@ type Presence = {
   currentProcess: number;
 };
 
-export type MusicStates = "playing" | "seeking" | "paused";
+export type MusicStates = 'playing' | 'seeking' | 'paused';
 
+export type ActiveUserInfo = UserInfo & {
+  enteredAt: number;
+};
 // Storage represents the shared document that persists in the Room
 type Storage = {
  
@@ -32,6 +35,10 @@ type Storage = {
     name: string;
   }>;
   time: LiveObject<{ time: number }>;
+  groupCall: LiveObject<{
+    roomId: string;
+    activeUsers: LiveList<ActiveUserInfo>;
+  }>;
 };
 
 // UserMeta represents static/readonly metadata on each User
@@ -45,6 +52,7 @@ export type UserMeta = {
 };
 
 // RoomEvent types
+
 export type RoomEvent =
   | { type: "TOAST"; message: string }
   | { type: "PLAY"; soundId: number }
@@ -52,6 +60,7 @@ export type RoomEvent =
   | { type: "AUDIO_PAUSE" }
   | { type: "START_TIMER"; time: number }
   | { type: "STOP_TIMER" };
+
 
 export const {
   suspense: {
@@ -68,10 +77,10 @@ export const {
     useEventListener,
     useErrorListener,
     useStorage,
-    useObject,
-    useMap,
-    useList,
-    useBatch,
+    // useObject,
+    // useMap,
+    // useList,
+    // useBatch,
     useHistory,
     useUndo,
     useRedo,
@@ -80,6 +89,4 @@ export const {
     useMutation,
   },
 } = createRoomContext<Presence, Storage, UserMeta, RoomEvent>(client);
-
-
 

@@ -2,10 +2,10 @@
 
 import { ReactNode, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { RoomProvider } from "@/liveblocks.config";
-import { ClientSideSuspense } from "@liveblocks/react";
-import { LiveList, LiveMap, LiveObject } from "@liveblocks/client";
-import { Layer } from "@/lib/types";
+import { RoomProvider } from '@/liveblocks.config';
+import { ClientSideSuspense } from '@liveblocks/react';
+import { LiveList, LiveMap, LiveObject } from '@liveblocks/client';
+import { Layer } from '@/lib/types';
 import { Loading } from '@/components/Loading';
 import Canvas from '@/components/Canvas/Canvas';
 
@@ -27,11 +27,14 @@ const Room = ({ roomId }: RoomProps) => {
       }}
       initialStorage={{
         time: new LiveObject({ time: 300 }),
+        groupCall: new LiveObject({
+          roomId: '',
+          activeUsers: new LiveList([]),
+        }),
         layers: new LiveMap<string, LiveObject<Layer>>(),
         layerIds: new LiveList([]),
-        person: new LiveObject({ name: "Marie", age: 30 }),
+        person: new LiveObject({ name: 'Marie', age: 30 }),
       }}
-
     >
       <ClientSideSuspense fallback={<Loading />}>
         {() => <Canvas />}

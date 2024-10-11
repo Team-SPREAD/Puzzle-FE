@@ -5,6 +5,19 @@ export type SoundType = {
   url: string;
 };
 
+export type UserInfo = {
+  id: string;
+  name: string;
+  avatar: string;
+  email: string;
+};
+export type ProjectInfo = {
+  name: string;
+  id: string;
+  description: string;
+  role: string;
+};
+
 export type Color = {
   r: number;
   g: number;
