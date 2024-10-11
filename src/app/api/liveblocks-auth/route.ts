@@ -1,52 +1,65 @@
-import { Liveblocks } from '@liveblocks/node';
-import { NextRequest, NextResponse } from 'next/server';
-import { getRandomUser } from '@/database';
+import { Liveblocks } from "@liveblocks/node";
+import { NextRequest } from "next/server";
 
-const LIVEBLOCKS_SECRET_KEY = process.env.LIVEBLOCKS_SECRET_KEY;
-
-if (!LIVEBLOCKS_SECRET_KEY) {
-  throw new Error('LIVEBLOCKS_SECRET_KEY is not set');
-}
+const API_KEY = process.env.LIVEBLOCKS_SECRET_KEY!;
 
 const liveblocks = new Liveblocks({
-  secret: LIVEBLOCKS_SECRET_KEY,
+  secret: API_KEY,
 });
 
 export async function POST(request: NextRequest) {
-  try {
-    // Get the current user's unique id and info from your database
-    const user = getRandomUser();
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    // Get the room id from the request body
-    const { room } = await request.json();
-
-    if (!room) {
-      return NextResponse.json(
-        { error: 'Room id is required' },
-        { status: 400 },
-      );
-    }
-
-    // Create a session for the current user
-    const session = liveblocks.prepareSession(`${user.id}`, {
-      userInfo: user.info,
-    });
-
-    // Allow access to the specific room
-    session.allow(room, session.FULL_ACCESS);
-
-    // Authorize the user and return the result
-    const { body, status } = await session.authorize();
-    return new NextResponse(body, { status });
-  } catch (error) {
-    console.error('Liveblocks authentication error:', error);
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 },
-    );
+  if (!API_KEY) {
+    return new Response(noKeyWarning(), { status: 403 });
   }
+  const userIndex = Math.floor(Math.random() * NAMES.length);
+
+  const session = liveblocks.prepareSession(`user-${userIndex}`, {
+    userInfo: {
+      name: NAMES[userIndex],
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      avatar: `https://liveblocks.io/avatars/avatar-${Math.floor(
+        Math.random() * 30,
+      )}.png`,
+    },
+  });
+
+  const { room } = await request.json();
+
+  session.allow(room, session.FULL_ACCESS);
+
+  const { status, body } = await session.authorize();
+
+  return new Response(body, { status });
 }
+
+const NAMES = ["멋쟁이", "고양이", "오리", "고릴라" ,"오소리" ,"너구리" , "강아지"];
+
+const COLORS = [
+  ["#FF0099", "#FF7A00"],
+  ["#002A95", "#00A0D2"],
+  ["#6116FF", "#E32DD1"],
+  ["#0EC4D1", "#1BCC00"],
+  ["#FF00C3", "#FF3333"],
+  ["#00C04D", "#00FFF0"],
+  ["#5A2BBE", "#C967EC"],
+  ["#46BE2B", "#67EC86"],
+  ["#F49300", "#FFE600"],
+  ["#F42900", "#FF9000"],
+  ["#00FF94", "#0094FF"],
+  ["#00FF40", "#1500FF"],
+  ["#00FFEA", "#BF00FF"],
+  ["#FFD600", "#BF00FF"],
+  ["#484559", "#282734"],
+  ["#881B9A", "#1D051E"],
+];
+
+// Just checking you have your liveblocks.io API key added, can be removed
+function noKeyWarning() {
+  return process.env.CODESANDBOX_SSE
+    ? `Add your secret key from https://liveblocks.io/dashboard/apikeys as the \`LIVEBLOCKS_SECRET_KEY\` secret in CodeSandbox.\n` +
+        `Learn more: https://github.com/liveblocks/liveblocks/tree/main/examples/nextjs-live-cursors-advanced#codesandbox.\n`
+    : `Create an \`.env.local\` file and add your secret key from https://liveblocks.io/dashboard/apikeys as the \`LIVEBLOCKS_SECRET_KEY\` environment variable.\n` +
+        `Learn more: https://github.com/liveblocks/liveblocks/tree/main/examples/nextjs-live-cursors-advanced#getting-started.\n`;
+}
+
+

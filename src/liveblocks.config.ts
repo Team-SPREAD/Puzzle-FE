@@ -25,11 +25,7 @@ export type MusicStates = "playing" | "seeking" | "paused";
 
 // Storage represents the shared document that persists in the Room
 type Storage = {
-  // music: LiveObject<{
-  //   musicState: MusicStates;
-  //   musicTime: number;
-  //   musicIndex: number;
-  // }>;
+ 
   layers: LiveMap<string, LiveObject<Layer>>;
   layerIds: LiveList<string>;
   person: LiveObject<{
@@ -39,7 +35,7 @@ type Storage = {
 };
 
 // UserMeta represents static/readonly metadata on each User
-type UserMeta = {
+export type UserMeta = {
   id: string;
   info: {
     name: string;
@@ -49,7 +45,7 @@ type UserMeta = {
 };
 
 // RoomEvent types
-type RoomEvent =
+export type RoomEvent =
   | { type: "TOAST"; message: string }
   | { type: "PLAY"; soundId: number }
   | { type: "AUDIO_PLAY" }
@@ -84,4 +80,6 @@ export const {
     useMutation,
   },
 } = createRoomContext<Presence, Storage, UserMeta, RoomEvent>(client);
+
+
 
