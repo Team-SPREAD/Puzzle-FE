@@ -4,6 +4,7 @@ import GroupCallButton from './GroupCallController';
 import LiveCallUsers from './LiveCallUsers';
 import Image from 'next/image';
 import audioIcon from '~/images/audio.svg';
+
 type GroupCallProps = {
   roomId: string;
 };
@@ -16,7 +17,7 @@ const GroupCall = (props: GroupCallProps) => {
         <p>음성 채팅</p>
       </div>
       <LiveCallUsers />
-      <GroupCallButton />
+      <GroupCallButton roomId="test" />
     </div>
   );
 };

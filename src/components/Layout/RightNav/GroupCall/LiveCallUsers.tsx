@@ -2,6 +2,7 @@
 
 import LiveCallUser from './LiveCallUser';
 import { useStorage } from '@liveblocks/react/suspense';
+
 export default function LiveCallUsers() {
   const activeUsers = useStorage((root) => root.groupCall.activeUsers);
   return (

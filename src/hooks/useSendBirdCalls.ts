@@ -1,22 +1,19 @@
 import SendBirdCall from 'sendbird-calls';
+import { AuthOption } from 'sendbird-calls';
 
-interface AuthOptionType {
-  userId: string;
-  accessToken: string;
-}
-
-const useSendBirdInit = async ({ userId, accessToken }: AuthOptionType) => {
+const useSendBirdInit = async ({ userId, accessToken }: AuthOption) => {
   SendBirdCall.init(process.env.NEXT_PUBLIC_SENDBIRD_APP_ID!);
   SendBirdCall.useMedia({ audio: true, video: true });
 
   const authOption = { userId, accessToken };
+  console.log(authOption);
   try {
     await SendBirdCall.authenticate(authOption, (result, error) => {
       if (error) {
-        console.error(error);
+        console.error('샌드버드 인증 실패', error);
         return;
       }
-      console.log('인증 성공', result);
+      console.log('샌드버드 인증 성공', result);
     });
 
     SendBirdCall.connectWebSocket()
