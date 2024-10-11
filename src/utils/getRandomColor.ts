@@ -1,50 +1,121 @@
 // utils/colorUtils.ts
 
+type RGB = {
+  r: number;
+  g: number;
+  b: number;
+};
+
 /**
- * 랜덤한 색상을 생성합니다.
- * @returns {string} HSL 형식의 색상 문자열
+ * HEX 색상을 RGB 객체로 변환합니다.
+ */
+function hexToRgb(hex: string): RGB | null {
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, (_, r, g, b) => r + r + g + g + b + b);
+
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16),
+      }
+    : null;
+}
+
+/**
+ * RGB 객체를 HSL 문자열로 변환합니다.
+ */
+function rgbToHsl(rgb: RGB): string {
+  let { r, g, b } = rgb;
+  r /= 255, g /= 255, b /= 255;
+
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+
+  if (max === min) {
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h! /= 6;
+  }
+
+  return `hsl(${Math.round(h! * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+}
+
+/**
+ * 색상 문자열을 표준화합니다.
+ */
+export function standardizeColor(color: string): string {
+  if (typeof window !== 'undefined') {
+    const ctx = document.createElement('canvas').getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = color;
+      return ctx.fillStyle;
+    }
+  }
+  return color; // 서버 사이드에서는 원래 색상을 반환
+}
+
+/**
+ * 대비되는 색상(검정 또는 흰색)을 반환합니다.
+ */
+export function getContrastingColor(color: string): string {
+  const standardColor = standardizeColor(color);
+  const rgb = hexToRgb(standardColor);
+  
+  if (!rgb) return '#000000'; // 기본값으로 검정색 반환
+
+  const { r, g, b } = rgb;
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 128 ? '#000000' : '#FFFFFF';
+}
+
+/**
+ * 랜덤한 HSL 색상을 생성합니다.
  */
 export function generateRandomColor(): string {
-    // 색조(Hue)는 0-360 사이의 랜덤한 값
-    const hue = Math.floor(Math.random() * 360);
-    
-    // 채도(Saturation)는 60-90% 사이로 제한하여 선명한 색상을 생성합니다.
-    const saturation = Math.floor(Math.random() * 30) + 60;
-    
-    // 명도(Lightness)는 40-60% 사이로 제한하여 너무 어둡거나 밝지 않게 합니다.
-    const lightness = Math.floor(Math.random() * 20) + 40;
+  const h = Math.floor(Math.random() * 360);
+  const s = Math.floor(Math.random() * 30) + 60;
+  const l = Math.floor(Math.random() * 20) + 40;
+  return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
+/**
+ * HSL 색상의 명도를 조정합니다.
+ */
+export function adjustColor(color: string, amount: number): string {
+  const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+  if (!match) return color;
+
+  let [, h, s, l] = match.map(Number);
+  l = Math.max(0, Math.min(100, l + amount));
+
+  return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
+/**
+ * 주어진 색상에 대해 다양한 정보를 반환합니다.
+ */
+export function getColorInfo(color: string) {
+  const standardColor = standardizeColor(color);
+  const rgb = hexToRgb(standardColor);
   
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-  }
-  
-  /**
-   * 주어진 색상의 대비색을 생성합니다.
-   * @param {string} color - HSL 형식의 색상 문자열
-   * @returns {string} 대비되는 색상 (검정 또는 흰색)
-   */
-  export function getContrastColor(color: string): string {
-    const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-    if (!match) return '#000000';  // 기본값으로 검정색 반환
-  
-    const lightness = parseInt(match[3]);
-    return lightness > 50 ? '#000000' : '#FFFFFF';
-  }
-  
-  /**
-   * 주어진 색상을 밝게 또는 어둡게 만듭니다.
-   * @param {string} color - HSL 형식의 색상 문자열
-   * @param {number} amount - 조정할 양 (-100 to 100)
-   * @returns {string} 조정된 HSL 색상 문자열
-   */
-  export function adjustColor(color: string, amount: number): string {
-    const match = color.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-    if (!match) return color;  // 매칭 실패 시 원본 색상 반환
-  
-    let h = parseInt(match[1]);
-    let s = parseInt(match[2]);
-    let l = parseInt(match[3]);
-  
-    l = Math.max(0, Math.min(100, l + amount));
-  
-    return `hsl(${h}, ${s}%, ${l}%)`;
-  }
+  if (!rgb) return null;
+
+  const hsl = rgbToHsl(rgb);
+  const contrastColor = getContrastingColor(standardColor);
+
+  return {
+    hex: standardColor,
+    rgb: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
+    hsl,
+    contrastColor
+  };
+}
