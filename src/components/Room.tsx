@@ -2,7 +2,7 @@
 import { ClientSideSuspense, RoomProvider } from '@liveblocks/react/suspense';
 import { useSearchParams } from 'next/navigation';
 import { ReactNode, useMemo } from 'react';
-import { LiveObject } from '@liveblocks/core';
+import { LiveObject, LiveList } from '@liveblocks/client';
 import { Loading } from '@/components/Loading';
 import Canvas from './Canvas';
 
@@ -18,6 +18,10 @@ const Room = ({ roomId }: RoomProps) => {
       id={exampleRoomId}
       initialStorage={{
         time: new LiveObject({ time: 300 }),
+        groupCall: new LiveObject({
+          roomId: '',
+          activeUsers: new LiveList([]),
+        }),
       }}
     >
       <ClientSideSuspense fallback={<Loading />}>

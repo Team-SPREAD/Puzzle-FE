@@ -1,4 +1,9 @@
-import { LiveObject } from '@liveblocks/core';
+import { LiveObject, LiveList } from '@liveblocks/core';
+import { UserInfo } from './lib/types';
+
+export type ActiveUserInfo = UserInfo & {
+  enteredAt: number;
+};
 
 declare global {
   interface Liveblocks {
@@ -6,7 +11,12 @@ declare global {
     Presence: {};
     Storage: {
       time: LiveObject<{ time: number }>;
+      groupCall: LiveObject<{
+        roomId: string;
+        activeUsers: LiveList<ActiveUserInfo>;
+      }>;
     };
+
     // Custom user info set when authenticating with a secret key
     UserMeta: {
       id: string; // Accessible through `user.id`
