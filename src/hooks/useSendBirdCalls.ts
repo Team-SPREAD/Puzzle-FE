@@ -6,6 +6,7 @@ const useSendBirdInit = async ({ userId, accessToken }: AuthOption) => {
   SendBirdCall.useMedia({ audio: true, video: true });
 
   const authOption = { userId, accessToken };
+
   console.log(authOption);
   try {
     await SendBirdCall.authenticate(authOption, (result, error) => {

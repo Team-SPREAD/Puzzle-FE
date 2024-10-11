@@ -14,11 +14,10 @@ interface RoomProps {
 }
 
 const Room = ({ roomId }: RoomProps) => {
-  const exampleRoomId = useExampleRoomId(roomId);
 
   return (
     <RoomProvider
-      id={exampleRoomId}
+      id={roomId}
       initialPresence={{
         selection: [],
         cursor: null,
@@ -46,17 +45,3 @@ const Room = ({ roomId }: RoomProps) => {
 
 export default Room;
 
-/**
- * This function is used when deploying an example on liveblocks.io.
- * You can ignore it completely if you run the example locally.
- */
-function useExampleRoomId(roomId: string) {
-  const params = useSearchParams();
-  const exampleId = params?.get('exampleId');
-
-  const exampleRoomId = useMemo(() => {
-    return exampleId ? `${roomId}-${exampleId}` : roomId;
-  }, [roomId, exampleId]);
-
-  return exampleRoomId;
-}

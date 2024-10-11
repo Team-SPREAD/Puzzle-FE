@@ -10,7 +10,6 @@ import { generateRandomColor } from '@/utils/getRandomColor';
 import useUserInfoStore from '@/hooks/useUserInfoStore';
 export default function DashboardPage() {
   const userInfo = useUserInfoStore();
-
   useAuth();
 
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);

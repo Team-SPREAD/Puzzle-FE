@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useRef, useCallback } from 'react';
 import { useMutation } from '@liveblocks/react/suspense';
 import { ActiveUserInfo } from '@/liveblocks.config';
@@ -35,6 +36,7 @@ export default function GroupCallController(groupCallId: TypeGroupCallId) {
   }, []);
   const addToActiveUsers = useMutation(({ storage }, user: ActiveUserInfo) => {
     const groupCallActiveUsers = storage.get('groupCall')!.get('activeUsers');
+
     groupCallActiveUsers.push(user);
   }, []);
 

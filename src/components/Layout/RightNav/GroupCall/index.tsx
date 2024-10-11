@@ -17,6 +17,7 @@ const GroupCall = (props: GroupCallProps) => {
         <p>음성 채팅</p>
       </div>
       <LiveCallUsers />
+
       <GroupCallButton roomId="test" />
     </div>
   );

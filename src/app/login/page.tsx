@@ -35,6 +35,7 @@ const LoginPage = () => {
       setUserInfo(userInfo);
 
       window.localStorage.setItem('authToken', userInfo.token);
+
       router.push(`/dashboard/${userInfo._id}`);
     } catch (error) {
       console.error('Login error:', error);
