@@ -16,7 +16,6 @@ export async function POST(request: NextRequest) {
   try {
     // Get the current user's unique id and info from your database
     const user = getRandomUser();
-
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }

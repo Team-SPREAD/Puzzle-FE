@@ -8,10 +8,9 @@ import ProjectGrid from '@/components/DashBoard/ProjectGrid';
 import TeamMembersBar from '@/components/DashBoard/TeamMembersBar';
 import { generateRandomColor } from '@/utils/getRandomColor';
 import useUserInfoStore from '@/hooks/useUserInfoStore';
-// import useUserInfoStore from '@/store/useUserInfoStore';
 export default function DashboardPage() {
   const userInfo = useUserInfoStore();
-  //   const { projects, setUserInfo, setProjectsInfo } = useUserInfoStore();
+
   useAuth();
 
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
