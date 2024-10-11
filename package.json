@@ -21,6 +21,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-error-boundary": "^4.0.11",
+    "sendbird-calls": "^1.10.19",
     "tldraw": "^3.0.2",
     "wavesurfer.js": "^7.8.6",
     "zustand": "^5.0.0-rc.2"
