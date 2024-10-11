@@ -99,7 +99,7 @@ export default function Timer() {
   const seconds = time % 60;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col border-b border-[#E9E9E9]">
       <h1 className="text-3xl text-[#FF2323] text-center my-1">
         {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
       </h1>
