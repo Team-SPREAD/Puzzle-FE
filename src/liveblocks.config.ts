@@ -40,7 +40,7 @@ export type UserMeta = {
   info: {
     name: string;
     color: [string, string];
-    avatar?: string;
+    avatar: string;
   };
 };
 
