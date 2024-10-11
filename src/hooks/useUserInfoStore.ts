@@ -23,6 +23,7 @@ interface UserInfo {
   teams: Team[];
   projects: Project[];
   token: string;
+  avatar: string;
 }
 
 interface UserInfoStore extends UserInfo {
@@ -40,6 +41,7 @@ const initialUserInfo: UserInfo = {
   teams: [],
   projects: [],
   token: '',
+  avatar: '',
 };
 
 const useUserInfoStore = create<UserInfoStore>((set) => ({
