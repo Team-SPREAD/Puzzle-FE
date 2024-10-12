@@ -50,6 +50,8 @@ import Cursors from "@/components/Cursors";
 import useUserInfoStore from "@/hooks/useUserInfoStore";
 import RightNav from "../Layout/RightNav";
 import Avatar from '@/components/Avatar';
+import ProcessNav from '@/components/Layout/ProcessNav/Index';
+import { steps } from '@/lib/process-data';
 
 const MAX_LAYERS = 100;
 
@@ -57,12 +59,21 @@ const Canvas = () => {
   const userInfo = useUserInfoStore();
   const layerIds = useStorage((root) => root.layerIds);
   const cursorPanel = useRef(null);
+  const [currentStep, setCurrentStep] = useState(1); //프로젝트 1단계
 
   const pencilDraft = useSelf((me) => me.presence.pencilDraft);
   const [canvasState, setState] = useState<CanvasState>({
     mode: CanvasMode.None,
   });
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
+  const handleSetCamera = useCallback((position: { x: number; y: number; zoom: number }) => {
+    setCamera({ x: position.x, y: position.y });
+    const newStep = steps.findIndex(step => step.camera.x === position.x && step.camera.y === position.y) + 1;
+    setCurrentStep(newStep);
+  }, []);
+
+
+
   const [lastUsedColor, setLastUsedColor] = useState<Color>({
     r: 252,
     g: 142,
@@ -75,6 +86,19 @@ const Canvas = () => {
   useDisableScrollBounce();
 
   const deleteLayers = useDeleteLayers();
+
+
+  /** 
+   * 단계를 위한 useEffect
+   * 
+  */
+  useEffect(() => {
+    const currentStepData = steps[currentStep - 1];
+    if (currentStepData) {
+      setCamera({ x: currentStepData.camera.x, y: currentStepData.camera.y });
+    }
+  }, [currentStep]);
+
 
   /**
    * Hook used to listen to Undo / Redo and delete selected layers
@@ -494,15 +518,19 @@ const Canvas = () => {
 
   return (
     <div className="w-full h-full relative bg-surface-canvas touch-none">
-      <div className="w-40 h-20 absolute top-4 right-4 z-10">
-        <Avatar/>
-      </div>
-      <div className="w-fit h-fit absolute top-16 left-40 z-10">
+      <ProcessNav
+        userInfo={userInfo}
+        setCamera={handleSetCamera}
+        currentStep={currentStep}
+        processes={steps}
+      />
+
+      <div className="w-fit h-fit absolute top-20 left-40 z-20">
         <RightNav />
       </div>
 
       <div
-        className="w-full h-full relative bg-surface-canvas touch-none"
+        className="w-full h-full relative bg-surface-canvas touch-none pt-16" // ProcessNav의 높이만큼 상단 패딩 추가
         ref={cursorPanel}
       >
         <Cursors cursorPanel={cursorPanel} />
@@ -567,14 +595,16 @@ const Canvas = () => {
           </g>
         </svg>
       </div>
-      <ToolsBar
-        canvasState={canvasState}
-        setCanvasState={setState}
-        undo={history.undo}
-        redo={history.redo}
-        canUndo={canUndo}
-        canRedo={canRedo}
-      />
+      <div className="absolute bottom-0 left-0 z-30"> {/* right-0 제거, z-index 유지 */}
+        <ToolsBar
+          canvasState={canvasState}
+          setCanvasState={setState}
+          undo={history.undo}
+          redo={history.redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        />
+      </div>
     </div>
   );
 };

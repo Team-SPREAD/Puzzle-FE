@@ -16,9 +16,9 @@ const GroupCall = (props: GroupCallProps) => {
         <Image src={audioIcon} alt="audioIcon" className="mr-2" />
         <p>음성 채팅</p>
       </div>
-      <LiveCallUsers />
+      {/* <LiveCallUsers /> */}
 
-      <GroupCallButton roomId="test" />
+      {/* <GroupCallButton roomId="test" /> */}
     </div>
   );
 };

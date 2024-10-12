@@ -26,10 +26,11 @@ export default function ToolsBar({
   canUndo,
   canRedo,
 }: Props) {
+
   return (
-    <div className="absolute bottom-6 right-0 left-0 flex items-center justify-center">
-      <div className="shadow-popup rounded-xl bg-surface-panel flex items-center justify-center">
-        <div className="flex items-center justify-center p-3">
+    <div className="fixed left-6 top-1/2 transform -translate-y-1/2 flex items-center z-50"> {/* fixed로 변경하고 z-index 추가 */}
+      <div className="shadow-popup rounded-xl bg-surface-panel flex flex-col items-center justify-center"> {/* flex-col 추가 */}
+        <div className="flex flex-col items-center justify-center p-3"> {/* flex-col 추가 */}
           <SelectionButton
             isActive={
               canvasState.mode === CanvasMode.None ||
@@ -94,8 +95,8 @@ export default function ToolsBar({
             }
           />
         </div>
-        <div className="w-[1px] bg-black bg-opacity-10 self-stretch"></div>
-        <div className="flex items-center justify-center p-3">
+        <div className="h-[1px] w-full bg-black bg-opacity-10"></div> {/* 가로 구분선으로 변경 */}
+        <div className="flex flex-col items-center justify-center p-3"> {/* flex-col 추가 */}
           <UndoButton onClick={undo} disabled={!canUndo} />
           <RedoButton onClick={redo} disabled={!canRedo} />
         </div>

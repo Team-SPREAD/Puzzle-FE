@@ -6,7 +6,7 @@ import GroupCall from './GroupCall';
 
 export default function RightNav() {
   return (
-    <div className="fixed right-4 w-[240px] h-[640px]  py-2 shadow-xl rounded-[4px] border-[1px] border-[#F0F0F0]">
+    <div className="fixed right-4 w-[240px] h-[540px]  py-2 shadow-xl rounded-[4px] border-[1px] border-[#F0F0F0]">
       {/* 타이머 */}
       <div className="py-4 px-5">
         <Timer />

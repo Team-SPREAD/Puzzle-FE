@@ -176,3 +176,11 @@ export enum CanvasMode {
    */
   Pencil,
 }
+
+export type Process = {
+  step: number;
+  title: string;
+  description: string;
+  camera: { x: number; y: number };
+  done: boolean;
+};
