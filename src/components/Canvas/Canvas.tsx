@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   useCallback,
@@ -6,8 +6,8 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { nanoid } from "nanoid";
+} from 'react';
+import { nanoid } from 'nanoid';
 import {
   useMutation,
   useHistory,
@@ -17,8 +17,8 @@ import {
   useCanUndo,
   useCanRedo,
   useMyPresence,
-} from "@/liveblocks.config";
-import { LiveObject } from "@liveblocks/client";
+} from '@/liveblocks.config';
+import { LiveObject } from '@liveblocks/client';
 import {
   Color,
   Layer,
@@ -29,7 +29,7 @@ import {
   Side,
   XYWH,
   Point,
-} from "@/lib/types";
+} from '@/lib/types';
 import {
   colorToCss,
   connectionIdToColor,
@@ -37,18 +37,18 @@ import {
   penPointsToPathLayer,
   pointerEventToCanvasPoint,
   resizeBounds,
-} from "@/lib/utils";
-import SelectionBox from "@/components/SelectionBox";
-import LayerComponent from "@/components/LayerComponent";
-import SelectionTools from "@/components/SelectionTools";
-import useDisableScrollBounce from "@/hooks/useDisableScrollBounce";
-import useDeleteLayers from "@/hooks/useDeleteLayers";
-import Drafts from "@/components/Drafts";
-import Path from "@/components/Path";
-import ToolsBar from "@/components/ToolsBar";
-import Cursors from "@/components/Cursors";
-import useUserInfoStore from "@/hooks/useUserInfoStore";
-import RightNav from "../Layout/RightNav";
+} from '@/lib/utils';
+import SelectionBox from '@/components/SelectionBox';
+import LayerComponent from '@/components/LayerComponent';
+import SelectionTools from '@/components/SelectionTools';
+import useDisableScrollBounce from '@/hooks/useDisableScrollBounce';
+import useDeleteLayers from '@/hooks/useDeleteLayers';
+import Drafts from '@/components/Drafts';
+import Path from '@/components/Path';
+import ToolsBar from '@/components/ToolsBar';
+import Cursors from '@/components/Cursors';
+import useUserInfoStore from '@/hooks/useUserInfoStore';
+import RightNav from '../Layout/RightNav';
 import Avatar from '@/components/Avatar';
 import ProcessNav from '@/components/Layout/ProcessNav/Index';
 import { steps } from '@/lib/process-data';
@@ -66,13 +66,18 @@ const Canvas = () => {
     mode: CanvasMode.None,
   });
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
-  const handleSetCamera = useCallback((position: { x: number; y: number; zoom: number }) => {
-    setCamera({ x: position.x, y: position.y });
-    const newStep = steps.findIndex(step => step.camera.x === position.x && step.camera.y === position.y) + 1;
-    setCurrentStep(newStep);
-  }, []);
-
-
+  const handleSetCamera = useCallback(
+    (position: { x: number; y: number; zoom: number }) => {
+      setCamera({ x: position.x, y: position.y });
+      const newStep =
+        steps.findIndex(
+          (step) =>
+            step.camera.x === position.x && step.camera.y === position.y,
+        ) + 1;
+      setCurrentStep(newStep);
+    },
+    [],
+  );
 
   const [lastUsedColor, setLastUsedColor] = useState<Color>({
     r: 252,
@@ -87,11 +92,10 @@ const Canvas = () => {
 
   const deleteLayers = useDeleteLayers();
 
-
-  /** 
+  /**
    * 단계를 위한 useEffect
-   * 
-  */
+   *
+   */
   useEffect(() => {
     const currentStepData = steps[currentStep - 1];
     if (currentStepData) {
@@ -99,18 +103,17 @@ const Canvas = () => {
     }
   }, [currentStep]);
 
-
   /**
    * Hook used to listen to Undo / Redo and delete selected layers
    */
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       switch (e.key) {
-        case "Backspace": {
+        case 'Backspace': {
           deleteLayers();
           break;
         }
-        case "z": {
+        case 'z': {
           if (e.ctrlKey || e.metaKey) {
             if (e.shiftKey) {
               history.redo();
@@ -123,10 +126,10 @@ const Canvas = () => {
       }
     }
 
-    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener('keydown', onKeyDown);
 
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener('keydown', onKeyDown);
     };
   }, [deleteLayers, history]);
 
@@ -150,7 +153,7 @@ const Canvas = () => {
       }
       setState({ mode: CanvasMode.Translating, current: point });
     },
-    [setState, camera, history, canvasState.mode]
+    [setState, camera, history, canvasState.mode],
   );
 
   /**
@@ -165,7 +168,7 @@ const Canvas = () => {
         corner,
       });
     },
-    [history]
+    [history],
   );
 
   /**
@@ -179,14 +182,14 @@ const Canvas = () => {
         | LayerType.Rectangle
         | LayerType.Note
         | LayerType.Text,
-      position: Point
+      position: Point,
     ) => {
-      const liveLayers = storage.get("layers");
+      const liveLayers = storage.get('layers');
       if (liveLayers.size >= MAX_LAYERS) {
         return;
       }
 
-      const liveLayerIds = storage.get("layerIds");
+      const liveLayerIds = storage.get('layerIds');
       const layerId = nanoid();
       const layer = new LiveObject({
         type: layerType,
@@ -202,17 +205,17 @@ const Canvas = () => {
       setMyPresence({ selection: [layerId] }, { addToHistory: true });
       setState({ mode: CanvasMode.None });
     },
-    [lastUsedColor]
+    [lastUsedColor],
   );
 
   const insertInitialLayer = useMutation(
     ({ storage, setMyPresence }) => {
-      const liveLayers = storage.get("layers");
+      const liveLayers = storage.get('layers');
       if (liveLayers.size >= MAX_LAYERS) {
         return;
       }
 
-      const liveLayerIds = storage.get("layerIds");
+      const liveLayerIds = storage.get('layerIds');
       const layerId = nanoid();
       const layer = new LiveObject({
         type: LayerType.Ellipse,
@@ -228,7 +231,7 @@ const Canvas = () => {
       setMyPresence({ selection: [layerId] }, { addToHistory: true });
       setState({ mode: CanvasMode.None });
     },
-    [lastUsedColor]
+    [lastUsedColor],
   );
 
   /**
@@ -236,7 +239,7 @@ const Canvas = () => {
    */
   const insertPath = useMutation(
     ({ storage, self, setMyPresence }) => {
-      const liveLayers = storage.get("layers");
+      const liveLayers = storage.get('layers');
       const { pencilDraft } = self.presence;
       if (
         pencilDraft == null ||
@@ -250,15 +253,15 @@ const Canvas = () => {
       const id = nanoid();
       liveLayers.set(
         id,
-        new LiveObject(penPointsToPathLayer(pencilDraft, lastUsedColor))
+        new LiveObject(penPointsToPathLayer(pencilDraft, lastUsedColor)),
       );
 
-      const liveLayerIds = storage.get("layerIds");
+      const liveLayerIds = storage.get('layerIds');
       liveLayerIds.push(id);
       setMyPresence({ pencilDraft: null });
       setState({ mode: CanvasMode.Pencil });
     },
-    [lastUsedColor]
+    [lastUsedColor],
   );
 
   /**
@@ -275,20 +278,20 @@ const Canvas = () => {
         y: point.y - canvasState.current.y,
       };
 
-      const liveLayers = storage.get("layers");
+      const liveLayers = storage.get('layers');
       for (const id of self.presence.selection) {
         const layer = liveLayers.get(id);
         if (layer) {
           layer.update({
-            x: layer.get("x") + offset.x,
-            y: layer.get("y") + offset.y,
+            x: layer.get('x') + offset.x,
+            y: layer.get('y') + offset.y,
           });
         }
       }
 
       setState({ mode: CanvasMode.Translating, current: point });
     },
-    [canvasState]
+    [canvasState],
   );
 
   /**
@@ -303,16 +306,16 @@ const Canvas = () => {
       const bounds = resizeBounds(
         canvasState.initialBounds,
         canvasState.corner,
-        point
+        point,
       );
 
-      const liveLayers = storage.get("layers");
+      const liveLayers = storage.get('layers');
       const layer = liveLayers.get(self.presence.selection[0]);
       if (layer) {
         layer.update(bounds);
       }
     },
-    [canvasState]
+    [canvasState],
   );
 
   const unselectLayers = useMutation(({ self, setMyPresence }) => {
@@ -331,7 +334,7 @@ const Canvas = () => {
         penColor: lastUsedColor,
       });
     },
-    [lastUsedColor]
+    [lastUsedColor],
   );
 
   /**
@@ -352,13 +355,13 @@ const Canvas = () => {
         cursor: point,
         pencilDraft:
           pencilDraft.length === 1 &&
-            pencilDraft[0][0] === point.x &&
-            pencilDraft[0][1] === point.y
+          pencilDraft[0][0] === point.x &&
+          pencilDraft[0][1] === point.y
             ? pencilDraft
             : [...pencilDraft, [point.x, point.y, e.pressure]],
       });
     },
-    [canvasState.mode]
+    [canvasState.mode],
   );
 
   /**
@@ -381,7 +384,7 @@ const Canvas = () => {
    */
   const updateSelectionNet = useMutation(
     ({ storage, setMyPresence }, current: Point, origin: Point) => {
-      const layers = storage.get("layers").toImmutable();
+      const layers = storage.get('layers').toImmutable();
       setState({
         mode: CanvasMode.SelectionNet,
         origin: origin,
@@ -391,11 +394,11 @@ const Canvas = () => {
         layerIds,
         layers,
         origin,
-        current
+        current,
       );
       setMyPresence({ selection: ids });
     },
-    [layerIds]
+    [layerIds],
   );
 
   const selections = useOthersMapped((other) => other.presence.selection);
@@ -439,7 +442,7 @@ const Canvas = () => {
 
       setState({ origin: point, mode: CanvasMode.Pressing });
     },
-    [camera, canvasState.mode, setState, startDrawing]
+    [camera, canvasState.mode, setState, startDrawing],
   );
 
   const onPointerMove = useMutation(
@@ -467,16 +470,16 @@ const Canvas = () => {
       startMultiSelection,
       translateSelectedLayers,
       updateSelectionNet,
-    ]
+    ],
   );
 
   const onPointerLeave = useMutation(
     ({ setMyPresence }) => setMyPresence({ cursor: null }),
-    []
+    [],
   );
 
   const onPointerUp = useMutation(
-    ({ }, e) => {
+    ({}, e) => {
       const point = pointerEventToCanvasPoint(e, camera);
 
       if (
@@ -506,7 +509,7 @@ const Canvas = () => {
       insertPath,
       setState,
       unselectLayers,
-    ]
+    ],
   );
 
   // Insert the first layer when the user joins the room
@@ -605,6 +608,9 @@ const Canvas = () => {
         </div>
   
         
+      </div>
+      <div className="absolute bottom-0 right-0 z-30">
+        <RightNav />
       </div>
     </div>
   );
