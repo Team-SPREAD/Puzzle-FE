@@ -1,6 +1,10 @@
-import { useOthersMapped, useUpdateMyPresence } from "@/liveblocks.config";
+import {
+  useOthersMapped,
+  useSelf,
+  useUpdateMyPresence,
+} from "@/liveblocks.config";
 import Cursor from "./Cursor";
-import { MutableRefObject, useEffect, useCallback } from "react";
+import { MutableRefObject, useEffect } from "react";
 import { shallow } from "@liveblocks/client";
 import { useBoundingClientRectRef } from "@/utils/useBoundingClientRectRef";
 
@@ -10,59 +14,59 @@ type Props = {
 
 const Cursors = ({ cursorPanel }: Props) => {
   const updateMyPresence = useUpdateMyPresence();
+  const me = useSelf();
+
   const others = useOthersMapped(
     (other) => ({
       cursor: other.presence.cursor,
       info: other.info,
+      currentProcess: other.presence.currentProcess,
     }),
-    shallow
+    shallow,
   );
   const rectRef = useBoundingClientRectRef(cursorPanel);
 
-  const updateCursor = useCallback((event: PointerEvent) => {
-    if (!cursorPanel.current) return;
-
-    const x = event.clientX - rectRef.current.x + cursorPanel.current.scrollLeft;
-    const y = event.clientY - rectRef.current.y + cursorPanel.current.scrollTop;
-
-    updateMyPresence({
-      cursor: {
-        x: Math.round(x),
-        y: Math.round(y),
-      },
-    });
-  }, [updateMyPresence, cursorPanel, rectRef]);
-
-  const removeCursor = useCallback(() => {
-    updateMyPresence({ cursor: null });
-  }, [updateMyPresence]);
-
   useEffect(() => {
-    const currentPanel = cursorPanel.current;
-    if (!currentPanel) return;
+    if (!(cursorPanel?.current instanceof HTMLElement)) {
+      console.warn('"cursorPanel"이 현재 HTMLElement가 아닙니다.');
+      return;
+    }
 
-    currentPanel.addEventListener("pointermove", updateCursor);
-    currentPanel.addEventListener("pointerleave", removeCursor);
-
-    return () => {
-      currentPanel.removeEventListener("pointermove", updateCursor);
-      currentPanel.removeEventListener("pointerleave", removeCursor);
+    const removeCursor = () => {
+      updateMyPresence({
+        cursor: null,
+      });
     };
-  }, [cursorPanel, updateCursor, removeCursor]);
+
+    cursorPanel.current.addEventListener("pointerleave", removeCursor);
+
+    const oldRef = cursorPanel.current;
+    return () => {
+      if (!oldRef) {
+        return;
+      }
+
+      oldRef.removeEventListener("pointerleave", removeCursor);
+    };
+  }, [updateMyPresence, cursorPanel, rectRef]);
 
   return (
     <>
-      {others.map(([id, other]) => (
-        other.cursor && (
+      {others.map(([id, other]) => {
+        if (other.cursor == null) {
+          return null;
+        }
+
+        return (
           <Cursor
             key={id}
             name={other.info.name}
             color={other.info.color}
             x={other.cursor.x}
-            y={other.cursor.y}
+            y={other.cursor.y - (me.presence.currentProcess - 1) * 1000}
           />
-        )
-      ))}
+        );
+      })}
     </>
   );
 };
