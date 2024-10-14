@@ -517,93 +517,94 @@ const Canvas = () => {
   }, [insertInitialLayer, layerIds.length]);
 
   return (
-    <div className="w-full h-full relative bg-surface-canvas touch-none">
+    <div className="w-full h-screen flex flex-col relative bg-surface-canvas touch-none overflow-hidden">
       <ProcessNav
         userInfo={userInfo}
         setCamera={handleSetCamera}
         currentStep={currentStep}
         processes={steps}
       />
-
-      <div className="w-fit h-fit absolute top-20 left-40 z-20">
-        <RightNav />
-      </div>
-
-      <div
-        className="w-full h-full relative bg-surface-canvas touch-none pt-16" // ProcessNav의 높이만큼 상단 패딩 추가
-        ref={cursorPanel}
-      >
-        <Cursors cursorPanel={cursorPanel} />
-        <SelectionTools
-          isAnimated={
-            canvasState.mode !== CanvasMode.Translating &&
-            canvasState.mode !== CanvasMode.Resizing
-          }
-          camera={camera}
-          setLastUsedColor={setLastUsedColor}
-        />
-        <svg
-          className="w-screen h-screen"
-          onWheel={onWheel}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerLeave={onPointerLeave}
-          onPointerUp={onPointerUp}
+  
+      <div className="flex-1 relative">
+        <div className="absolute top-40 left-4 z-20">
+          <RightNav />
+        </div>
+  
+        <div
+          className="w-full h-full relative bg-surface-canvas touch-none"
+          ref={cursorPanel}
         >
-          <g
-            style={{
-              transform: `translate(${camera.x}px, ${camera.y}px)`,
-            }}
+          <Cursors cursorPanel={cursorPanel} />
+          <SelectionTools
+            isAnimated={
+              canvasState.mode !== CanvasMode.Translating &&
+              canvasState.mode !== CanvasMode.Resizing
+            }
+            camera={camera}
+            setLastUsedColor={setLastUsedColor}
+          />
+          <svg
+            className="w-full h-full"
+            onWheel={onWheel}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerLeave={onPointerLeave}
+            onPointerUp={onPointerUp}
           >
-            {layerIds.map((layerId) => (
-              <LayerComponent
-                key={layerId}
-                id={layerId}
-                mode={canvasState.mode}
-                onLayerPointerDown={onLayerPointerDown}
-                selectionColor={layerIdsToColorSelection[layerId]}
+            <g
+              style={{
+                transform: `translate(${camera.x}px, ${camera.y}px)`,
+              }}
+            >
+              {layerIds.map((layerId) => (
+                <LayerComponent
+                  key={layerId}
+                  id={layerId}
+                  mode={canvasState.mode}
+                  onLayerPointerDown={onLayerPointerDown}
+                  selectionColor={layerIdsToColorSelection[layerId]}
+                />
+              ))}
+              <SelectionBox
+                onResizeHandlePointerDown={onResizeHandlePointerDown}
               />
-            ))}
-            {/* Blue square that show the selection of the current users. Also contains the resize handles. */}
-            <SelectionBox
-              onResizeHandlePointerDown={onResizeHandlePointerDown}
-            />
-            {/* Selection net that appears when the user is selecting multiple layers at once */}
-            {canvasState.mode === CanvasMode.SelectionNet &&
-              canvasState.current != null && (
-                <rect
-                  className="fill-primary opacity-5 stroke-primary stroke-[0.5px]"
-                  x={Math.min(canvasState.origin.x, canvasState.current.x)}
-                  y={Math.min(canvasState.origin.y, canvasState.current.y)}
-                  width={Math.abs(canvasState.origin.x - canvasState.current.x)}
-                  height={Math.abs(
-                    canvasState.origin.y - canvasState.current.y
-                  )}
+              {canvasState.mode === CanvasMode.SelectionNet &&
+                canvasState.current != null && (
+                  <rect
+                    className="fill-primary opacity-5 stroke-primary stroke-[0.5px]"
+                    x={Math.min(canvasState.origin.x, canvasState.current.x)}
+                    y={Math.min(canvasState.origin.y, canvasState.current.y)}
+                    width={Math.abs(canvasState.origin.x - canvasState.current.x)}
+                    height={Math.abs(
+                      canvasState.origin.y - canvasState.current.y
+                    )}
+                  />
+                )}
+              <Drafts />
+              {pencilDraft != null && pencilDraft.length > 0 && (
+                <Path
+                  points={pencilDraft}
+                  fill={colorToCss(lastUsedColor)}
+                  x={0}
+                  y={0}
                 />
               )}
-            <Drafts />
-            <div className="absolute top-[200px] w-full h-full">gd</div>
-            {/* Drawing in progress. Still not commited to the storage. */}
-            {pencilDraft != null && pencilDraft.length > 0 && (
-              <Path
-                points={pencilDraft}
-                fill={colorToCss(lastUsedColor)}
-                x={0}
-                y={0}
-              />
-            )}
-          </g>
-        </svg>
-      </div>
-      <div className="absolute bottom-0 left-0 z-30"> {/* right-0 제거, z-index 유지 */}
-        <ToolsBar
-          canvasState={canvasState}
-          setCanvasState={setState}
-          undo={history.undo}
-          redo={history.redo}
-          canUndo={canUndo}
-          canRedo={canRedo}
-        />
+            </g>
+          </svg>
+        </div>
+  
+        <div className="absolute bottom-4 left-4 z-30">
+          <ToolsBar
+            canvasState={canvasState}
+            setCanvasState={setState}
+            undo={history.undo}
+            redo={history.redo}
+            canUndo={canUndo}
+            canRedo={canRedo}
+          />
+        </div>
+  
+        
       </div>
     </div>
   );

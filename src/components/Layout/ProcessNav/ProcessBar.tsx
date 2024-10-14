@@ -7,15 +7,22 @@ const icons = [Star, Flag, Pencil, Star, Cloud, UserCircle, Users, FileText];
 interface ProcessBarProps {
   processes: Process[];
   currentStep: number;
-  setCamera: (position: { x: number; y: number; zoom: number }) => void;
+  setCamera: (position: { x: number; y: number }) => void;
   userInfo: {
-    id: string;
+    _id: string;
     name: string;
     avatar: string;
   };
+  updateCurrentProcess: (step: number) => void;
 }
 
-const ProcessBar: React.FC<ProcessBarProps> = ({ processes, currentStep, setCamera, userInfo }) => {
+const ProcessBar: React.FC<ProcessBarProps> = ({ 
+  processes, 
+  currentStep, 
+  setCamera, 
+  userInfo,
+  updateCurrentProcess
+}) => {
   return (
     <div className="flex items-center">
       {processes.map((process, index) => (
@@ -30,9 +37,16 @@ const ProcessBar: React.FC<ProcessBarProps> = ({ processes, currentStep, setCame
               />
             )}
             <button
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${process.step <= currentStep ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'
-                } transition-colors duration-200 hover:bg-blue-600`}
-              onClick={() => setCamera({ x: process.camera.x, y: process.camera.y, zoom: 1 })}
+              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                process.step <= currentStep ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'
+              } transition-colors duration-200 hover:bg-blue-600`}
+              onClick={() => {
+                setCamera({
+                  x: process.camera.x,
+                  y: process.camera.y,
+                });
+                updateCurrentProcess(process.step);
+              }}
               title={process.title}
             >
               {React.createElement(icons[index], { size: 20 })}
