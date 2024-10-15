@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@liveblocks/react/suspense';
 import { ActiveUserInfo } from '@/liveblocks.config';
 import phoneIcon from '~/images/phone.svg';
@@ -10,17 +10,15 @@ import microPhone from '~/images/microphone.svg';
 import Image from 'next/image';
 import testUserIcon from '~/images/testUserIcon.jpeg';
 import useUserInfoStore from '@/hooks/useUserInfoStore';
-import SendBirdCall from 'sendbird-calls';
+import SendBirdCall, { Room } from 'sendbird-calls';
 import { useSendBirdInit } from '@/hooks/useSendBirdCalls';
+import { LiveObject, LiveList } from '@liveblocks/client';
+import { addActiveUser, removeActiveUser } from '@/utils/activeUserUtils';
 
-interface TypeGroupCallId {
-  roomId: string;
-}
-
-export default function GroupCallController(groupCallId: TypeGroupCallId) {
-  const [isCalling, setIsCalling] = useState(false);
+export default function GroupCallController() {
   const userInfo = useUserInfoStore();
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [isCalling, setIsCalling] = useState(false);
 
   const roomParams = {
     roomType: SendBirdCall.RoomType.LARGE_ROOM_FOR_AUDIO_ONLY,
@@ -30,90 +28,171 @@ export default function GroupCallController(groupCallId: TypeGroupCallId) {
     videoEnabled: false, // 비디오 미사용
     audioEnabled: true, // 오디오만 출력
   };
-  const updateRoomId = useMutation(({ storage }, roomId: string) => {
-    const groupCallId = storage.get('groupCall');
-    groupCallId.set('roomId', roomId);
-  }, []);
-  const addToActiveUsers = useMutation(({ storage }, user: ActiveUserInfo) => {
-    const groupCallActiveUsers = storage.get('groupCall')!.get('activeUsers');
-
-    groupCallActiveUsers.push(user);
-  }, []);
-
-  const exitFromActiveUsers = useMutation(({ storage }) => {
-    const groupCallActiveUsers = storage.get('groupCall')!.get('activeUsers');
-    const userIndex = groupCallActiveUsers.findIndex(
-      (user: ActiveUserInfo) => user.id === userInfo._id,
-    );
-    if (userIndex !== -1) {
-      groupCallActiveUsers.delete(userIndex);
-    } else {
-      console.log('삭제할 유저를 찾을 수 없습니다.');
-    }
-  }, []);
 
   //sendbird 초기화 및 유저 인증 과정
   const authToken = localStorage.getItem('authToken');
-  const authOption = { userId: userInfo._id, accessToken: authToken! }; // Authentication options using user information
+  const authOption = { userId: userInfo._id, accessToken: authToken! };
   useSendBirdInit(authOption);
 
-  const GroupCallIn = async () => {
-    // 아직 프로젝트 내에 그룹 콜이 진행되지 않은 경우, 새로운 방 생성
-    if (!groupCallId.roomId) {
-      SendBirdCall.createRoom(roomParams).then((room) => {
-        updateRoomId(room.roomId); // 프로젝트 내 그룹 콜 ID 설정
-      });
+  //필요시 사용
+  // const updateRoomId = useMutation(({ storage }, roomId: string) => {
+  //   const groupCallId = storage.get('groupCall') as
+  //     | LiveObject<{ roomId: string; activeUsers: LiveList<ActiveUserInfo> }>
+  //     | undefined;
+  //   if (!groupCallId) {
+  //     console.error('groupCall 객체를 찾을 수 없습니다.');
+  //     return;
+  //   }
+  //   groupCallId.set('roomId', roomId);
+  // }, []);
+
+  //그룹에 참가한 유저를 liveblocks storage에 추가
+  const addToActiveUsers = useMutation(({ storage }, user: ActiveUserInfo) => {
+    const groupCall = storage.get('groupCall') as
+      | LiveObject<{ roomId: string; activeUsers: LiveList<ActiveUserInfo> }>
+      | undefined;
+    if (!groupCall) {
+      console.error('groupCall 객체를 찾을 수 없습니다.');
+      return;
     }
-    SendBirdCall.fetchRoomById(groupCallId.roomId).then((room) => {
+    addActiveUser(groupCall, user);
+  }, []);
+  //그룹에서 나간 유저를 liveblocks storage에 제거
+  const exitFromActiveUsers = useMutation(({ storage }) => {
+    const groupCall = storage.get('groupCall') as
+      | LiveObject<{ roomId: string; activeUsers: LiveList<ActiveUserInfo> }>
+      | undefined;
+    if (!groupCall) {
+      console.error('groupCall 객체를 찾을 수 없습니다.');
+      return;
+    }
+    removeActiveUser(groupCall, userInfo._id);
+  }, []);
+
+  //GroupCall에 참가하는 함수
+  const GroupCallIn = useMutation(async ({ storage }) => {
+    const groupCall = storage.get('groupCall') as
+      | LiveObject<{ roomId: string; activeUsers: LiveList<ActiveUserInfo> }>
+      | undefined;
+
+    if (!groupCall) {
+      console.error('groupCall 객체가 존재하지 않습니다.');
+      return;
+    }
+
+    const roomId = groupCall.get('roomId'); // 스토리지에서 roomId 가져오기
+
+    // roomId가 없을 경우 방 생성
+    if (!roomId) {
+      try {
+        const createNewRoom = async () => {
+          const room = await SendBirdCall.createRoom(roomParams);
+          console.log('방 생성 성공:', room);
+
+          // 방 생성 후 roomId를 업데이트
+          groupCall.set('roomId', room.roomId);
+
+          // 방 입장
+          const fetchedRoom = await SendBirdCall.fetchRoomById(room.roomId);
+          await enterRoom(fetchedRoom);
+        };
+
+        createNewRoom();
+      } catch (error) {
+        console.error('방 생성 실패: ', error);
+      }
+    } else {
+      // roomId가 이미 있을 경우 방 입장
+      try {
+        const room = SendBirdCall.getCachedRoomById(roomId);
+
+        if (!room) {
+          const fetchedRoom = await SendBirdCall.fetchRoomById(roomId);
+          await enterRoom(fetchedRoom);
+        } else {
+          await enterRoom(room);
+        }
+      } catch (error) {
+        console.error('방 입장 실패: ', error);
+      }
+    }
+  }, []);
+
+  const enterRoom = async (room: Room) => {
+    try {
       if (
         room.participants.filter(
           (participant) => participant.user.userId === userInfo._id,
         ).length > 0
       ) {
         console.log('이미 참여한 방입니다.');
-        return;
-      } else {
-        room
-          .enter(enterParams)
-          .then(() => {
-            if (!audioRef.current) return;
-
-            room.setAudioForLargeRoom(audioRef.current); // 오디오 설정
-            audioRef.current!.muted = false; // 음소거 설정
-
-            setIsCalling(true);
-            addToActiveUsers({
-              name: userInfo.name,
-              id: userInfo._id,
-              avatar: userInfo.avatar,
-              email: userInfo.email,
-              enteredAt: Date.now(),
-            });
-          })
-          .catch((error) => {
-            console.error('입장 실패: ', error);
-          });
-
-        room.addEventListener('remoteParticipantEntered', (participant) => {
-          console.log('다른 참가자가 입장했습니다. 참가자:', participant);
-        });
-      }
-    });
-  };
-  const GroupCallOut = useCallback(() => {
-    const room = SendBirdCall.getCachedRoomById(groupCallId.roomId);
-    try {
-      if (!room) {
-        console.log('방이 존재하지 않습니다.');
+        setIsCalling(true);
         return;
       }
-      room.exit();
-      setIsCalling(false);
-      exitFromActiveUsers();
+
+      await room.enter(enterParams);
+      if (!audioRef.current) return;
+
+      room.setAudioForLargeRoom(audioRef.current);
+      audioRef.current!.muted = false;
+
+      setIsCalling(true);
+
+      addToActiveUsers({
+        name: userInfo.name,
+        id: userInfo._id,
+        avatar: userInfo.avatar,
+        email: userInfo.email,
+        enteredAt: Date.now(),
+      });
     } catch (error) {
-      console.log('방에 참여하지 않은 상태입니다.');
+      console.error('입장 실패: ', error);
     }
-  }, [groupCallId.roomId, exitFromActiveUsers]);
+  };
+
+  const GroupCallOut = useMutation(
+    ({ storage }) => {
+      const groupCall = storage.get('groupCall') as
+        | LiveObject<{ roomId: string; activeUsers: LiveList<ActiveUserInfo> }>
+        | undefined;
+
+      if (!groupCall) {
+        console.log('groupCall 객체가 존재하지 않습니다.');
+        return;
+      }
+
+      const roomId = groupCall.get('roomId'); // 스토리지에서 roomId 가져오기
+      const room = SendBirdCall.getCachedRoomById(roomId); // 수정된 부분
+
+      try {
+        if (!roomId) {
+          console.log('방이 존재하지 않습니다.');
+          return;
+        }
+        room.exit();
+        setIsCalling(false);
+        exitFromActiveUsers();
+      } catch (error) {
+        console.log('방에 참여하지 않은 상태입니다.');
+        setIsCalling(false);
+      }
+    },
+    [exitFromActiveUsers],
+  );
+
+  // 브라우저가 닫히거나 페이지가 떠날 때 유저를 ActiveUser에서 제거
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      exitFromActiveUsers();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      handleBeforeUnload();
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [exitFromActiveUsers]);
 
   return (
     <div className="flex w-full h-8 items-center justify-center px-1 rounded-[4px] border border-[#E9E9E9]">

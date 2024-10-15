@@ -51,7 +51,7 @@ export default function RightNav() {
           </div>
           <div className="py-2 px-3">
             {/* 룸아이디 임시 */}
-            <GroupCall roomId="1" />
+            <GroupCall />
           </div>
         </div>
       </motion.div>
