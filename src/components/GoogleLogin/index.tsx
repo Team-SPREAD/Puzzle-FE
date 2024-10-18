@@ -2,11 +2,11 @@
 
 import Image from 'next/image';
 import googleIcon from '~/images/logo/google-logo.svg';
+
 const GoogleLoginButton = () => {
   const handleGoogleLogin = () => {
     window.location.href = 'http://kim-sun-woo.com/auth/google/';
   };
-
   return (
     <div
       onClick={handleGoogleLogin}
