@@ -32,7 +32,7 @@ export default function TeamMembersBar({
       <div className="mt-auto">
         <button
           style={{ backgroundColor: buttonColor }}
-          className="w-10 h-10 rounded-full text-white flex items-center justify-center"
+          className="w-10 h-10 rounded-full text-white flex items-center justify-center text-[8px]"
           onClick={handleLogout}
         >
           로그아웃
