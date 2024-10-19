@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import useAuth from '@/hooks/useAuth';
 import Sidebar from '@/components/DashBoard/SideBar';
 import Header from '@/components/DashBoard/Header';
@@ -8,8 +9,13 @@ import ProjectGrid from '@/components/DashBoard/ProjectGrid';
 import TeamMembersBar from '@/components/DashBoard/TeamMembersBar';
 import { generateRandomColor } from '@/utils/getRandomColor';
 import useUserInfoStore from '@/hooks/useUserInfoStore';
+import useUserStore from '@/store/useUserStore';
+
 export default function DashboardPage() {
+  const { userId } = useParams();
+  const router = useRouter();
   const userInfo = useUserInfoStore();
+  const testUserInfo = useUserStore().userInfo;
   useAuth();
 
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
@@ -17,11 +23,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     setButtonColor(generateRandomColor());
-  }, []);
+  }, [router, testUserInfo, userId]);
 
   const filteredProjects =
     selectedTeamId === null
-      ? userInfo.projects // 개인 대시보드: 모든 프로젝트 표시
+      ? userInfo.projects
       : userInfo.projects.filter((p) => p.teamId === selectedTeamId);
 
   const dashboardTitle =
@@ -51,7 +57,7 @@ export default function DashboardPage() {
         <Header
           isDashboardPersonal={selectedTeamId === null}
           buttonColor={buttonColor}
-          userName={userInfo.name}
+          userName={testUserInfo.name}
         />
         <main className="flex-1 p-6 overflow-auto">
           <h1 className="text-2xl font-bold mb-4">{dashboardTitle}</h1>
