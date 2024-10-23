@@ -3,7 +3,7 @@ import { AuthOption } from 'sendbird-calls';
 const useSendBirdInit = async ({ userId, accessToken }: AuthOption) => {
   SendBirdCall.init(process.env.NEXT_PUBLIC_SENDBIRD_APP_ID!);
 
-  SendBirdCall.useMedia({ audio: true, video: true });
+  SendBirdCall.useMedia({ audio: true, video: false });
 
   try {
     const authOption = { userId, accessToken };
