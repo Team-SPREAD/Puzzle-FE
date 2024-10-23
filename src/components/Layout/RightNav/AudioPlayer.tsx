@@ -1,9 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import {
-  useBroadcastEvent,
-  useEventListener,
-} from '@liveblocks/react/suspense';
+import { useBroadcastEvent } from '@liveblocks/react/suspense';
+import { useEventListener } from '@/liveblocks.config';
 import Image from 'next/image';
 import WaveSurfer from 'wavesurfer.js';
 import playIcon from '~/images/play_red.svg';
@@ -66,6 +64,7 @@ export default function AudioPlayer() {
       setIsPlaying(false);
     }
   });
+
   return (
     <div className="border-b border-[#E9E9E9]">
       <div className="flex mt-6 items-center">

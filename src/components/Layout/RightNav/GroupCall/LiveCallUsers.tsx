@@ -1,7 +1,7 @@
 'use client';
 
 import LiveCallUser from './LiveCallUser';
-import { useStorage } from '@liveblocks/react/suspense';
+import { useStorage } from '@/liveblocks.config';
 
 export default function LiveCallUsers() {
   const activeUsers = useStorage((root) => root.groupCall.activeUsers);

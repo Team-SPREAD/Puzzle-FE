@@ -2,10 +2,7 @@
 import { useRef } from 'react';
 import Image from 'next/image';
 
-import {
-  useBroadcastEvent,
-  useEventListener,
-} from '@liveblocks/react/suspense';
+import { useBroadcastEvent, useEventListener } from '@/liveblocks.config';
 
 interface SoundBoxProps {
   name: string;

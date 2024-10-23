@@ -6,7 +6,7 @@ import {
   useEventListener,
   useStorage,
   useMutation,
-} from '@liveblocks/react/suspense';
+} from '@/liveblocks.config';
 import playIcon from '~/images/play.svg';
 import stopIcon from '~/images/stop.svg';
 
