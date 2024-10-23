@@ -1,6 +1,15 @@
 import React from 'react';
-import { Process } from "@/lib/types";
-import { Star, Flag, Pencil, Cloud, UserCircle, Users, FileText } from 'lucide-react';
+import { Process } from '@/lib/types';
+import {
+  Star,
+  Flag,
+  Pencil,
+  Cloud,
+  UserCircle,
+  Users,
+  FileText,
+} from 'lucide-react';
+import Image from 'next/image';
 
 const icons = [Star, Flag, Pencil, Star, Cloud, UserCircle, Users, FileText];
 
@@ -16,12 +25,12 @@ interface ProcessBarProps {
   updateCurrentProcess: (step: number) => void;
 }
 
-const ProcessBar: React.FC<ProcessBarProps> = ({ 
-  processes, 
-  currentStep, 
-  setCamera, 
+const ProcessBar: React.FC<ProcessBarProps> = ({
+  processes,
+  currentStep,
+  setCamera,
   userInfo,
-  updateCurrentProcess
+  updateCurrentProcess,
 }) => {
   return (
     <div className="flex items-center">
@@ -30,7 +39,7 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
           {index > 0 && <div className="w-4 h-[1px] bg-gray-300 mx-1" />}
           <div className="relative group">
             {process.step === currentStep && (
-              <img
+              <Image
                 src={userInfo.avatar}
                 alt={userInfo.name}
                 className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full border-2 border-white"
@@ -38,7 +47,9 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
             )}
             <button
               className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                process.step <= currentStep ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'
+                process.step <= currentStep
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-600'
               } transition-colors duration-200 hover:bg-blue-600`}
               onClick={() => {
                 setCamera({

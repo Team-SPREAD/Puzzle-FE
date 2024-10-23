@@ -5,10 +5,10 @@ import { HelpCircle, Plus } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import Image from 'next/image';
 import { useUpdateMyPresence } from '@/liveblocks.config';
-
+import puzzleLogo from '~/images/logo/logo.svg';
 interface ProcessNavProps {
   userInfo: {
-    id: string;
+    _id: string;
     name: string;
     avatar: string;
   };
@@ -35,12 +35,7 @@ const ProcessNav: React.FC<ProcessNavProps> = ({
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-10 px-4 py-3">
       <div className="max-w-[1400px] mx-auto flex items-center justify-between">
         <span className="text-2xl font-bold">
-          <Image
-            src="/images/logo/logo.svg"
-            alt="Logo"
-            width={100}
-            height={40}
-          />
+          <Image src={puzzleLogo} alt="Logo" width={100} height={40} />
         </span>
         <ProcessBar
           processes={processes}
