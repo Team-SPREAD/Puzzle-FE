@@ -66,18 +66,15 @@ const Canvas = () => {
     mode: CanvasMode.None,
   });
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
-  const handleSetCamera = useCallback(
-    (position: { x: number; y: number; zoom: number }) => {
-      setCamera({ x: position.x, y: position.y });
-      const newStep =
-        steps.findIndex(
-          (step) =>
-            step.camera.x === position.x && step.camera.y === position.y,
-        ) + 1;
-      setCurrentStep(newStep);
-    },
-    [],
-  );
+  const handleSetCamera = useCallback((position: { x: number; y: number }) => {
+    //postion 객체 안에 zoom: number 제거함
+    setCamera({ x: position.x, y: position.y });
+    const newStep =
+      steps.findIndex(
+        (step) => step.camera.x === position.x && step.camera.y === position.y,
+      ) + 1;
+    setCurrentStep(newStep);
+  }, []);
 
   const [lastUsedColor, setLastUsedColor] = useState<Color>({
     r: 252,
@@ -527,12 +524,12 @@ const Canvas = () => {
         currentStep={currentStep}
         processes={steps}
       />
-  
+
       <div className="flex-1 relative">
         <div className="absolute top-40 left-4 z-20">
           <RightNav />
         </div>
-  
+
         <div
           className="w-full h-full relative bg-surface-canvas touch-none"
           ref={cursorPanel}
@@ -577,9 +574,11 @@ const Canvas = () => {
                     className="fill-primary opacity-5 stroke-primary stroke-[0.5px]"
                     x={Math.min(canvasState.origin.x, canvasState.current.x)}
                     y={Math.min(canvasState.origin.y, canvasState.current.y)}
-                    width={Math.abs(canvasState.origin.x - canvasState.current.x)}
+                    width={Math.abs(
+                      canvasState.origin.x - canvasState.current.x,
+                    )}
                     height={Math.abs(
-                      canvasState.origin.y - canvasState.current.y
+                      canvasState.origin.y - canvasState.current.y,
                     )}
                   />
                 )}
@@ -595,7 +594,7 @@ const Canvas = () => {
             </g>
           </svg>
         </div>
-  
+
         <div className="absolute bottom-4 left-4 z-30">
           <ToolsBar
             canvasState={canvasState}
@@ -606,8 +605,6 @@ const Canvas = () => {
             canRedo={canRedo}
           />
         </div>
-  
-        
       </div>
       <div className="absolute bottom-0 right-0 z-30">
         <RightNav />

@@ -29,9 +29,10 @@ export function getRandomUser() {
   return USER_INFO[Math.floor(Math.random() * 10) % USER_INFO.length];
 }
 
-export function getUser(id: string) {
-  return USER_INFO.find((u) => u.id === id) || null;
-}
+//현재 사용하지 않은 함수여서 주석 처리 하였음
+// export function getUser(id: string) {
+//   return USER_INFO.find((u) => u.id === id) || null;
+// }
 
 export function getUsers() {
   return USER_INFO;
