@@ -21,7 +21,7 @@ const nextConfig = {
     return config;
   },
   typescript: {
-    ignoreBuildErrors: true, // 경고를 무시한채로 빌드 origin false , 테스트용 입니다.
+    ignoreBuildErrors: false, // 경고를 무시한채로 빌드 origin false , 테스트용 입니다.
   },
 };
 
