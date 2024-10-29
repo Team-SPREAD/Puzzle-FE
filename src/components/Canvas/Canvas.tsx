@@ -192,8 +192,8 @@ const Canvas = () => {
         type: layerType,
         x: position.x,
         y: position.y,
-        height: 100,
-        width: 100,
+        height: 40,
+        width: 200,
         fill: lastUsedColor,
       });
       liveLayerIds.push(layerId);

@@ -92,6 +92,7 @@ export type TextLayer = {
   width: number;
   fill: Color;
   value?: string;
+  isEditing?:boolean;
 };
 
 export type Point = {
