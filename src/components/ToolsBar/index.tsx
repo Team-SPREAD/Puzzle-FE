@@ -5,7 +5,7 @@ import EllipseButton from './EllipseButton';
 import UndoButton from './UndoButton';
 import RedoButton from './RedoButton';
 import SelectionButton from './SelectionButton';
-import { CanvasMode, LayerType, CanvasState ,Color} from '@/lib/types';
+import { CanvasMode, LayerType, CanvasState, Color } from '@/lib/types';
 import TextButton from './TextButton';
 import NoteButton from './NoteButton';
 
@@ -74,6 +74,8 @@ export default function ToolsBar({
                 layerType: LayerType.Text,
               })
             }
+            currentColor={currentColor}
+            onColorChange={onColorChange}
           />
 
           <RectangleButton

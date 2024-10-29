@@ -62,6 +62,7 @@ const Canvas = () => {
   const [currentStep, setCurrentStep] = useState(1); //프로젝트 1단계
   const [penSize, setPenSize] = useState(16); //펜 사이즈 use
   const pencilDraft = useSelf((me) => me.presence.pencilDraft);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | undefined>(); //text 컬러 상태관리
   const [canvasState, setState] = useState<CanvasState>({
     mode: CanvasMode.None,
   });
@@ -188,21 +189,37 @@ const Canvas = () => {
 
       const liveLayerIds = storage.get('layerIds');
       const layerId = nanoid();
-      const layer = new LiveObject({
-        type: layerType,
-        x: position.x,
-        y: position.y,
-        height: 40,
-        width: 200,
-        fill: lastUsedColor,
-      });
+
+      let layer;
+
+      if (layerType === LayerType.Text) {
+        layer = new LiveObject({
+          type: layerType,
+          x: position.x,
+          y: position.y,
+          width: 200,
+          height: 40,
+          fill: lastUsedColor, // 현재 선택된 색상 사용
+          value: '',
+        });
+      } else {
+        layer = new LiveObject({
+          type: layerType,
+          x: position.x,
+          y: position.y,
+          width: 100,
+          height: 100,
+          fill: lastUsedColor,
+        });
+      }
+
       liveLayerIds.push(layerId);
       liveLayers.set(layerId, layer);
 
       setMyPresence({ selection: [layerId] }, { addToHistory: true });
       setState({ mode: CanvasMode.None });
     },
-    [lastUsedColor],
+    [lastUsedColor], // lastUsedColor 의존성 추가
   );
 
   const insertInitialLayer = useMutation(
