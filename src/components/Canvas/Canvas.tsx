@@ -190,36 +190,52 @@ const Canvas = () => {
       const liveLayerIds = storage.get('layerIds');
       const layerId = nanoid();
 
-      let layer;
+      // 기본 레이어 속성
+      const baseLayerProps = {
+        x: position.x,
+        y: position.y,
+      };
 
-      if (layerType === LayerType.Text) {
-        layer = new LiveObject({
-          type: layerType,
-          x: position.x,
-          y: position.y,
-          width: 200,
-          height: 40,
-          fill: lastUsedColor, // 현재 선택된 색상 사용
-          value: '',
-        });
-      } else {
-        layer = new LiveObject({
-          type: layerType,
-          x: position.x,
-          y: position.y,
-          width: 100,
-          height: 100,
-          fill: lastUsedColor,
-        });
-      }
+      // 타입 캐스팅을 사용하여 Layer 타입으로 변환
+      const layer = (() => {
+        if (layerType === LayerType.Note) {
+          return {
+            ...baseLayerProps,
+            type: LayerType.Note,
+            width: 180,
+            height: 180,
+            fill: { r: 255, g: 244, b: 189 },
+            value: '',
+          };
+        } else if (layerType === LayerType.Text) {
+          return {
+            ...baseLayerProps,
+            type: LayerType.Text,
+            width: 200,
+            height: 40,
+            fill: lastUsedColor,
+            value: '',
+          };
+        } else {
+          return {
+            ...baseLayerProps,
+            type: layerType,
+            width: 100,
+            height: 100,
+            fill: lastUsedColor,
+          };
+        }
+      })();
 
       liveLayerIds.push(layerId);
-      liveLayers.set(layerId, layer);
+
+      // as unknown as Layer를 사용하여 타입 에러 해결
+      liveLayers.set(layerId, new LiveObject(layer as unknown as Layer));
 
       setMyPresence({ selection: [layerId] }, { addToHistory: true });
       setState({ mode: CanvasMode.None });
     },
-    [lastUsedColor], // lastUsedColor 의존성 추가
+    [lastUsedColor],
   );
 
   const insertInitialLayer = useMutation(

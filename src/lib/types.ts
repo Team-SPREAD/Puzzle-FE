@@ -63,12 +63,13 @@ export type EllipseLayer = {
 };
 
 export type NoteLayer = {
-  type: LayerType.Note;
+  type: ' LayerType.Note';
   x: number;
   y: number;
   height: number;
   width: number;
   fill: Color;
+  value: string;
 };
 
 export type PathLayer = {
@@ -92,7 +93,7 @@ export type TextLayer = {
   width: number;
   fill: Color;
   value?: string;
-  isEditing?:boolean;
+  isEditing?: boolean;
 };
 
 export type Point = {

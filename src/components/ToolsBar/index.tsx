@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import PencilButton from './PencilButton';
 import RectangleButton from './RectangleButton';
 import EllipseButton from './EllipseButton';
@@ -34,99 +35,188 @@ export default function ToolsBar({
   currentColor,
   onColorChange,
 }: Props) {
-  const handlePencilClick = () => {
-    setCanvasState({ mode: CanvasMode.Pencil });
+  const isToolActive = (mode: CanvasMode, checkLayerType?: LayerType) => {
+    // Selection 도구 체크
+    if (mode === CanvasMode.None) {
+      return (
+        canvasState.mode === CanvasMode.None ||
+        canvasState.mode === CanvasMode.Translating ||
+        canvasState.mode === CanvasMode.SelectionNet ||
+        canvasState.mode === CanvasMode.Pressing ||
+        canvasState.mode === CanvasMode.Resizing
+      );
+    }
+
+    // 펜슬 도구 체크
+    if (mode === CanvasMode.Pencil) {
+      return canvasState.mode === CanvasMode.Pencil;
+    }
+
+    // 도형 삽입 도구들 체크
+    if (mode === CanvasMode.Inserting && typeof checkLayerType === 'number') {
+      return (
+        canvasState.mode === mode &&
+        'layerType' in canvasState &&
+        canvasState.layerType === checkLayerType
+      );
+    }
+
+    return false;
   };
 
   return (
-    <div className="fixed left-6 top-1/2 -translate-y-1/2 z-50">
-      <div className="flex flex-col gap-3 bg-white rounded-xl shadow-lg p-3 border border-gray-200">
-        {/* Main Tools Section */}
-        <div className="flex flex-col gap-2">
-          <SelectionButton
-            isActive={
-              canvasState.mode === CanvasMode.None ||
-              canvasState.mode === CanvasMode.Translating ||
-              canvasState.mode === CanvasMode.SelectionNet ||
-              canvasState.mode === CanvasMode.Pressing ||
-              canvasState.mode === CanvasMode.Resizing
-            }
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+      className="fixed left-6 top-[30%] z-50 flex flex-col items-center gap-3"
+    >
+      {/* Undo/Redo Tools */}
+      <motion.div
+        className="flex justify-center items-center bg-white rounded-xl shadow-lg border border-zinc-200/80"
+        layout
+      >
+        <motion.div
+          className={`p-1 ${!canUndo ? 'opacity-50' : ''}`}
+          whileHover={{ scale: 1.1 }}
+        >
+          <UndoButton onClick={undo} disabled={!canUndo} />
+        </motion.div>
+        <motion.div className="w-px h-6 bg-zinc-200 mx-1" layout />
+        <motion.div
+          className={`p-1 ${!canRedo ? 'opacity-50' : ''}`}
+          whileHover={{ scale: 1.1 }}
+        >
+          <RedoButton onClick={redo} disabled={!canRedo} />
+        </motion.div>
+      </motion.div>
+      {/* Main Tools */}
+      <motion.div
+        className="flex flex-col bg-white rounded-xl shadow-lg py-3 px-2.5 border border-zinc-200/80 w-[52px]"
+        layout
+      >
+        <div className="space-y-3">
+          <ToolButton
+            active={isToolActive(CanvasMode.None)}
             onClick={() => setCanvasState({ mode: CanvasMode.None })}
-          />
+          >
+            <SelectionButton
+              isActive={isToolActive(CanvasMode.None)}
+              onClick={() => {}}
+            />
+          </ToolButton>
 
-          <PencilButton
-            isActive={canvasState.mode === CanvasMode.Pencil}
-            onClick={handlePencilClick}
-            size={penSize}
-            onSizeChange={setPenSize}
-            currentColor={currentColor}
-            onColorChange={onColorChange}
-          />
+          <ToolButton
+            active={isToolActive(CanvasMode.Pencil)}
+            onClick={() => setCanvasState({ mode: CanvasMode.Pencil })}
+          >
+            <PencilButton
+              isActive={isToolActive(CanvasMode.Pencil)}
+              onClick={() => {}}
+              size={penSize}
+              onSizeChange={setPenSize}
+              currentColor={currentColor}
+              onColorChange={onColorChange}
+            />
+          </ToolButton>
 
-          <TextButton
-            isActive={
-              canvasState.mode === CanvasMode.Inserting &&
-              canvasState.layerType === LayerType.Text
-            }
+          <ToolButton
+            active={isToolActive(CanvasMode.Inserting, LayerType.Text)}
             onClick={() =>
               setCanvasState({
                 mode: CanvasMode.Inserting,
                 layerType: LayerType.Text,
               })
             }
-            currentColor={currentColor}
-            onColorChange={onColorChange}
-          />
+          >
+            <TextButton
+              isActive={isToolActive(CanvasMode.Inserting, LayerType.Text)}
+              onClick={() => {}}
+              currentColor={currentColor}
+              onColorChange={onColorChange}
+            />
+          </ToolButton>
 
-          <RectangleButton
-            isActive={
-              canvasState.mode === CanvasMode.Inserting &&
-              canvasState.layerType === LayerType.Rectangle
-            }
+          <ToolButton
+            active={isToolActive(CanvasMode.Inserting, LayerType.Rectangle)}
             onClick={() =>
               setCanvasState({
                 mode: CanvasMode.Inserting,
                 layerType: LayerType.Rectangle,
               })
             }
-          />
+          >
+            <RectangleButton
+              isActive={isToolActive(CanvasMode.Inserting, LayerType.Rectangle)}
+              onClick={() => {}}
+            />
+          </ToolButton>
 
-          <EllipseButton
-            isActive={
-              canvasState.mode === CanvasMode.Inserting &&
-              canvasState.layerType === LayerType.Ellipse
-            }
+          <ToolButton
+            active={isToolActive(CanvasMode.Inserting, LayerType.Ellipse)}
             onClick={() =>
               setCanvasState({
                 mode: CanvasMode.Inserting,
                 layerType: LayerType.Ellipse,
               })
             }
-          />
+          >
+            <EllipseButton
+              isActive={isToolActive(CanvasMode.Inserting, LayerType.Ellipse)}
+              onClick={() => {}}
+            />
+          </ToolButton>
 
-          <NoteButton
-            isActive={
-              canvasState.mode === CanvasMode.Inserting &&
-              canvasState.layerType === LayerType.Note
-            }
+          <ToolButton
+            active={isToolActive(CanvasMode.Inserting, LayerType.Note)}
             onClick={() =>
               setCanvasState({
                 mode: CanvasMode.Inserting,
                 layerType: LayerType.Note,
               })
             }
-          />
+          >
+            <NoteButton
+              isActive={isToolActive(CanvasMode.Inserting, LayerType.Note)}
+              onClick={() => {}}
+            />
+          </ToolButton>
         </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
-        {/* Divider */}
-        <div className="h-[1px] bg-gray-200 w-full" />
-
-        {/* Undo/Redo Section */}
-        <div className="flex flex-col gap-2">
-          <UndoButton onClick={undo} disabled={!canUndo} />
-          <RedoButton onClick={redo} disabled={!canRedo} />
+function ToolButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.button
+      onClick={onClick}
+      className="relative w-full flex items-center justify-center"
+      whileHover={{ scale: 1.1 }}
+    >
+      <div className="w-7 h-7 flex items-center justify-center">
+        {active && (
+          <motion.div
+            layoutId="activeToolHighlight"
+            className="absolute inset-0 bg-black rounded-md"
+            initial={false}
+            transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+          />
+        )}
+        <div
+          className={`relative z-10 ${active ? 'text-white' : 'text-black'}`}
+        >
+          {children}
         </div>
       </div>
-    </div>
+    </motion.button>
   );
 }
