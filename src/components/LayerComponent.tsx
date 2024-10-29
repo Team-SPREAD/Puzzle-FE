@@ -45,6 +45,12 @@ const LayerComponent = memo(
             y={layer.y}
             fill={layer.fill ? colorToCss(layer.fill) : "#CCC"}
             stroke={selectionColor}
+            strokeOptions={{
+              size: layer.strokeWidth||16,
+              thinning: 0.5,
+              smoothing: 0.5,
+              streamline: 0.5,
+            }}
           />
         );
       case LayerType.Rectangle:

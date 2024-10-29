@@ -5,7 +5,7 @@ import EllipseButton from './EllipseButton';
 import UndoButton from './UndoButton';
 import RedoButton from './RedoButton';
 import SelectionButton from './SelectionButton';
-import { CanvasMode, LayerType, CanvasState } from '@/lib/types';
+import { CanvasMode, LayerType, CanvasState ,Color} from '@/lib/types';
 import TextButton from './TextButton';
 import NoteButton from './NoteButton';
 
@@ -16,6 +16,10 @@ type Props = {
   redo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  penSize: number;
+  setPenSize: (size: number) => void;
+  currentColor: Color;
+  onColorChange: (color: Color) => void;
 };
 
 export default function ToolsBar({
@@ -25,7 +29,15 @@ export default function ToolsBar({
   redo,
   canUndo,
   canRedo,
+  penSize,
+  setPenSize,
+  currentColor,
+  onColorChange,
 }: Props) {
+  const handlePencilClick = () => {
+    setCanvasState({ mode: CanvasMode.Pencil });
+  };
+
   return (
     <div className="fixed left-6 top-1/2 -translate-y-1/2 z-50">
       <div className="flex flex-col gap-3 bg-white rounded-xl shadow-lg p-3 border border-gray-200">
@@ -44,7 +56,11 @@ export default function ToolsBar({
 
           <PencilButton
             isActive={canvasState.mode === CanvasMode.Pencil}
-            onClick={() => setCanvasState({ mode: CanvasMode.Pencil })}
+            onClick={handlePencilClick}
+            size={penSize}
+            onSizeChange={setPenSize}
+            currentColor={currentColor}
+            onColorChange={onColorChange}
           />
 
           <TextButton

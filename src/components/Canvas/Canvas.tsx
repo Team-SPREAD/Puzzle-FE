@@ -60,7 +60,7 @@ const Canvas = () => {
   const layerIds = useStorage((root) => root.layerIds);
   const cursorPanel = useRef(null);
   const [currentStep, setCurrentStep] = useState(1); //프로젝트 1단계
-
+  const [penSize, setPenSize] = useState(16); //펜 사이즈 use
   const pencilDraft = useSelf((me) => me.presence.pencilDraft);
   const [canvasState, setState] = useState<CanvasState>({
     mode: CanvasMode.None,
@@ -248,17 +248,21 @@ const Canvas = () => {
       }
 
       const id = nanoid();
+
+      //penPointesToPathLayer에 strokeWidth 전달
       liveLayers.set(
         id,
-        new LiveObject(penPointsToPathLayer(pencilDraft, lastUsedColor)),
+        new LiveObject({
+          ...penPointsToPathLayer(pencilDraft, lastUsedColor),
+          strokeWidth: penSize, // 여기에 penSize 추가
+        }),
       );
 
       const liveLayerIds = storage.get('layerIds');
       liveLayerIds.push(id);
       setMyPresence({ pencilDraft: null });
-      setState({ mode: CanvasMode.Pencil });
     },
-    [lastUsedColor],
+    [lastUsedColor, penSize], // penSize 의존성 추가
   );
 
   /**
@@ -516,6 +520,17 @@ const Canvas = () => {
     }
   }, [insertInitialLayer, layerIds.length]);
 
+  // Path 컴포넌트에 전달할 getStroke 옵션
+  const strokeOptions = useMemo(
+    () => ({
+      size: penSize,
+      thinning: 0.5,
+      smoothing: 0.5,
+      streamline: 0.5,
+    }),
+    [penSize],
+  );
+
   return (
     <div className="w-full h-screen flex flex-col relative bg-surface-canvas touch-none overflow-hidden">
       <ProcessNav
@@ -589,6 +604,7 @@ const Canvas = () => {
                   fill={colorToCss(lastUsedColor)}
                   x={0}
                   y={0}
+                  strokeOptions={strokeOptions} // strokeOptions 전달
                 />
               )}
             </g>
@@ -603,6 +619,10 @@ const Canvas = () => {
             redo={history.redo}
             canUndo={canUndo}
             canRedo={canRedo}
+            penSize={penSize}
+            setPenSize={setPenSize}
+            currentColor={lastUsedColor} // 추가
+            onColorChange={setLastUsedColor}
           />
         </div>
       </div>
