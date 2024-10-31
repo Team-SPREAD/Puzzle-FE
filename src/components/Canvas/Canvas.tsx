@@ -526,10 +526,6 @@ const Canvas = () => {
       />
 
       <div className="flex-1 relative">
-        <div className="absolute top-40 left-4 z-20">
-          <RightNav />
-        </div>
-
         <div
           className="w-full h-full relative bg-surface-canvas touch-none"
           ref={cursorPanel}
@@ -605,9 +601,9 @@ const Canvas = () => {
             canRedo={canRedo}
           />
         </div>
-      </div>
-      <div className="absolute bottom-0 right-0 z-30">
-        <RightNav />
+        <div className="absolute bottom-0 right-0 z-30">
+          <RightNav />
+        </div>
       </div>
     </div>
   );

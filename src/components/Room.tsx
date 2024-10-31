@@ -8,14 +8,13 @@ import { LiveList, LiveMap, LiveObject } from '@liveblocks/client';
 import { Layer } from '@/lib/types';
 import { Loading } from '@/components/Loading';
 import Canvas from '@/components/Canvas/Canvas';
-import {steps} from '@/lib/process-data';
+import { steps } from '@/lib/process-data';
 
 interface RoomProps {
   roomId: string;
 }
 
 const Room = ({ roomId }: RoomProps) => {
-
   return (
     <RoomProvider
       id={roomId}
@@ -46,4 +45,3 @@ const Room = ({ roomId }: RoomProps) => {
 };
 
 export default Room;
-

@@ -5,23 +5,50 @@ import { useParams, useRouter } from 'next/navigation';
 import useAuth from '@/hooks/useAuth';
 import Sidebar from '@/components/DashBoard/SideBar';
 import Header from '@/components/DashBoard/Header';
-import ProjectGrid from '@/components/DashBoard/ProjectGrid';
 import TeamMembersBar from '@/components/DashBoard/TeamMembersBar';
 import { generateRandomColor } from '@/utils/getRandomColor';
 import useUserInfoStore from '@/hooks/useUserInfoStore';
 import useUserStore from '@/store/useUserStore';
+import useModalStore from '@/store/useModalStore';
+import CreateTeamModal from '@/components/DashBoard/Modal/CreateTeamModal';
+import ProjectOverview from '@/components/DashBoard/ProjecOverview';
 
 export default function DashboardPage() {
   const { userId } = useParams();
   const router = useRouter();
   const userInfo = useUserInfoStore();
   const testUserInfo = useUserStore().userInfo;
+  const { modalType, closeModal } = useModalStore();
+
   useAuth();
 
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [buttonColor, setButtonColor] = useState('');
+  const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
+  const [userTeams, setUserTeams] = useState([]);
+  // 사용자가 속한 팀 목록 가져오기
+  const fetchUserTeams = async () => {
+    try {
+      const authToken = localStorage.getItem('authToken');
+      const response = await fetch('http://kim-sun-woo.com/puzzle/me/teams', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      if (response.ok) {
+        const teams = await response.json();
+        setUserTeams(teams);
+      } else {
+        console.error('Failed to fetch teams');
+      }
+    } catch (error) {
+      console.error('Error fetching teams:', error);
+    }
+  };
 
   useEffect(() => {
+    fetchUserTeams();
     setButtonColor(generateRandomColor());
   }, [router, testUserInfo, userId]);
 
@@ -37,7 +64,8 @@ export default function DashboardPage() {
         '팀 대시보드';
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex w-screen h-screen ">
+      {/* //userInfo를 변경 하기 */}
       <TeamMembersBar
         teamMembers={
           selectedTeamId
@@ -46,23 +74,32 @@ export default function DashboardPage() {
         }
         buttonColor={buttonColor}
       />
-      <Sidebar
-        selectedTeamId={selectedTeamId}
-        setSelectedTeamId={setSelectedTeamId}
-        buttonColor={buttonColor}
-        favoriteProjects={userInfo.projects.filter((p) => p.isFavorite)}
-        teams={userInfo.teams}
-      />
-      <div className="flex flex-col flex-1">
+      <div className="w-[96%] h-full">
         <Header
           isDashboardPersonal={selectedTeamId === null}
           buttonColor={buttonColor}
           userName={testUserInfo.name}
         />
-        <main className="flex-1 p-6 overflow-auto">
-          <h1 className="text-2xl font-bold mb-4">{dashboardTitle}</h1>
-          <ProjectGrid projects={filteredProjects} buttonColor={buttonColor} />
-        </main>
+
+        <div className="flex w-full h-[92%] ">
+          <Sidebar
+            selectedTeamId={selectedTeamId}
+            setSelectedTeamId={setSelectedTeamId}
+            buttonColor={buttonColor}
+            favoriteProjects={userInfo.projects.filter((p) => p.isFavorite)}
+            teams={userTeams}
+            userInfo={testUserInfo}
+          />
+          <ProjectOverview
+            dashboardTitle={'My Boards'}
+            filteredProjects={filteredProjects}
+            buttonColor={buttonColor}
+          />
+        </div>
+        {/* 모달 타입에 따른 조건부 렌더링 */}
+        {modalType === 'CREATE_TEAM' && (
+          <CreateTeamModal isOpen={true} onClose={closeModal} />
+        )}
       </div>
     </div>
   );
