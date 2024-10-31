@@ -10,8 +10,17 @@ const nextConfig = {
         hostname: 'liveblocks.io',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'aws-file-uploder.s3.ap-northeast-2.amazonaws.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
-    domains: ['aws-file-uploder.s3.ap-northeast-2.amazonaws.com'], // S3 버킷 도메인 추가
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
@@ -21,7 +30,7 @@ const nextConfig = {
     return config;
   },
   typescript: {
-    ignoreBuildErrors: false, // 경고를 무시한채로 빌드 origin false , 테스트용 입니다.
+    ignoreBuildErrors: false, // 경고를 무시하지 않고 빌드, 테스트용입니다.
   },
 };
 
