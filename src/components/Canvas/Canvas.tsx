@@ -52,6 +52,8 @@ import RightNav from '../Layout/RightNav';
 import Avatar from '@/components/Avatar';
 import ProcessNav from '@/components/Layout/ProcessNav/Index';
 import { steps } from '@/lib/process-data';
+import IceBreakingArea from '../Templates/IceBreaking';
+
 
 const MAX_LAYERS = 100;
 
@@ -574,6 +576,12 @@ const Canvas = () => {
       />
 
       <div className="flex-1 relative">
+      {currentStep === 1 && (
+        <IceBreakingArea 
+          camera={camera}
+          userInfo={userInfo}
+        />
+      )}
         <div className="absolute top-40 left-4 z-20">
           <RightNav />
         </div>
