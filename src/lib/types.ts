@@ -186,4 +186,20 @@ export type Process = {
   description: string;
   camera: { x: number; y: number };
   done: boolean;
+  iceBreaking?: {
+    isGameActive: boolean;
+    game?: IceBreakingGame;
+    introductions: {
+      userId: string;
+      content: string;
+      position: Point;
+    }[];
+  };
+};
+
+export type IceBreakingGame = {
+  type: 'random-question' | 'word-chain' | 'drawing-guess';
+  isPlaying: boolean;
+  participants: string[];
+  currentTurn?: string;
 };
