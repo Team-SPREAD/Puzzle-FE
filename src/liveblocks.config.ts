@@ -5,7 +5,7 @@ import {
   createClient,
 } from '@liveblocks/client';
 import { createRoomContext } from '@liveblocks/react';
-import { Color, Layer, Point, UserInfo, Process } from '@/lib/types';
+import { Color, Layer, Point, UserInfo, Process ,IceBreakingGame} from '@/lib/types';
 
 const client = createClient({
   authEndpoint: '/api/liveblocks-auth',
@@ -39,6 +39,10 @@ type Storage = {
     activeUsers: LiveList<ActiveUserInfo>;
   }>;
   process: LiveList<Process>;
+  iceBreakingState: LiveObject<{
+    isGameActive: boolean;
+    currentGame?: IceBreakingGame;
+  }>;
 };
 
 // UserMeta represents static/readonly metadata on each User
