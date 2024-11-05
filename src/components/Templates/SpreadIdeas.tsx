@@ -1,4 +1,3 @@
-// src/components/Templates/SpreadIdeas.tsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Camera, UserInfo } from '@/lib/types';
@@ -50,25 +49,19 @@ export default function SpreadIdeas({ camera, userInfo }: SpreadIdeasProps) {
                     <h3 className="font-medium text-blue-800 mb-1 text-sm flex items-center gap-1">
                       <span>🌟</span> 핵심 기능
                     </h3>
-                    <p className="text-xs text-blue-600">
-                      필수 기능 정리
-                    </p>
+                    <p className="text-xs text-blue-600">필수 기능 정리</p>
                   </div>
                   <div className="bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-blue-800 mb-1 text-sm flex items-center gap-1">
                       <span>🎨</span> UI/UX
                     </h3>
-                    <p className="text-xs text-blue-600">
-                      디자인 구상하기
-                    </p>
+                    <p className="text-xs text-blue-600">디자인 구상하기</p>
                   </div>
                   <div className="bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-blue-800 mb-1 text-sm flex items-center gap-1">
                       <span>⚡</span> 확장성
                     </h3>
-                    <p className="text-xs text-blue-600">
-                      추가 기능 검토
-                    </p>
+                    <p className="text-xs text-blue-600">추가 기능 검토</p>
                   </div>
                 </div>
               </motion.div>

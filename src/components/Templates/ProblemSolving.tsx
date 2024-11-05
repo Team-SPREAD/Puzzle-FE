@@ -1,4 +1,3 @@
-// src/components/Templates/ProblemSolving.tsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Camera, UserInfo } from '@/lib/types';
@@ -8,7 +7,10 @@ interface ProblemSolvingProps {
   userInfo: UserInfo;
 }
 
-export default function ProblemSolving({ camera, userInfo }: ProblemSolvingProps) {
+export default function ProblemSolving({
+  camera,
+  userInfo,
+}: ProblemSolvingProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -50,25 +52,19 @@ export default function ProblemSolving({ camera, userInfo }: ProblemSolvingProps
                     <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
                       <span>⚡</span> 핵심 문제
                     </h3>
-                    <p className="text-xs text-amber-600">
-                      문제 정의
-                    </p>
+                    <p className="text-xs text-amber-600">문제 정의</p>
                   </div>
                   <div className="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
                       <span>🔍</span> 해결책
                     </h3>
-                    <p className="text-xs text-amber-600">
-                      방안 도출
-                    </p>
+                    <p className="text-xs text-amber-600">방안 도출</p>
                   </div>
                   <div className="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
                       <span>📊</span> 검증
                     </h3>
-                    <p className="text-xs text-amber-600">
-                      효과 분석
-                    </p>
+                    <p className="text-xs text-amber-600">효과 분석</p>
                   </div>
                 </div>
               </motion.div>

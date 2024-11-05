@@ -1,4 +1,3 @@
-// src/components/Templates/UserStory.tsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Camera, UserInfo } from '@/lib/types';
@@ -37,7 +36,9 @@ export default function UserStory({ camera, userInfo }: UserStoryProps) {
                     <span className="bg-indigo-100 text-indigo-600 text-xs px-2 py-0.5 rounded-full font-medium">
                       Step 8
                     </span>
-                    <h2 className="font-semibold text-gray-800">사용자 스토리</h2>
+                    <h2 className="font-semibold text-gray-800">
+                      사용자 스토리
+                    </h2>
                   </div>
                   <p className="text-xs text-gray-500">
                     사용자 관점에서 스토리를 작성해보세요
@@ -50,25 +51,19 @@ export default function UserStory({ camera, userInfo }: UserStoryProps) {
                     <h3 className="font-medium text-indigo-800 mb-1 text-sm flex items-center gap-1">
                       <span>👤</span> 사용자
                     </h3>
-                    <p className="text-xs text-indigo-600">
-                      역할 정의
-                    </p>
+                    <p className="text-xs text-indigo-600">역할 정의</p>
                   </div>
                   <div className="bg-indigo-50 rounded-lg p-3 hover:bg-indigo-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-indigo-800 mb-1 text-sm flex items-center gap-1">
                       <span>🎯</span> 목적
                     </h3>
-                    <p className="text-xs text-indigo-600">
-                      원하는 결과
-                    </p>
+                    <p className="text-xs text-indigo-600">원하는 결과</p>
                   </div>
                   <div className="bg-indigo-50 rounded-lg p-3 hover:bg-indigo-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-indigo-800 mb-1 text-sm flex items-center gap-1">
                       <span>✨</span> 가치
                     </h3>
-                    <p className="text-xs text-indigo-600">
-                      기대 효과
-                    </p>
+                    <p className="text-xs text-indigo-600">기대 효과</p>
                   </div>
                 </div>
               </motion.div>

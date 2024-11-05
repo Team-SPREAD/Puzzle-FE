@@ -1,17 +1,12 @@
-// components/StageAreas/IceBreakingArea.tsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Camera, UserInfo } from '@/lib/types';
 
 interface IceBreakingAreaProps {
   camera: Camera;
-  userInfo: UserInfo;
 }
 
-export default function IceBreakingArea({
-  camera,
-  userInfo,
-}: IceBreakingAreaProps) {
+export default function IceBreakingArea({ camera }: IceBreakingAreaProps) {
   const [showGameModal, setShowGameModal] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -83,7 +78,6 @@ export default function IceBreakingArea({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="h-full flex items-center justify-center py-3"
-                
               >
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-orange-500">

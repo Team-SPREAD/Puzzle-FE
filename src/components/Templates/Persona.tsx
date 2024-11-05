@@ -1,4 +1,3 @@
-// src/components/Templates/Persona.tsx
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Camera, UserInfo } from '@/lib/types';
