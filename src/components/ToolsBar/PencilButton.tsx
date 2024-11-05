@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import IconButton from "../IconButton";
-import { Color } from "@/lib/types";
+import React, { useState } from 'react';
+import IconButton from '../IconButton';
+import { Color } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type Props = {
@@ -12,13 +12,13 @@ type Props = {
   onColorChange?: (color: Color) => void;
 };
 
-export default function PencilButton({ 
-  isActive, 
-  onClick, 
-  size = 16, 
+export default function PencilButton({
+  isActive,
+  onClick,
+  size = 8,
   onSizeChange,
   currentColor = { r: 252, g: 142, b: 42 },
-  onColorChange
+  onColorChange,
 }: Props) {
   const [showControl, setShowControl] = useState(false);
 
@@ -38,20 +38,22 @@ export default function PencilButton({
   // 16진수 색상 코드를 RGB로 변환
   const hexToColor = (hex: string): Color => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 0, g: 0, b: 0 };
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 0, g: 0, b: 0 };
   };
 
   const colorPresets = [
-    { r: 0, g: 0, b: 0 },        // Black
-    { r: 255, g: 0, b: 0 },      // Red
-    { r: 0, g: 255, b: 0 },      // Green
-    { r: 0, g: 0, b: 255 },      // Blue
-    { r: 252, g: 142, b: 42 },   // Orange
-    { r: 255, g: 255, b: 0 },    // Yellow
+    { r: 0, g: 0, b: 0 }, // Black
+    { r: 255, g: 0, b: 0 }, // Red
+    { r: 0, g: 255, b: 0 }, // Green
+    { r: 0, g: 0, b: 255 }, // Blue
+    { r: 252, g: 142, b: 42 }, // Orange
+    { r: 255, g: 255, b: 0 }, // Yellow
   ];
 
   return (
@@ -68,16 +70,16 @@ export default function PencilButton({
       {/* Control Popup with Framer Motion */}
       <AnimatePresence>
         {isActive && showControl && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95, x: 0 }}
             animate={{ opacity: 1, scale: 1, x: 20 }}
             exit={{ opacity: 0, scale: 0.95, x: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
             className="absolute left-11 top-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-4 w-[220px] z-50 border border-gray-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Pen Size Slider */}
-            <motion.div 
+            <motion.div
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1 }}
@@ -87,7 +89,7 @@ export default function PencilButton({
                 <span className="text-sm font-medium text-gray-700">크기</span>
                 <span className="text-sm text-gray-500">{size}px</span>
               </div>
-              
+
               <input
                 type="range"
                 min="1"
@@ -110,7 +112,7 @@ export default function PencilButton({
             </motion.div>
 
             {/* Color Selection */}
-            <motion.div 
+            <motion.div
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}

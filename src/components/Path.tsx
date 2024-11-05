@@ -1,5 +1,5 @@
-import { getSvgPathFromStroke } from "@/lib/utils";
-import getStroke from "perfect-freehand";
+import { getSvgPathFromStroke } from '@/lib/utils';
+import getStroke from 'perfect-freehand';
 
 interface PathProps {
   x: number;
@@ -24,7 +24,7 @@ export default function Path({
   fill,
   points,
   strokeOptions = {
-    size: 16,
+    size: 8,
     thinning: 0.5,
     smoothing: 0.5,
     streamline: 0.5,
