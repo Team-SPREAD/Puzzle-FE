@@ -30,6 +30,7 @@ export enum LayerType {
   Path,
   Text,
   Note,
+  Vision, // Vision 추가
 }
 
 export type Camera = {
@@ -42,7 +43,8 @@ export type Layer =
   | EllipseLayer
   | PathLayer
   | TextLayer
-  | NoteLayer;
+  | NoteLayer
+  | VisionLayer;
 
 export type RectangleLayer = {
   type: LayerType.Rectangle;
@@ -94,6 +96,19 @@ export type TextLayer = {
   fill: Color;
   value?: string;
   isEditing?: boolean;
+};
+
+export type VisionLayer = {
+  type: LayerType.Vision;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: Color;
+  borderColor: Color; // 비전 박스 테두리 색상
+  value: string; // 비전 텍스트
+  fontStyle: string; // 폰트 스타일
+  iconUrl?: string; // 아이콘 URL (옵션)
 };
 
 export type Point = {
@@ -186,20 +201,21 @@ export type Process = {
   description: string;
   camera: { x: number; y: number };
   done: boolean;
-  iceBreaking?: {
-    isGameActive: boolean;
-    game?: IceBreakingGame;
-    introductions: {
-      userId: string;
-      content: string;
-      position: Point;
-    }[];
-  };
+  // 현재 안 쓰이는 단계, 필요하면 쓰는 걸로, 게임을 위해서 만들어봄
+  // iceBreaking?: { 
+  //   isGameActive: boolean;
+  //   game?: IceBreakingGame;
+  //   introductions: {
+  //     userId: string;
+  //     content: string;
+  //     position: Point;
+  //   }[];
+  // };
 };
 
-export type IceBreakingGame = {
-  type: 'random-question' | 'word-chain' | 'drawing-guess';
-  isPlaying: boolean;
-  participants: string[];
-  currentTurn?: string;
-};
+// export type IceBreakingGame = {
+//   type: 'random-question' | 'word-chain' | 'drawing-guess';
+//   isPlaying: boolean;
+//   participants: string[];
+//   currentTurn?: string;
+// };
