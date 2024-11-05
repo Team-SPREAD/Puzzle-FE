@@ -7,6 +7,7 @@ import { colorToCss } from "@/lib/utils";
 import Rectangle from "./Rectangle";
 import Note from "./Note";
 import Text from "./Text";
+import Vision from "./Vision";
 
 type Props = {
   id: string;
@@ -74,6 +75,15 @@ const LayerComponent = memo(
       case LayerType.Note:
         return (
           <Note
+            id={id}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
+        case LayerType.Vision: // VisionLayer 처리 추가
+        return (
+          <Vision
             id={id}
             layer={layer}
             onPointerDown={onLayerPointerDown}
