@@ -522,6 +522,13 @@ const Canvas = () => {
   const onPointerMove = useMutation(
     ({ setMyPresence }, e: React.PointerEvent) => {
       e.preventDefault();
+      e.stopPropagation(); //브라우저 기본 드래그 동작
+
+      // 브라우저의 기본 드래그 방지
+      if (e.target instanceof HTMLElement || e.target instanceof SVGElement) {
+        e.target.style.userSelect = 'none';
+      }
+
       const current = pointerEventToCanvasPoint(e, camera);
       if (canvasState.mode === CanvasMode.Pressing) {
         startMultiSelection(current, canvasState.origin);
