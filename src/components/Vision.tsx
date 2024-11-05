@@ -98,19 +98,6 @@ export default function Vision({
           transformOrigin: `${x + width / 2}px ${y + height / 2}px`,
         }}
       />
-      {/* 아이콘 추가 (옵션) */}
-      {iconUrl && (
-        <image
-          href={iconUrl}
-          x={x + 15}
-          y={y + 15}
-          height={40}
-          width={40}
-          style={{
-            transformOrigin: `${x}px ${y}px`,
-          }}
-        />
-      )}
       <foreignObject
         x={x}
         y={y}
@@ -122,34 +109,43 @@ export default function Vision({
           transformOrigin: `${x + width / 2}px ${y + height / 2}px`,
         }}
       >
-        <ContentEditable
-          innerRef={contentRef}
-          html={value || ''}
-          disabled={!isEditing}
-          onChange={handleContentChange}
-          onDoubleClick={handleDoubleClick}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          className={cn(
-            'w-full h-full',
-            'outline-none',
-            'whitespace-pre-wrap',
-            isEditing ? 'bg-white/20' : 'bg-transparent',
-            'transition-all',
-            'p-6',
-            'font-vision', // Tailwind 설정에 추가 필요
+        <div className="flex items-center p-3">
+          {/* 아이콘 추가 (옵션) */}
+          {iconUrl && (
+            <img
+              src={iconUrl}
+              alt="user avatar"
+              className="w-8 h-8 rounded-full mr-3" // 작은 동그라미 모양 아바타
+            />
           )}
-          style={{
-            color: '#1A202C',
-            cursor: isEditing ? 'text' : 'move',
-            fontFamily: fontStyle || "'Poppins', 'Cute Font', sans-serif", // 모던한 느낌의 폰트 스타일
-            fontSize: '1.4rem', // 약간 더 큼직하게 설정
-            lineHeight: '1.6',
-            textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)', // 가벼운 텍스트 그림자 추가
-            boxShadow: isSelected ? `0 0 0 2px ${selectionColor}` : 'none',
-            fontWeight: '500', // 더 선명하고 두껍게
-          }}
-        />
+          <ContentEditable
+            innerRef={contentRef}
+            html={value || ''}
+            disabled={!isEditing}
+            onChange={handleContentChange}
+            onDoubleClick={handleDoubleClick}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            className={cn(
+              'flex-1',
+              'outline-none',
+              'whitespace-nowrap', // 한 줄로 표시
+              'overflow-hidden', // 넘칠 경우 숨김
+              isEditing ? 'bg-white/20' : 'bg-transparent',
+              'transition-all',
+              'font-vision', // Tailwind 설정에 추가 필요
+            )}
+            style={{
+              color: '#1A202C',
+              cursor: isEditing ? 'text' : 'move',
+              fontFamily: fontStyle || "'Poppins', 'Cute Font', sans-serif",
+              fontSize: '1.2rem', // 약간 작게 설정
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)', // 가벼운 텍스트 그림자 추가
+              boxShadow: isSelected ? `0 0 0 2px ${selectionColor}` : 'none',
+              fontWeight: '500',
+            }}
+          />
+        </div>
       </foreignObject>
     </motion.g>
   );

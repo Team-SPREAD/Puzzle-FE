@@ -5,6 +5,7 @@ import { LayerType, VisionLayer } from '@/lib/types';
 import { VisionBoxProps } from './types';
 import { LiveObject } from '@liveblocks/client';
 import { STAGE_GIMMICKS } from './configs';
+import { useSelf } from '@liveblocks/react'; // 현재 사용자 정보 가져오기 위한 import
 
 export default function VisionBoxTemplate({
   id,
@@ -13,6 +14,12 @@ export default function VisionBoxTemplate({
 }: VisionBoxProps) {
   const [content, setContent] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false); // 박스 접힘 상태 관리
+
+  // 현재 사용자 정보 가져오기
+  const me = useSelf();
+
+  const userName = me?.info?.name || '익명 사용자';
+  const avatar = me?.info?.avatar;
 
   // 내용 업데이트 mutation
   const updateContent = useMutation(({ storage }, newContent: string) => {
@@ -48,12 +55,12 @@ export default function VisionBoxTemplate({
         x: newX,
         y: newY,
         width: 350,
-        height: 100,
-        value: ` ${content} `,
+        height: 50,
+        value: `${content}`,
         fill: color,
         borderColor: { r: 255, g: 223, b: 120 },
         fontStyle: "'Cute Font', 'Nanum Pen Script', cursive",
-        // iconUrl: 'https://example.com/icon.png',
+        iconUrl: avatar, // 현재 사용자의 아바타 URL 사용
       };
 
       // LiveObject로 새로운 Layer 생성
@@ -64,7 +71,7 @@ export default function VisionBoxTemplate({
       layerIds.push(newId);
       setContent('');
     },
-    [content, color],
+    [content, color, avatar],
   );
 
   useEffect(() => {
@@ -96,7 +103,8 @@ export default function VisionBoxTemplate({
     >
       <div className={`p-4 ${isCollapsed ? 'px-3 py-2' : ''}`}>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-base font-medium text-gray-700">
+          <span className="text-base font-medium text-gray-700 flex items-center">
+            
             나의 비전은?
           </span>
           <button
@@ -106,11 +114,24 @@ export default function VisionBoxTemplate({
             {isCollapsed ? (
               // 창 크기 키우기 아이콘 (빈칸 네모로 수정)
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" />
+                <rect
+                  x="4"
+                  y="4"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
               </svg>
             ) : (
               // 언더바 모양 아이콘 (접기)
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <rect x="4" y="11" width="16" height="2" />
               </svg>
             )}
