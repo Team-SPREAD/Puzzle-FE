@@ -4,10 +4,10 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface SpreadIdeasProps {
   camera: Camera;
-  userInfo: UserInfo;
+ 
 }
 
-export default function SpreadIdeas({ camera, userInfo }: SpreadIdeasProps) {
+export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (

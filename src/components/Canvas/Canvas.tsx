@@ -111,19 +111,19 @@ const Canvas = () => {
       case 3:
         return <TopicSelection camera={camera} />;
       case 4:
-        return <SpreadIdeas camera={camera} userInfo={userInfo} />;
+        return <SpreadIdeas camera={camera}  />;
       case 5:
-        return <Discussion camera={camera} userInfo={userInfo} />;
+        return <Discussion camera={camera}  />;
       case 6:
-        return <Persona camera={camera} userInfo={userInfo} />;
+        return <Persona camera={camera}  />;
       case 7:
-        return <ProblemSolving camera={camera} userInfo={userInfo} />;
+        return <ProblemSolving camera={camera}  />;
       case 8:
-        return <UserStory camera={camera} userInfo={userInfo} />;
+        return <UserStory camera={camera}  />;
       case 9:
-        return <RoleAssignment camera={camera} userInfo={userInfo} />;
+        return <RoleAssignment camera={camera}  />;
       case 10:
-        return <Result camera={camera} userInfo={userInfo} />;
+        return <Result camera={camera} />;
       default:
         return null;
     }

@@ -39,10 +39,6 @@ type Storage = {
     activeUsers: LiveList<ActiveUserInfo>;
   }>;
   process: LiveList<Process>;
-  iceBreakingState: LiveObject<{
-    isGameActive: boolean;
-    currentGame?: IceBreakingGame;
-  }>;
 };
 
 // UserMeta represents static/readonly metadata on each User

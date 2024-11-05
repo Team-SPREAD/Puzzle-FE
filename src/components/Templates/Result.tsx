@@ -4,10 +4,10 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface ResultProps {
   camera: Camera;
-  userInfo: UserInfo;
+ 
 }
 
-export default function Result({ camera, userInfo }: ResultProps) {
+export default function Result({ camera }: ResultProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (

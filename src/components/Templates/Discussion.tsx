@@ -4,10 +4,9 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface DiscussionProps {
   camera: Camera;
-  userInfo: UserInfo;
 }
 
-export default function Discussion({ camera, userInfo }: DiscussionProps) {
+export default function Discussion({ camera }: DiscussionProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -49,25 +48,19 @@ export default function Discussion({ camera, userInfo }: DiscussionProps) {
                     <h3 className="font-medium text-violet-800 mb-1 text-sm flex items-center gap-1">
                       <span>💭</span> 브레인스토밍
                     </h3>
-                    <p className="text-xs text-violet-600">
-                      아이디어 공유
-                    </p>
+                    <p className="text-xs text-violet-600">아이디어 공유</p>
                   </div>
                   <div className="bg-violet-50 rounded-lg p-3 hover:bg-violet-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-violet-800 mb-1 text-sm flex items-center gap-1">
                       <span>🔄</span> 피드백
                     </h3>
-                    <p className="text-xs text-violet-600">
-                      의견 주고받기
-                    </p>
+                    <p className="text-xs text-violet-600">의견 주고받기</p>
                   </div>
                   <div className="bg-violet-50 rounded-lg p-3 hover:bg-violet-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-violet-800 mb-1 text-sm flex items-center gap-1">
                       <span>✨</span> 결론
                     </h3>
-                    <p className="text-xs text-violet-600">
-                      방향성 정하기
-                    </p>
+                    <p className="text-xs text-violet-600">방향성 정하기</p>
                   </div>
                 </div>
               </motion.div>

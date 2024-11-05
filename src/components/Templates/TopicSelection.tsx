@@ -4,11 +4,11 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface TopicSelectionProps {
   camera: Camera;
-  userInfo: UserInfo;
+
 }
 export default function TopicSelection({
   camera,
-  userInfo,
+
 }: TopicSelectionProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 

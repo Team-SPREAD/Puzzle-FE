@@ -4,10 +4,10 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface UserStoryProps {
   camera: Camera;
-  userInfo: UserInfo;
+
 }
 
-export default function UserStory({ camera, userInfo }: UserStoryProps) {
+export default function UserStory({ camera }: UserStoryProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (

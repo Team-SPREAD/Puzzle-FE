@@ -63,7 +63,7 @@ export type EllipseLayer = {
 };
 
 export type NoteLayer = {
-  type: ' LayerType.Note';
+  type: LayerType.Note;
   x: number;
   y: number;
   height: number;

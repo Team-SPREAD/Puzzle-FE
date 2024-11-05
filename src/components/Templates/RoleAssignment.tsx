@@ -4,10 +4,10 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface RoleAssignmentProps {
   camera: Camera;
-  userInfo: UserInfo;
+ 
 }
 
-export default function RoleAssignment({ camera, userInfo }: RoleAssignmentProps) {
+export default function RoleAssignment({ camera }: RoleAssignmentProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (

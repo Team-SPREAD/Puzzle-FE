@@ -4,10 +4,9 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface PersonaProps {
   camera: Camera;
-  userInfo: UserInfo;
 }
 
-export default function Persona({ camera, userInfo }: PersonaProps) {
+export default function Persona({ camera }: PersonaProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -49,25 +48,19 @@ export default function Persona({ camera, userInfo }: PersonaProps) {
                     <h3 className="font-medium text-rose-800 mb-1 text-sm flex items-center gap-1">
                       <span>👤</span> 기본 정보
                     </h3>
-                    <p className="text-xs text-rose-600">
-                      인적 사항
-                    </p>
+                    <p className="text-xs text-rose-600">인적 사항</p>
                   </div>
                   <div className="bg-rose-50 rounded-lg p-3 hover:bg-rose-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-rose-800 mb-1 text-sm flex items-center gap-1">
                       <span>🎯</span> 목표
                     </h3>
-                    <p className="text-xs text-rose-600">
-                      주요 니즈
-                    </p>
+                    <p className="text-xs text-rose-600">주요 니즈</p>
                   </div>
                   <div className="bg-rose-50 rounded-lg p-3 hover:bg-rose-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-rose-800 mb-1 text-sm flex items-center gap-1">
                       <span>💡</span> 동기
                     </h3>
-                    <p className="text-xs text-rose-600">
-                      사용 계기
-                    </p>
+                    <p className="text-xs text-rose-600">사용 계기</p>
                   </div>
                 </div>
               </motion.div>

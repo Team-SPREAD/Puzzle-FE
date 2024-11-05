@@ -4,13 +4,9 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface ProblemSolvingProps {
   camera: Camera;
-  userInfo: UserInfo;
 }
 
-export default function ProblemSolving({
-  camera,
-  userInfo,
-}: ProblemSolvingProps) {
+export default function ProblemSolving({ camera }: ProblemSolvingProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
