@@ -46,8 +46,8 @@ export default function VisionBoxTemplate({
 
       // 새로운 박스를 기존 박스의 위치에서 조금 옮겨서 생성
       const basePosition = stageGimmick.boxes[0].position;
-      const newX = basePosition.x + 50;
-      const newY = basePosition.y + 1250;
+      const newX = basePosition.x + 450;
+      const newY = basePosition.y + 1100;
 
       // 새로운 VisionLayer 추가
       const newLayer: VisionLayer = {
