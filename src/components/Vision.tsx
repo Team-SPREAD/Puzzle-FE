@@ -20,7 +20,8 @@ export default function Vision({
   selectionColor,
   isSelected,
 }: VisionBoxProps) {
-  const { x, y, width, height, fill, value, borderColor, fontStyle, iconUrl } = layer;
+  const { x, y, width, height, fill, value, borderColor, fontStyle, iconUrl } =
+    layer;
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -67,7 +68,7 @@ export default function Vision({
     <motion.g
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 200, damping: 30 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 30 }}
     >
       {/* 유리모피즘 느낌의 그림자 */}
       <rect

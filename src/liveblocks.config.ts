@@ -5,7 +5,7 @@ import {
   createClient,
 } from '@liveblocks/client';
 import { createRoomContext } from '@liveblocks/react';
-import { Color, Layer, Point, UserInfo, Process ,IceBreakingGame} from '@/lib/types';
+import { Color, Layer, Point, UserInfo, Process } from '@/lib/types';
 
 const client = createClient({
   authEndpoint: '/api/liveblocks-auth',
