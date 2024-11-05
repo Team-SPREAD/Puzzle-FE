@@ -52,8 +52,18 @@ import RightNav from '../Layout/RightNav';
 import Avatar from '@/components/Avatar';
 import ProcessNav from '@/components/Layout/ProcessNav/Index';
 import { steps } from '@/lib/process-data';
-import IceBreakingArea from '../Templates/IceBreaking';
-
+import {
+  IceBreakingArea,
+  VisionFinding,
+  TopicSelection,
+  SpreadIdeas,
+  Discussion,
+  Persona,
+  ProblemSolving,
+  UserStory,
+  RoleAssignment,
+  Result,
+} from '../Templates';
 
 const MAX_LAYERS = 100;
 
@@ -91,6 +101,33 @@ const Canvas = () => {
   useDisableScrollBounce();
 
   const deleteLayers = useDeleteLayers();
+
+  const renderStageTemplate = () => {
+    switch (currentStep) {
+      case 1:
+        return <IceBreakingArea camera={camera} />;
+      case 2:
+        return <VisionFinding camera={camera} />;
+      case 3:
+        return <TopicSelection camera={camera} />;
+      case 4:
+        return <SpreadIdeas camera={camera} userInfo={userInfo} />;
+      case 5:
+        return <Discussion camera={camera} userInfo={userInfo} />;
+      case 6:
+        return <Persona camera={camera} userInfo={userInfo} />;
+      case 7:
+        return <ProblemSolving camera={camera} userInfo={userInfo} />;
+      case 8:
+        return <UserStory camera={camera} userInfo={userInfo} />;
+      case 9:
+        return <RoleAssignment camera={camera} userInfo={userInfo} />;
+      case 10:
+        return <Result camera={camera} userInfo={userInfo} />;
+      default:
+        return null;
+    }
+  };
 
   /**
    * 단계를 위한 useEffect
@@ -576,12 +613,8 @@ const Canvas = () => {
       />
 
       <div className="flex-1 relative">
-      {currentStep === 1 && (
-        <IceBreakingArea 
-          camera={camera}
-          userInfo={userInfo}
-        />
-      )}
+        {/* 현재 단계의 템플릿 렌더링 */}
+        {renderStageTemplate()}
         <div className="absolute top-40 left-4 z-20">
           <RightNav />
         </div>
