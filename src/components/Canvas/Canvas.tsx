@@ -64,6 +64,7 @@ import {
   RoleAssignment,
   Result,
 } from '../Templates';
+import { StageGimmicks } from '@/components/StageGimmicks';
 
 const MAX_LAYERS = 100;
 
@@ -111,17 +112,17 @@ const Canvas = () => {
       case 3:
         return <TopicSelection camera={camera} />;
       case 4:
-        return <SpreadIdeas camera={camera}  />;
+        return <SpreadIdeas camera={camera} />;
       case 5:
-        return <Discussion camera={camera}  />;
+        return <Discussion camera={camera} />;
       case 6:
-        return <Persona camera={camera}  />;
+        return <Persona camera={camera} />;
       case 7:
-        return <ProblemSolving camera={camera}  />;
+        return <ProblemSolving camera={camera} />;
       case 8:
-        return <UserStory camera={camera}  />;
+        return <UserStory camera={camera} />;
       case 9:
-        return <RoleAssignment camera={camera}  />;
+        return <RoleAssignment camera={camera} />;
       case 10:
         return <Result camera={camera} />;
       default:
@@ -614,6 +615,7 @@ const Canvas = () => {
 
       <div className="flex-1 relative">
         {/* 현재 단계의 템플릿 렌더링 */}
+        <StageGimmicks currentStep={currentStep} />
         {renderStageTemplate()}
         <div className="absolute top-40 left-4 z-20">
           <RightNav />
