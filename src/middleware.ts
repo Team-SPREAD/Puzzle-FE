@@ -63,5 +63,5 @@ export function middleware(req: NextRequest) {
 
 // 적용할 경로 설정
 export const config = {
-  matcher: ['/dashboard/:path*'], // /dashboard 하위 모든 경로에 대해 미들웨어 적용
+  matcher: ['/dashboarddddd/:path*'], // /dashboard 하위 모든 경로에 대해 미들웨어 적용
 };
