@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import useAuth from '@/hooks/useAuth';
 import Sidebar from '@/components/DashBoard/SideBar';
 import Header from '@/components/DashBoard/Header';
 import TeamMembersBar from '@/components/DashBoard/TeamMembersBar';
 import { generateRandomColor } from '@/utils/getRandomColor';
-import useUserInfoStore from '@/hooks/useUserInfoStore';
+import useUserInfoStore from '@/hooks/useUserInfoStore'; //지워야 함
 import useUserStore from '@/store/useUserStore';
+import { UserInfo } from '@/lib/types';
 import useModalStore from '@/store/useModalStore';
 import CreateTeamModal from '@/components/DashBoard/Modal/CreateTeamModal';
 import ProjectOverview from '@/components/DashBoard/ProjecOverview';
@@ -16,16 +16,25 @@ import ProjectOverview from '@/components/DashBoard/ProjecOverview';
 export default function DashboardPage() {
   const { userId } = useParams();
   const router = useRouter();
-  const userInfo = useUserInfoStore();
+  const mockUserInfo = useUserInfoStore();
   const testUserInfo = useUserStore().userInfo;
   const { modalType, closeModal } = useModalStore();
 
-  useAuth();
-
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [buttonColor, setButtonColor] = useState('');
-  const [isCreateTeamModalOpen, setIsCreateTeamModalOpen] = useState(false);
   const [userTeams, setUserTeams] = useState([]);
+  const { setUserInfo, userInfo } = useUserStore();
+
+  useEffect(() => {
+    // 로컬 스토리지에서 사용자 정보 불러오기
+    const storedUserInfo = localStorage.getItem('userInfo');
+    if (storedUserInfo) {
+      setUserInfo(JSON.parse(storedUserInfo)); // 로컬 스토리지 데이터로 Zustand 상태 설정
+    } else {
+      router.push('/login'); // 사용자 정보가 없으면 로그인 페이지로 이동
+    }
+  }, [setUserInfo, router]);
+
   // 사용자가 속한 팀 목록 가져오기
   const fetchUserTeams = async () => {
     try {
@@ -36,6 +45,7 @@ export default function DashboardPage() {
           Authorization: `Bearer ${authToken}`,
         },
       });
+
       if (response.ok) {
         const teams = await response.json();
         setUserTeams(teams);
@@ -54,13 +64,13 @@ export default function DashboardPage() {
 
   const filteredProjects =
     selectedTeamId === null
-      ? userInfo.projects
-      : userInfo.projects.filter((p) => p.teamId === selectedTeamId);
+      ? mockUserInfo.projects
+      : mockUserInfo.projects.filter((p) => p.teamId === selectedTeamId);
 
   const dashboardTitle =
     selectedTeamId === null
       ? '개인 대시보드'
-      : userInfo.teams.find((t) => t.id === selectedTeamId)?.name ||
+      : mockUserInfo.teams.find((t) => t.id === selectedTeamId)?.name ||
         '팀 대시보드';
 
   return (
@@ -69,7 +79,8 @@ export default function DashboardPage() {
       <TeamMembersBar
         teamMembers={
           selectedTeamId
-            ? userInfo.teams.find((t) => t.id === selectedTeamId)?.members || []
+            ? mockUserInfo.teams.find((t) => t.id === selectedTeamId)
+                ?.members || []
             : []
         }
         buttonColor={buttonColor}
@@ -86,7 +97,7 @@ export default function DashboardPage() {
             selectedTeamId={selectedTeamId}
             setSelectedTeamId={setSelectedTeamId}
             buttonColor={buttonColor}
-            favoriteProjects={userInfo.projects.filter((p) => p.isFavorite)}
+            favoriteProjects={mockUserInfo.projects.filter((p) => p.isFavorite)}
             teams={userTeams}
             userInfo={testUserInfo}
           />
@@ -98,7 +109,11 @@ export default function DashboardPage() {
         </div>
         {/* 모달 타입에 따른 조건부 렌더링 */}
         {modalType === 'CREATE_TEAM' && (
-          <CreateTeamModal isOpen={true} onClose={closeModal} />
+          <CreateTeamModal
+            isOpen={true}
+            onClose={closeModal}
+            userId={Number(testUserInfo.id)}
+          />
         )}
       </div>
     </div>

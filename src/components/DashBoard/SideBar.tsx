@@ -14,7 +14,7 @@ interface SidebarProps {
   setSelectedTeamId: (teamId: string | null) => void;
   buttonColor: string;
   favoriteProjects: { id: string; name: string; isFavorite: boolean }[];
-  teams: { id: string; name: string }[];
+  teams: { id: string; teamName: string }[];
   userInfo: UserInfo;
 }
 
@@ -26,7 +26,6 @@ export default function Sidebar({
   teams,
   userInfo,
 }: SidebarProps) {
-  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const { openModal, closeModal, modalType } = useModalStore();
   const [isUserSelectThrottled, setIsUserSelectThrottled] = useState(false); // 딜레이 상태 추가
 
@@ -68,7 +67,7 @@ export default function Sidebar({
               className="w-full h-[48px] text-left px-4 py-2 border rounded-md flex justify-between items-center"
             >
               {selectedTeamId
-                ? teams.find((t) => t.id === selectedTeamId)?.name
+                ? teams.find((t) => t.id === selectedTeamId)?.teamName
                 : '개인 대시보드'}
               <Image
                 src={arrowBottom}
@@ -91,7 +90,7 @@ export default function Sidebar({
                     onClick={() => handleTeamSelect(team.id)}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
-                    {team.name}
+                    {team.teamName}
                   </button>
                 ))}
                 <button

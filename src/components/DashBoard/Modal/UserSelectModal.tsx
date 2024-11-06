@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import useModalStore from '@/store/useModalStore';
 import { destroyCookie } from 'nookies';
 import { useRouter } from 'next/navigation';
+import useUserStore from '@/store/useUserStore';
 
 interface UserSelectModalProps {
   email: string;
@@ -12,12 +13,13 @@ const UserSelectModal: React.FC<UserSelectModalProps> = ({ email }) => {
   const { closeModal } = useModalStore();
   const router = useRouter();
   const modalRef = useRef<HTMLDivElement>(null);
+  const clearUserInfo = useUserStore((state) => state.clearUserInfo);
 
   const handleLogout = () => {
     // 쿠키 및 로컬 스토리지에서 인증 토큰 제거
     destroyCookie(null, 'token');
     localStorage.removeItem('authToken');
-
+    clearUserInfo(); // Zustand의 clearUserInfo 호출
     // 로그아웃 후 메인 페이지로 이동
     router.push('/');
     closeModal();
