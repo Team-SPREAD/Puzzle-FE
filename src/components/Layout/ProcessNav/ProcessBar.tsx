@@ -8,10 +8,23 @@ import {
   UserCircle,
   Users,
   FileText,
+  UserPlus,
+  CheckSquare,
 } from 'lucide-react';
 import Image from 'next/image';
 
-const icons = [Star, Flag, Pencil, Star, Cloud, UserCircle, Users, FileText];
+const icons = [
+  Star, // 1단계: 아이스브레이킹
+  Flag, // 2단계: 비전 설정
+  Pencil, // 3단계: 주제 선정
+  Star, // 4단계: 스프레드
+  Cloud, // 5단계: 토론하기
+  UserCircle, // 6단계: 페르소나
+  Users, // 7단계: 문제해결
+  FileText, // 8단계: 사용자 스토리
+  UserPlus, // 9단계: 역할분담
+  CheckSquare, // 10단계: 마무리
+];
 
 interface ProcessBarProps {
   processes: Process[];

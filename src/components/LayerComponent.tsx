@@ -7,6 +7,7 @@ import { colorToCss } from "@/lib/utils";
 import Rectangle from "./Rectangle";
 import Note from "./Note";
 import Text from "./Text";
+import Vision from "./Vision";
 
 type Props = {
   id: string;
@@ -45,6 +46,12 @@ const LayerComponent = memo(
             y={layer.y}
             fill={layer.fill ? colorToCss(layer.fill) : "#CCC"}
             stroke={selectionColor}
+            strokeOptions={{
+              size: layer.strokeWidth||16,
+              thinning: 0.5,
+              smoothing: 0.5,
+              streamline: 0.5,
+            }}
           />
         );
       case LayerType.Rectangle:
@@ -68,6 +75,15 @@ const LayerComponent = memo(
       case LayerType.Note:
         return (
           <Note
+            id={id}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
+        case LayerType.Vision: // VisionLayer 처리 추가
+        return (
+          <Vision
             id={id}
             layer={layer}
             onPointerDown={onLayerPointerDown}

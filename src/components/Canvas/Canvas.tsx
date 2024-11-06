@@ -52,6 +52,19 @@ import RightNav from '../Layout/RightNav';
 import Avatar from '@/components/Avatar';
 import ProcessNav from '@/components/Layout/ProcessNav/Index';
 import { steps } from '@/lib/process-data';
+import {
+  IceBreakingArea,
+  VisionFinding,
+  TopicSelection,
+  SpreadIdeas,
+  Discussion,
+  Persona,
+  ProblemSolving,
+  UserStory,
+  RoleAssignment,
+  Result,
+} from '../Templates';
+import { StageGimmicks } from '@/components/StageGimmicks';
 
 const MAX_LAYERS = 100;
 
@@ -60,8 +73,9 @@ const Canvas = () => {
   const layerIds = useStorage((root) => root.layerIds);
   const cursorPanel = useRef(null);
   const [currentStep, setCurrentStep] = useState(1); //프로젝트 1단계
-
+  const [penSize, setPenSize] = useState(8); //펜 사이즈 use
   const pencilDraft = useSelf((me) => me.presence.pencilDraft);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | undefined>(); //text 컬러 상태관리
   const [canvasState, setState] = useState<CanvasState>({
     mode: CanvasMode.None,
   });
@@ -88,6 +102,33 @@ const Canvas = () => {
   useDisableScrollBounce();
 
   const deleteLayers = useDeleteLayers();
+
+  const renderStageTemplate = () => {
+    switch (currentStep) {
+      case 1:
+        return <IceBreakingArea camera={camera} />;
+      case 2:
+        return <VisionFinding camera={camera} />;
+      case 3:
+        return <TopicSelection camera={camera} />;
+      case 4:
+        return <SpreadIdeas camera={camera} />;
+      case 5:
+        return <Discussion camera={camera} />;
+      case 6:
+        return <Persona camera={camera} />;
+      case 7:
+        return <ProblemSolving camera={camera} />;
+      case 8:
+        return <UserStory camera={camera} />;
+      case 9:
+        return <RoleAssignment camera={camera} />;
+      case 10:
+        return <Result camera={camera} />;
+      default:
+        return null;
+    }
+  };
 
   /**
    * 단계를 위한 useEffect
@@ -188,16 +229,48 @@ const Canvas = () => {
 
       const liveLayerIds = storage.get('layerIds');
       const layerId = nanoid();
-      const layer = new LiveObject({
-        type: layerType,
+
+      // 기본 레이어 속성
+      const baseLayerProps = {
         x: position.x,
         y: position.y,
-        height: 100,
-        width: 100,
-        fill: lastUsedColor,
-      });
+      };
+
+      // 타입 캐스팅을 사용하여 Layer 타입으로 변환
+      const layer = (() => {
+        if (layerType === LayerType.Note) {
+          return {
+            ...baseLayerProps,
+            type: LayerType.Note,
+            width: 180,
+            height: 180,
+            fill: { r: 255, g: 244, b: 189 },
+            value: '',
+          };
+        } else if (layerType === LayerType.Text) {
+          return {
+            ...baseLayerProps,
+            type: LayerType.Text,
+            width: 200,
+            height: 40,
+            fill: lastUsedColor,
+            value: '',
+          };
+        } else {
+          return {
+            ...baseLayerProps,
+            type: layerType,
+            width: 100,
+            height: 100,
+            fill: lastUsedColor,
+          };
+        }
+      })();
+
       liveLayerIds.push(layerId);
-      liveLayers.set(layerId, layer);
+
+      // as unknown as Layer를 사용하여 타입 에러 해결
+      liveLayers.set(layerId, new LiveObject(layer as unknown as Layer));
 
       setMyPresence({ selection: [layerId] }, { addToHistory: true });
       setState({ mode: CanvasMode.None });
@@ -248,17 +321,21 @@ const Canvas = () => {
       }
 
       const id = nanoid();
+
+      //penPointesToPathLayer에 strokeWidth 전달
       liveLayers.set(
         id,
-        new LiveObject(penPointsToPathLayer(pencilDraft, lastUsedColor)),
+        new LiveObject({
+          ...penPointsToPathLayer(pencilDraft, lastUsedColor),
+          strokeWidth: penSize, // 여기에 penSize 추가
+        }),
       );
 
       const liveLayerIds = storage.get('layerIds');
       liveLayerIds.push(id);
       setMyPresence({ pencilDraft: null });
-      setState({ mode: CanvasMode.Pencil });
     },
-    [lastUsedColor],
+    [lastUsedColor, penSize], // penSize 의존성 추가
   );
 
   /**
@@ -445,6 +522,13 @@ const Canvas = () => {
   const onPointerMove = useMutation(
     ({ setMyPresence }, e: React.PointerEvent) => {
       e.preventDefault();
+      e.stopPropagation(); //브라우저 기본 드래그 동작
+
+      // 브라우저의 기본 드래그 방지
+      if (e.target instanceof HTMLElement || e.target instanceof SVGElement) {
+        e.target.style.userSelect = 'none';
+      }
+
       const current = pointerEventToCanvasPoint(e, camera);
       if (canvasState.mode === CanvasMode.Pressing) {
         startMultiSelection(current, canvasState.origin);
@@ -516,6 +600,17 @@ const Canvas = () => {
     }
   }, [insertInitialLayer, layerIds.length]);
 
+  // Path 컴포넌트에 전달할 getStroke 옵션
+  const strokeOptions = useMemo(
+    () => ({
+      size: penSize,
+      thinning: 0.5,
+      smoothing: 0.5,
+      streamline: 0.5,
+    }),
+    [penSize],
+  );
+
   return (
     <div className="w-full h-screen flex flex-col relative bg-surface-canvas touch-none overflow-hidden">
       <ProcessNav
@@ -526,6 +621,9 @@ const Canvas = () => {
       />
 
       <div className="flex-1 relative">
+        {/* 현재 단계의 템플릿 렌더링 */}
+        <StageGimmicks currentStep={currentStep} />
+        {renderStageTemplate()}
         <div
           className="w-full h-full relative bg-surface-canvas touch-none"
           ref={cursorPanel}
@@ -585,6 +683,7 @@ const Canvas = () => {
                   fill={colorToCss(lastUsedColor)}
                   x={0}
                   y={0}
+                  strokeOptions={strokeOptions} // strokeOptions 전달
                 />
               )}
             </g>
@@ -599,6 +698,10 @@ const Canvas = () => {
             redo={history.redo}
             canUndo={canUndo}
             canRedo={canRedo}
+            penSize={penSize}
+            setPenSize={setPenSize}
+            currentColor={lastUsedColor} // 추가
+            onColorChange={setLastUsedColor}
           />
         </div>
         <div className="absolute bottom-0 right-0 z-30">
