@@ -17,6 +17,11 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function colorToCss(color: Color) {
+  if (!color || typeof color.r !== 'number' || typeof color.g !== 'number' || typeof color.b !== 'number') {
+    console.error("Invalid color object:", color);
+    return '#000000'; // 기본 값으로 검정색 반환
+  }
+
   return `#${color.r.toString(16).padStart(2, '0')}${color.g
     .toString(16)
     .padStart(2, '0')}${color.b.toString(16).padStart(2, '0')}`;
