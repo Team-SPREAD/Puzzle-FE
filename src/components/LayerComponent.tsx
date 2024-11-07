@@ -1,13 +1,14 @@
-import { useStorage } from "@/liveblocks.config";
-import React, { memo } from "react";
-import Ellipse from "./Ellipse";
-import Path from "./Path";
-import { CanvasMode, LayerType } from "@/lib/types";
-import { colorToCss } from "@/lib/utils";
-import Rectangle from "./Rectangle";
-import Note from "./Note";
-import Text from "./Text";
-import Vision from "./Vision";
+import { useStorage } from '@/liveblocks.config';
+import React, { memo } from 'react';
+import Ellipse from './Ellipse';
+import Path from './Path';
+import { CanvasMode, LayerType } from '@/lib/types';
+import { colorToCss } from '@/lib/utils';
+import Rectangle from './Rectangle';
+import Note from './Note';
+import Text from './Text';
+import Vision from './Vision';
+import TopicVote from './TopicVote';
 
 type Props = {
   id: string;
@@ -44,10 +45,10 @@ const LayerComponent = memo(
             onPointerDown={(e) => onLayerPointerDown(e, id)}
             x={layer.x}
             y={layer.y}
-            fill={layer.fill ? colorToCss(layer.fill) : "#CCC"}
+            fill={layer.fill ? colorToCss(layer.fill) : '#CCC'}
             stroke={selectionColor}
             strokeOptions={{
-              size: layer.strokeWidth||16,
+              size: layer.strokeWidth || 16,
               thinning: 0.5,
               smoothing: 0.5,
               streamline: 0.5,
@@ -81,7 +82,7 @@ const LayerComponent = memo(
             selectionColor={selectionColor}
           />
         );
-        case LayerType.Vision: // VisionLayer 처리 추가
+      case LayerType.Vision: // VisionLayer 처리 추가
         return (
           <Vision
             id={id}
@@ -90,13 +91,22 @@ const LayerComponent = memo(
             selectionColor={selectionColor}
           />
         );
+        case LayerType.TopicVote: // TopicVote 케이스 추가
+        return (
+          <TopicVote
+            id={id}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
       default:
-        console.warn("Unknown layer type");
+        console.warn('Unknown layer type');
         return null;
     }
-  }
+  },
 );
 
-LayerComponent.displayName = "LayerComponent";
+LayerComponent.displayName = 'LayerComponent';
 
 export default LayerComponent;
