@@ -20,24 +20,31 @@ export default function TopicVote({
 }: TopicVoteProps) {
   const { x, y, width, height, value, reactions = {}, iconUrl } = layer;
   const me = useSelf();
-
   const updateReaction = useMutation(({ storage }, emoji: string) => {
     const liveLayers = storage.get('layers');
     const layer = liveLayers.get(id);
 
     if (layer && me?.id) {
-      const currentReactions = { ...(layer.get('reactions') || {}) };
+      // layer.get() 호출 자체에 any 타입 적용
+      const reactions = (layer as any).get('reactions') as Record<
+        string,
+        {
+          emoji: string;
+          timestamp: number;
+        }
+      >;
+      const currentReactions = { ...(reactions || {}) };
 
       if (currentReactions[me.id]?.emoji === emoji) {
         const { [me.id]: _, ...remainingReactions } = currentReactions;
-        layer.update({ reactions: remainingReactions });
+        layer.update({ reactions: remainingReactions } as any);
       } else {
         layer.update({
           reactions: {
             ...currentReactions,
             [me.id]: { emoji, timestamp: Date.now() },
           },
-        });
+        } as any);
       }
     }
   }, []);
