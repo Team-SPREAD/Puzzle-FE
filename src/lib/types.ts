@@ -30,7 +30,8 @@ export enum LayerType {
   Path,
   Text,
   Note,
-  Vision, // Vision 추가
+  Vision, // 2단계 Vision 추가
+  TopicVote, // 3단계
 }
 
 export type Camera = {
@@ -44,7 +45,8 @@ export type Layer =
   | PathLayer
   | TextLayer
   | NoteLayer
-  | VisionLayer;
+  | VisionLayer
+  | TopicVoteLayer;
 
 export type RectangleLayer = {
   type: LayerType.Rectangle;
@@ -110,6 +112,32 @@ export type VisionLayer = {
   fontStyle: string; // 폰트 스타일
   iconUrl?: string; // 아이콘 URL (옵션)
 };
+
+// TopicVote 레이어 타입
+export type TopicVoteLayer = {
+  type: LayerType.TopicVote;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: Color;
+  value: string;
+  borderColor: Color;
+  fontStyle: string;
+  iconUrl?: string;
+  reactions: Record<string, {
+    emoji: string;
+    timestamp: number;
+  }>;
+};
+
+// 3단계 주제선정에서 쓰이는 타입
+export interface ReactionData {
+  [userId: string]: {
+    emoji: string;
+    timestamp: number;
+  };
+}
 
 export type Point = {
   x: number;
@@ -202,7 +230,7 @@ export type Process = {
   camera: { x: number; y: number };
   done: boolean;
   // 현재 안 쓰이는 단계, 필요하면 쓰는 걸로, 게임을 위해서 만들어봄
-  // iceBreaking?: { 
+  // iceBreaking?: {
   //   isGameActive: boolean;
   //   game?: IceBreakingGame;
   //   introductions: {
