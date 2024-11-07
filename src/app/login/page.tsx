@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import useUserInfoStore from '@/hooks/useUserInfoStore';
+import useUserInfoStore from '@/store/useUserInfoStore';
 import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {

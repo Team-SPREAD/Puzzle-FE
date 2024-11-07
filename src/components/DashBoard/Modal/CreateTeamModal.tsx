@@ -29,14 +29,14 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://kim-sun-woo.com/puzzle/teams', {
+      const response = await fetch('/api/team', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          teamName,
-          userId,
+          name: teamName, // 'teamName'을 'name'으로 변경하여 API에 맞춤
+          members: [userId.toString()], // members에 userId 추가
         }),
       });
       if (response.ok) {

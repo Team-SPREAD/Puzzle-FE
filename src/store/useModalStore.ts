@@ -6,6 +6,7 @@ type ModalType =
   | 'INVITE_TEAM'
   | 'DROPDOWN_TEAM_SELECT'
   | 'USER_SELECT'
+  | 'PROJECT_SETTING'
   | null;
 
 interface ModalState {

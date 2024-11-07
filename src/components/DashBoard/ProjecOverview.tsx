@@ -1,4 +1,3 @@
-// components/DashBoard/ProjectOverview.tsx
 'use client';
 import ProjectGrid from '@/components/DashBoard/ProjectGrid';
 import Image from 'next/image';

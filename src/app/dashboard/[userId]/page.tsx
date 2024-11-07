@@ -6,9 +6,8 @@ import Sidebar from '@/components/DashBoard/SideBar';
 import Header from '@/components/DashBoard/Header';
 import TeamMembersBar from '@/components/DashBoard/TeamMembersBar';
 import { generateRandomColor } from '@/utils/getRandomColor';
-import useUserInfoStore from '@/hooks/useUserInfoStore'; //지워야 함
-import useUserStore from '@/store/useUserStore';
-import { UserInfo } from '@/lib/types';
+import useUserInfoStore from '@/store/useUserInfoStore';
+
 import useModalStore from '@/store/useModalStore';
 import CreateTeamModal from '@/components/DashBoard/Modal/CreateTeamModal';
 import ProjectOverview from '@/components/DashBoard/ProjecOverview';
@@ -17,23 +16,11 @@ export default function DashboardPage() {
   const { userId } = useParams();
   const router = useRouter();
   const mockUserInfo = useUserInfoStore();
-  const testUserInfo = useUserStore().userInfo;
   const { modalType, closeModal } = useModalStore();
 
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [buttonColor, setButtonColor] = useState('');
   const [userTeams, setUserTeams] = useState([]);
-  const { setUserInfo, userInfo } = useUserStore();
-
-  useEffect(() => {
-    // 로컬 스토리지에서 사용자 정보 불러오기
-    const storedUserInfo = localStorage.getItem('userInfo');
-    if (storedUserInfo) {
-      setUserInfo(JSON.parse(storedUserInfo)); // 로컬 스토리지 데이터로 Zustand 상태 설정
-    } else {
-      router.push('/login'); // 사용자 정보가 없으면 로그인 페이지로 이동
-    }
-  }, [setUserInfo, router]);
 
   // 사용자가 속한 팀 목록 가져오기
   const fetchUserTeams = async () => {
@@ -58,15 +45,13 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    fetchUserTeams();
     setButtonColor(generateRandomColor());
-  }, [router, testUserInfo, userId]);
+  }, [router, userId]);
 
   const filteredProjects =
     selectedTeamId === null
       ? mockUserInfo.projects
       : mockUserInfo.projects.filter((p) => p.teamId === selectedTeamId);
-
   const dashboardTitle =
     selectedTeamId === null
       ? '개인 대시보드'
@@ -89,7 +74,7 @@ export default function DashboardPage() {
         <Header
           isDashboardPersonal={selectedTeamId === null}
           buttonColor={buttonColor}
-          userName={testUserInfo.name}
+          userName={mockUserInfo.name}
         />
 
         <div className="flex w-full h-[92%] ">
@@ -98,11 +83,16 @@ export default function DashboardPage() {
             setSelectedTeamId={setSelectedTeamId}
             buttonColor={buttonColor}
             favoriteProjects={mockUserInfo.projects.filter((p) => p.isFavorite)}
-            teams={userTeams}
-            userInfo={testUserInfo}
+            teams={mockUserInfo.teams}
+            userInfo={{
+              id: mockUserInfo._id,
+              name: mockUserInfo.name,
+              avatar: mockUserInfo.avatar,
+              email: mockUserInfo.email,
+            }}
           />
           <ProjectOverview
-            dashboardTitle={'My Boards'}
+            dashboardTitle={dashboardTitle}
             filteredProjects={filteredProjects}
             buttonColor={buttonColor}
           />
@@ -112,7 +102,7 @@ export default function DashboardPage() {
           <CreateTeamModal
             isOpen={true}
             onClose={closeModal}
-            userId={Number(testUserInfo.id)}
+            userId={Number(mockUserInfo._id)}
           />
         )}
       </div>

@@ -14,7 +14,7 @@ interface SidebarProps {
   setSelectedTeamId: (teamId: string | null) => void;
   buttonColor: string;
   favoriteProjects: { id: string; name: string; isFavorite: boolean }[];
-  teams: { id: string; teamName: string }[];
+  teams: { id: string; name: string }[];
   userInfo: UserInfo;
 }
 
@@ -67,7 +67,7 @@ export default function Sidebar({
               className="w-full h-[48px] text-left px-4 py-2 border rounded-md flex justify-between items-center"
             >
               {selectedTeamId
-                ? teams.find((t) => t.id === selectedTeamId)?.teamName
+                ? teams.find((t) => t.id === selectedTeamId)?.name
                 : '개인 대시보드'}
               <Image
                 src={arrowBottom}
@@ -77,7 +77,7 @@ export default function Sidebar({
               />
             </button>
             {modalType === 'DROPDOWN_TEAM_SELECT' && (
-              <div className="mt-2 bg-white rounded-md shadow-lg absolute z-50">
+              <div className="mt-2 bg-white rounded-md shadow-lg absolute z-50 w-[14%]">
                 <button
                   onClick={() => handleTeamSelect(null)}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -90,7 +90,7 @@ export default function Sidebar({
                     onClick={() => handleTeamSelect(team.id)}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
-                    {team.teamName}
+                    {team.name}
                   </button>
                 ))}
                 <button
