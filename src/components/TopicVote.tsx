@@ -4,6 +4,7 @@ import { useMutation, useSelf } from '@/liveblocks.config';
 import { motion } from 'framer-motion';
 import { cn, colorToCss } from '@/lib/utils';
 import { REACTIONS } from '@/components/StageGimmicks/configs';
+import Image from 'next/image';
 
 interface TopicVoteProps {
   id: string;
@@ -79,7 +80,7 @@ export default function TopicVote({
           {/* 헤더 영역 */}
           <div className="flex items-center gap-3 mb-4 pb-3 border-b border-indigo-100">
             {iconUrl ? (
-              <img
+              <Image
                 src={iconUrl}
                 alt=""
                 className="w-10 h-10 rounded-full border-2 border-indigo-200"
