@@ -1,6 +1,7 @@
-import { VisionBoxTemplate } from '.';
+import { VisionBoxTemplate,TopicVoteTemplate } from '.';
 import { STAGE_GIMMICKS } from './configs';
 import { motion } from 'framer-motion';
+
 
 interface StageGimmicksProps {
   currentStep: number;
@@ -12,7 +13,7 @@ export default function StageGimmicks({ currentStep }: StageGimmicksProps) {
 
   const GimmickComponent = {
     2: VisionBoxTemplate,
-    // 추후 다른 단계들이 여기에 추가될 예정
+    3: TopicVoteTemplate
   }[currentStep];
 
   if (!GimmickComponent) return null;
