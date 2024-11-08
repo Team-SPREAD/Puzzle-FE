@@ -32,6 +32,7 @@ export enum LayerType {
   Note,
   Vision, // 2단계 Vision 추가
   TopicVote, // 3단계
+  UserStory, //8단계
 }
 
 export type Camera = {
@@ -46,7 +47,8 @@ export type Layer =
   | TextLayer
   | NoteLayer
   | VisionLayer
-  | TopicVoteLayer;
+  | TopicVoteLayer
+  | UserStoryLayer;
 
 export type RectangleLayer = {
   type: LayerType.Rectangle;
@@ -125,10 +127,13 @@ export type TopicVoteLayer = {
   borderColor: Color;
   fontStyle: string;
   iconUrl?: string;
-  reactions: Record<string, {
-    emoji: string;
-    timestamp: number;
-  }>;
+  reactions: Record<
+    string,
+    {
+      emoji: string;
+      timestamp: number;
+    }
+  >;
 };
 
 // 3단계 주제선정에서 쓰이는 타입
@@ -138,6 +143,27 @@ export interface ReactionData {
     timestamp: number;
   };
 }
+//UserStory 레이어 타입
+export type UserStoryLayer = {
+  type: LayerType; // 레이어의 타입 (LayerType.UserStory)
+  x: number; // 레이어의 x 좌표 위치
+  y: number; // 레이어의 y 좌표 위치
+  width: number; // 레이어의 가로 크기
+  height: number; // 레이어의 세로 크기
+  who: string; // 'Who'에 해당하는 사용자
+  goal: string; // 'Why'에 해당하는 목적
+  action: string; // 'What'에 해당하는 활동/작업
+  task: string; // 작업
+  fill: Color; // 레이어의 배경 색상
+  borderColor: {
+    // 레이어의 테두리 색상 (RGB 형식)
+    r: number;
+    g: number;
+    b: number;
+  };
+  fontStyle: string; // 레이어의 폰트 스타일
+  iconUrl?: string; // 사용자 아이콘 URL (선택적)
+};
 
 export type Point = {
   x: number;
