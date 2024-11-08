@@ -83,6 +83,8 @@ export default function TopicVote({
               <Image
                 src={iconUrl}
                 alt=""
+                width={40}
+                height={40}
                 className="w-10 h-10 rounded-full border-2 border-indigo-200"
               />
             ) : (

@@ -117,6 +117,8 @@ export default function Vision({
             <Image
               src={iconUrl}
               alt="user avatar"
+              width={40}
+              height={40}
               className="w-8 h-8 rounded-full mr-3" // 작은 동그라미 모양 아바타
             />
           )}
