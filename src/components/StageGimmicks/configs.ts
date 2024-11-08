@@ -34,6 +34,19 @@ export const STAGE_GIMMICKS: { [key: number]: StageGimmick } = {
     title: '주제에 대해 투표해주세요',
     description: '프로젝트의 방향성을 결정하기 위해 의견을 나누고 투표해주세요',
   },
+  8: {
+    boxes: [
+      {
+        id: 'user-story-box',
+        type: 'userStory',
+        color: { r: 34, g: 197, b: 94 }, // Green 색상
+        position: { x: 150, y: 250 },
+      },
+    ],
+    title: '사용자 스토리 맵',
+    description:
+      '사용자가 목표를 달성하기 위해 수행하는 모든 행동을 시각적으로 정리합시다',
+  },
 };
 
 export const REACTIONS = [
