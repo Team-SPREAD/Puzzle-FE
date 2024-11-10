@@ -4,6 +4,7 @@ import { VisionLayer, Color } from '@/lib/types';
 import { useMutation } from '@/liveblocks.config';
 import { motion } from 'framer-motion';
 import { cn, colorToCss } from '@/lib/utils';
+import Image from 'next/image';
 
 interface VisionBoxProps {
   id: string;
@@ -113,9 +114,11 @@ export default function Vision({
         <div className="flex items-center p-3">
           {/* 아이콘 추가 (옵션) */}
           {iconUrl && (
-            <img
+            <Image
               src={iconUrl}
               alt="user avatar"
+              width={40}
+              height={40}
               className="w-8 h-8 rounded-full mr-3" // 작은 동그라미 모양 아바타
             />
           )}
