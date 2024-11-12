@@ -32,6 +32,7 @@ export enum LayerType {
   Note,
   Vision, // 2단계 Vision 추가
   TopicVote, // 3단계
+  Spread, // 4단계 Spread 추가
   UserStory, //8단계
 }
 
@@ -48,7 +49,8 @@ export type Layer =
   | NoteLayer
   | VisionLayer
   | TopicVoteLayer
-  | UserStoryLayer;
+  | UserStoryLayer
+  | SpreadLayer;
 
 export type RectangleLayer = {
   type: LayerType.Rectangle;
@@ -142,7 +144,38 @@ export interface ReactionData {
     emoji: string;
     timestamp: number;
   };
-}
+}// types.ts
+export type SpreadLayer = {
+  type: LayerType.Spread;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: Color;
+  content?: string;
+  tag?: string;
+  centerIdea:string;
+};
+
+//4단계 아이디어 레이어
+export type Idea = {
+  id: string;
+  content: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  tag?: string;
+  connections: string[];
+  reactions: {
+    [userId: string]: {
+      emoji: string;
+      timestamp: number;
+    };
+  };
+};
+
+
 //UserStory 레이어 타입
 export type UserStoryLayer = {
   type: LayerType; // 레이어의 타입 (LayerType.UserStory)
