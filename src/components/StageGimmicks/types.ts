@@ -17,3 +17,9 @@ export interface UserStoryProps {
   position: { x: number; y: number };
   color: Color;
 }
+
+export interface SpreadBoxProps {
+  id: string;
+  position: { x: number; y: number };
+  color: Color;
+}
