@@ -10,6 +10,7 @@ import Text from './Text';
 import Vision from './Vision';
 import TopicVote from './TopicVote';
 import Story from './Story';
+import Spread from './Spread.';
 
 type Props = {
   id: string;
@@ -95,6 +96,16 @@ const LayerComponent = memo(
       case LayerType.TopicVote: // TopicVote 케이스 추가
         return (
           <TopicVote
+            id={id}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
+
+      case LayerType.Spread:
+        return (
+          <Spread
             id={id}
             layer={layer}
             onPointerDown={onLayerPointerDown}
