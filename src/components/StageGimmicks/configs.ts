@@ -34,6 +34,19 @@ export const STAGE_GIMMICKS: { [key: number]: StageGimmick } = {
     title: '주제에 대해 투표해주세요',
     description: '프로젝트의 방향성을 결정하기 위해 의견을 나누고 투표해주세요',
   },
+
+  4: {
+    boxes: [
+      {
+        id: 'topic-vote-box',
+        type: 'topicVote',
+        color: { r: 236, g: 72, b: 153 },
+        position: { x: 150, y: 250 },
+      },
+    ],
+    title: '아이디어를 확장해보세요',
+    description: '핵심 아이디어로부터 다양한 관점과 가능성을 탐색해보세요',
+  },
   8: {
     boxes: [
       {
