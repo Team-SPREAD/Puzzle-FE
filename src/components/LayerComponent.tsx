@@ -10,7 +10,7 @@ import Text from './Text';
 import Vision from './Vision';
 import TopicVote from './TopicVote';
 import Story from './Story';
-import Spread from './Spread.';
+import Spread from './Spread';
 
 type Props = {
   id: string;
