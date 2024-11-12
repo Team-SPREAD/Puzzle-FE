@@ -55,8 +55,8 @@ export default function Spread({
         direction,
       });
 
-      // Storage에 추가
-      layers.set(newId, newLayer);
+     
+     
       layerIds.push(newId);
     },
     [x, y, layer.fill]

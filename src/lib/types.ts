@@ -144,7 +144,10 @@ export interface ReactionData {
     emoji: string;
     timestamp: number;
   };
-}// types.ts
+}
+
+//4단계 레이어 
+
 export type SpreadLayer = {
   type: LayerType.Spread;
   x: number;
@@ -152,9 +155,10 @@ export type SpreadLayer = {
   width: number;
   height: number;
   fill: Color;
+  centerIdea: string;
   content?: string;
+  direction?: 'up' | 'right' | 'down' | 'left';
   tag?: string;
-  centerIdea:string;
 };
 
 //4단계 아이디어 레이어
@@ -178,7 +182,7 @@ export type Idea = {
 
 //UserStory 레이어 타입
 export type UserStoryLayer = {
-  type: LayerType; // 레이어의 타입 (LayerType.UserStory)
+  type: LayerType.UserStory // 레이어의 타입 (LayerType.UserStory)
   x: number; // 레이어의 x 좌표 위치
   y: number; // 레이어의 y 좌표 위치
   width: number; // 레이어의 가로 크기

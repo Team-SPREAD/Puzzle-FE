@@ -46,7 +46,7 @@ export default function SpreadBoxTemplate({
         ideas: [],
       });
 
-      layers.set(newId, newLayer);
+     
       layerIds.push(newId);
       setCenterIdea('');
       setIsCollapsed(true);
