@@ -53,10 +53,10 @@ export default function Spread({
         centerIdea: '',
         content: '',
         direction,
-      });
+      }as any);
 
-     
-     
+      // Storage에 추가
+      layers.set(newId, newLayer);
       layerIds.push(newId);
     },
     [x, y, layer.fill]
