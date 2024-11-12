@@ -34,7 +34,7 @@ export default function SpreadBoxTemplate({
       const newX = basePosition.x + 550;
       const newY = basePosition.y + 3100;
 
-      const newLayer = new LiveObject({
+       const newLayer = new LiveObject({
         type: LayerType.Spread,
         x: newX,
         y: newY,
