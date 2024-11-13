@@ -5,10 +5,10 @@ import dots from '~/images/dots.svg';
 import testImage from '~/images/testUserIcon.jpeg';
 import useModalStore from '@/store/useModalStore';
 import { useState } from 'react';
-import ProjectSettingModal from '@/components/DashBoard/Modal/ProjectSettingModal';
+import BoardSettingModal from '@/components/DashBoard/Modal/BoardSettingModal';
 
-interface ProjectGridProps {
-  projects: {
+interface BoardGridProps {
+  boards: {
     id: string;
     name: string;
     teamId: string | null;
@@ -17,29 +17,26 @@ interface ProjectGridProps {
   buttonColor: string;
 }
 
-export default function ProjectGrid({
-  projects,
-  buttonColor,
-}: ProjectGridProps) {
-  const getProjectUrl = (projectName: string) => {
-    return `/board/${projectName.toLowerCase().replace(/ /g, '-')}`;
+export default function BoardGrid({ boards, buttonColor }: BoardGridProps) {
+  const getBoardUrl = (boardName: string) => {
+    return `/board/${boardName.toLowerCase().replace(/ /g, '-')}`;
   };
 
   const { modalType, openModal, closeModal } = useModalStore();
   const [isThrottled, setIsThrottled] = useState(false);
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [activeBoardId, setActiveBoardId] = useState<string | null>(null);
 
-  const handleProjectClick = (projectId: string) => {
+  const handleBoardClick = (boardId: string) => {
     if (isThrottled) return;
     setIsThrottled(true);
 
     // 클릭한 projectId에 따라 모달 열기/닫기
-    if (modalType === 'PROJECT_SETTING' && activeProjectId === projectId) {
+    if (modalType === 'PROJECT_SETTING' && activeBoardId === boardId) {
       closeModal();
-      setActiveProjectId(null);
+      setActiveBoardId(null);
     } else {
       openModal('PROJECT_SETTING');
-      setActiveProjectId(projectId);
+      setActiveBoardId(boardId);
     }
 
     setTimeout(() => {
@@ -60,24 +57,24 @@ export default function ProjectGrid({
         </button>
         <p>New board</p>
       </div>
-      {projects.map((project) => (
-        <div key={project.id}>
+      {boards.map((board) => (
+        <div key={board.id}>
           <div className="bg-white rounded-lg shadow-md transition-all duration-200 aspect-[2/3] p-6 flex flex-col justify-around transform group hover:shadow-lg">
             <div className="flex justify-end">
               <Image
                 src={dots}
                 alt="dots"
-                onClick={() => handleProjectClick(project.id)}
+                onClick={() => handleBoardClick(board.id)}
                 className="cursor-pointer"
               />
               {/* 현재 project.id가 activeProjectId와 동일할 때만 모달 표시 */}
               {modalType === 'PROJECT_SETTING' &&
-                activeProjectId === project.id && (
-                  <ProjectSettingModal onClose={closeModal} />
+                activeBoardId === board.id && (
+                  <BoardSettingModal onClose={closeModal} />
                 )}
             </div>
             <Link
-              href={getProjectUrl(project.name)}
+              href={getBoardUrl(board.name)}
               className="flex justify-center"
             >
               <Image
@@ -90,15 +87,15 @@ export default function ProjectGrid({
               <div
                 className="h-full rounded"
                 style={{
-                  width: `${(project.currentStep / TOTAL_STEPS) * 100}%`,
-                  backgroundColor: project.teamId ? buttonColor : 'gray',
+                  width: `${(board.currentStep / TOTAL_STEPS) * 100}%`,
+                  backgroundColor: board.teamId ? buttonColor : 'gray',
                 }}
               ></div>
             </div>
             <div>
-              <h3 className="font-bold text-xl mb-2">{project.name}</h3>
+              <h3 className="font-bold text-xl mb-2">{board.name}</h3>
               <p className="text-sm text-gray-500">
-                {project.teamId ? '팀 프로젝트' : '개인 프로젝트'}
+                {board.teamId ? '팀 프로젝트' : '개인 프로젝트'}
               </p>
             </div>
           </div>

@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import logo from '~/images/logo/logo.svg';
 import Image from 'next/image';
+import useModalStore from '@/store/useModalStore';
+
 interface HeaderProps {
   isDashboardPersonal: boolean;
   buttonColor: string;
@@ -12,6 +14,8 @@ export default function Header({
   buttonColor,
   userName,
 }: HeaderProps) {
+  const { openModal } = useModalStore();
+
   return (
     <header className="bg-white shadow-sm w-full h-[8%] flex">
       <div id="a" className="w-[16%] h-full flex justify-center items-center">
@@ -33,11 +37,11 @@ export default function Header({
             <button
               style={{ backgroundColor: buttonColor }}
               className="px-4 py-2 text-white rounded-md"
+              onClick={() => openModal('INVITE_TEAM')}
             >
               + 멤버 초대
             </button>
           )}
-          <span className="text-sm">안녕하세요, {userName}님!</span>
         </div>
       </div>
     </header>

@@ -1,20 +1,22 @@
-import { useState } from 'react';
+'use client';
+import { useState, useEffect } from 'react';
 import { UserInfo } from '@/lib/types';
 import Image from 'next/image';
-import Link from 'next/link';
 import useModalStore from '@/store/useModalStore';
 import dots from '~/images/dots.svg';
 import star from '~/images/star.svg';
 import projects from '~/images/projects.svg';
 import arrowBottom from '~/images/arrow-bottom.svg';
 import UserSelectModal from './Modal/UserSelectModal';
+import defaultIcon from '~/images/testUserIcon.jpeg';
+import { generateRandomColor } from '@/utils/getRandomColor';
 
 interface SidebarProps {
   selectedTeamId: string | null;
   setSelectedTeamId: (teamId: string | null) => void;
   buttonColor: string;
   favoriteProjects: { id: string; name: string; isFavorite: boolean }[];
-  teams: { id: string; name: string }[];
+  teams: { _id: string; teamName: string }[];
   userInfo: UserInfo;
 }
 
@@ -28,6 +30,23 @@ export default function Sidebar({
 }: SidebarProps) {
   const { openModal, closeModal, modalType } = useModalStore();
   const [isUserSelectThrottled, setIsUserSelectThrottled] = useState(false); // 딜레이 상태 추가
+
+  // 팀의 첫 글자와 랜덤 색상 저장 상태
+  const [teamInitialColors, setTeamInitialColors] = useState<{
+    [key: string]: string;
+  }>({});
+
+  useEffect(() => {
+    // 팀 리스트를 기반으로 각 팀의 첫 글자에 대한 랜덤 색상 생성
+    const colors = teams.reduce(
+      (acc, team) => {
+        acc[team._id] = generateRandomColor();
+        return acc;
+      },
+      {} as { [key: string]: string },
+    );
+    setTeamInitialColors(colors);
+  }, [teams]);
 
   const handleTeamSelect = (teamId: string | null) => {
     setSelectedTeamId(teamId);
@@ -66,9 +85,30 @@ export default function Sidebar({
               }
               className="w-full h-[48px] text-left px-4 py-2 border rounded-md flex justify-between items-center"
             >
-              {selectedTeamId
-                ? teams.find((t) => t.id === selectedTeamId)?.name
-                : '개인 대시보드'}
+              <div className="flex items-center">
+                {selectedTeamId ? (
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
+                    style={{
+                      backgroundColor: teamInitialColors[selectedTeamId],
+                    }}
+                  >
+                    {teams
+                      .find((t) => t._id === selectedTeamId)
+                      ?.teamName[0].toUpperCase()}
+                  </div>
+                ) : (
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
+                    style={{ backgroundColor: buttonColor }}
+                  >
+                    개인
+                  </div>
+                )}
+                {selectedTeamId
+                  ? teams.find((t) => t._id === selectedTeamId)?.teamName
+                  : '개인 대시보드'}
+              </div>
               <Image
                 src={arrowBottom}
                 width={12}
@@ -80,17 +120,29 @@ export default function Sidebar({
               <div className="mt-2 bg-white rounded-md shadow-lg absolute z-50 w-[14%]">
                 <button
                   onClick={() => handleTeamSelect(null)}
-                  className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                  className="w-full text-left px-2 py-2 hover:bg-gray-100 flex items-center"
                 >
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
+                    style={{ backgroundColor: buttonColor }}
+                  >
+                    개인
+                  </div>
                   개인 대시보드
                 </button>
                 {teams.map((team) => (
                   <button
-                    key={team.id}
-                    onClick={() => handleTeamSelect(team.id)}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    key={team._id}
+                    onClick={() => handleTeamSelect(team._id)}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"
                   >
-                    {team.name}
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
+                      style={{ backgroundColor: teamInitialColors[team._id] }}
+                    >
+                      {team.teamName[0].toUpperCase()}
+                    </div>
+                    {team.teamName}
                   </button>
                 ))}
                 <button
@@ -134,11 +186,11 @@ export default function Sidebar({
           )}
           <div
             onClick={handleUserSelectClick}
-            className="w-full h-[48px]  px-2 py-2 rounded-md border flex justify-between items-center"
+            className="w-full h-[48px] px-2 py-2 rounded-md border flex justify-between items-center"
           >
             <div className="flex justify-between items-center space-x-2">
               <Image
-                src={userInfo.avatar}
+                src={userInfo.avatar || defaultIcon}
                 alt="user avatar"
                 width={35}
                 height={35}

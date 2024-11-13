@@ -11,6 +11,7 @@ interface TeamSettingModalProps {
 
 const TeamSettingModal: React.FC<TeamSettingModalProps> = ({ onClose }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const { openModal } = useModalStore();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -33,12 +34,22 @@ const TeamSettingModal: React.FC<TeamSettingModalProps> = ({ onClose }) => {
       ref={modalRef}
       className="absolute top-8 left-0 w-56 bg-white shadow-lg rounded-lg flex flex-col items-center z-50"
     >
-      <div className="w-full h-[48px] p-4 flex items-center cursor-pointer  hover:bg-gray-100">
+      <div
+        className="w-full h-[48px] p-4 flex items-center cursor-pointer hover:bg-gray-100"
+        onClick={() => {
+          openModal('EDIT_TEAM');
+        }}
+      >
         <Image src={pencil} width={12} height={7} alt="edit" />
         <p className="ml-2">이름 변경</p>
       </div>
       <div className="w-11/12 border-b border-[#EDEDED]"></div>
-      <div className="w-full h-[48px] p-4 flex items-center cursor-pointer hover:bg-gray-100">
+      <div
+        className="w-full h-[48px] p-4 flex items-center cursor-pointer hover:bg-gray-100"
+        onClick={() => {
+          openModal('DELETE_TEAM'); // 모달 상태를 DELETE_TEAM으로 설정하여 DeleteTeamModal을 열도록 함
+        }}
+      >
         <Image src={out} width={12} height={7} alt="exit" />
         <p className="ml-2">팀 나가기</p>
       </div>

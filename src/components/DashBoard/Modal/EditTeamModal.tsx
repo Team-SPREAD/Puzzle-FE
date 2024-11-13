@@ -1,60 +1,60 @@
 'use client';
 import React, { useState } from 'react';
 import CheckModal from '@/components/AniModals/CheckModal';
-import { createTeam } from '@/app/api/dashboard-axios';
-import think from '~/lotties/think.json';
+import { updateTeam } from '@/app/api/dashboard-axios';
+import pencil from '~/lotties/pencil.json';
 
-interface CreateTeamModalProps {
+interface EditTeamModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userId: number;
-  token: string; // JWT 토큰 추가
+  teamId: string;
+  currentTeamName: string;
 }
 
-const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
+const EditTeamModal: React.FC<EditTeamModalProps> = ({
   isOpen,
   onClose,
-  userId,
-  token,
+  teamId,
+  currentTeamName,
 }) => {
-  const [teamName, setTeamName] = useState('');
+  const [teamName, setTeamName] = useState(currentTeamName);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isTeamCreated, setIsTeamCreated] = useState(false); // 팀 생성 완료 상태 추가
+  const [isTeamUpdated, setIsTeamUpdated] = useState(false); // 팀 수정 완료 상태 추가
   const [showThinkModal, setShowThinkModal] = useState(false); // ThinkModal 딜레이를 위해 추가
 
-  if (!isOpen && !isTeamCreated) return null;
+  if (!isOpen && !isTeamUpdated) return null;
 
   // 모달 외부 클릭 시 모달을 닫는 함수
   const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      if (isTeamCreated) {
-        setIsTeamCreated(false); // ThinkModal이 열려있다면 ThinkModal 닫기
+      if (isTeamUpdated) {
+        setIsTeamUpdated(false); // ThinkModal이 열려있다면 ThinkModal 닫기
       } else {
         onClose();
       }
     }
   };
 
-  // 팀 생성 핸들러
-  const handleCreateTeam = async () => {
+  // 팀 수정 핸들러
+  const handleEditTeam = async () => {
     if (!teamName) return; // 팀 이름이 비어 있는 경우 요청하지 않음
     setIsSubmitting(true);
 
     try {
-      const response = await createTeam(teamName);
-      if (response.status === 201) {
-        console.log('Team created successfully');
-        setIsTeamCreated(true); // 팀 생성 성공 시 상태 업데이트
-        setIsSubmitting(true);
+      const response = await updateTeam(teamId, teamName);
+      if (response.status === 200) {
+        console.log('Team updated successfully');
+        setIsTeamUpdated(true); // 팀 수정 성공 시 상태 업데이트
+
         // 딜레이 후 ThinkModal 표시
         setTimeout(() => {
           setShowThinkModal(true);
         }, 1000); // 1000ms 딜레이
       } else {
-        console.error('Failed to create team');
+        console.error('Failed to update team');
       }
     } catch (error) {
-      console.error('Error creating team:', error);
+      console.error('Error updating team:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -62,8 +62,8 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
 
   return (
     <>
-      {/* 팀 생성 모달 */}
-      {!isTeamCreated && (
+      {/* 팀 수정 모달 */}
+      {!isTeamUpdated && isOpen && (
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           onClick={handleOutsideClick}
@@ -76,7 +76,7 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
               ✕
             </button>
             <h2 className="text-2xl font-semibold text-center mb-4">
-              새로운 팀 만들기
+              팀 이름 수정하기
             </h2>
             <input
               type="text"
@@ -87,30 +87,30 @@ const CreateTeamModal: React.FC<CreateTeamModalProps> = ({
             />
             <button
               className="w-full mt-6 bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-200"
-              onClick={handleCreateTeam}
+              onClick={handleEditTeam}
               disabled={isSubmitting}
             >
-              {isSubmitting ? '팀 생성 중...' : '팀 생성'}
+              {isSubmitting ? '팀 수정 중...' : '팀 수정'}
             </button>
           </div>
         </div>
       )}
-      {/* 팀 생성 완료 모달 */}
+      {/* 팀 수정 완료 모달 */}
       {showThinkModal && (
         <CheckModal
           onClose={() => {
-            setShowThinkModal(false);
-            setIsTeamCreated(false);
-            onClose();
-            window.location.reload();
+            setShowThinkModal(false); // ThinkModal 닫기
+            setIsTeamUpdated(false); // ThinkModal 닫기
+            onClose(); // EditTeamModal도 닫기
+            window.location.reload(); // 페이지 새로고침
           }}
-          lottieAnimationData={think}
-          title={'축하합니다!'}
-          description={'팀 생성이 완료되었어요'}
+          lottieAnimationData={pencil}
+          title={'수정 완료'}
+          description={'멋진 이름으로 수정하셨군요!'}
         />
       )}
     </>
   );
 };
 
-export default CreateTeamModal;
+export default EditTeamModal;

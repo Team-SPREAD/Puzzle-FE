@@ -16,9 +16,8 @@ const UserSelectModal: React.FC<UserSelectModalProps> = ({ email }) => {
   const clearUserInfo = useUserStore((state) => state.clearUserInfo);
 
   const handleLogout = () => {
-    // 쿠키 및 로컬 스토리지에서 인증 토큰 제거
-    destroyCookie(null, 'token');
-    localStorage.removeItem('authToken');
+    // 로컬 스토리지에서 인증 토큰 제거
+    localStorage.removeItem('token');
     clearUserInfo(); // Zustand의 clearUserInfo 호출
     // 로그아웃 후 메인 페이지로 이동
     router.push('/');
@@ -50,11 +49,10 @@ const UserSelectModal: React.FC<UserSelectModalProps> = ({ email }) => {
       <div className="flex-1 flex items-center justify-center">
         <p className="text-gray-800 text-sm">{email}</p>
       </div>
-      <button
-        onClick={handleLogout}
-        className="flex-1 w-full text-left text-red-500 hover:bg-gray-100 rounded flex items-center justify-center"
-      >
-        로그아웃
+      <button onClick={handleLogout} className="flex-1 w-full p-3 text-left ">
+        <div className=" w-full h-full text-white bg-red-500 hover:bg-red-400 rounded flex items-center justify-center">
+          로그아웃
+        </div>
       </button>
     </div>
   );
