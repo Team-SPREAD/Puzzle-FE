@@ -33,6 +33,7 @@ export enum LayerType {
   Vision, // 2단계 Vision 추가
   TopicVote, // 3단계
   Spread, // 4단계 Spread 추가
+  Discussion, // 5단계 토론하기
   UserStory, //8단계
 }
 
@@ -50,7 +51,8 @@ export type Layer =
   | VisionLayer
   | TopicVoteLayer
   | UserStoryLayer
-  | SpreadLayer;
+  | SpreadLayer
+  | DiscussionLayer;
 
 export type RectangleLayer = {
   type: LayerType.Rectangle;
@@ -146,7 +148,7 @@ export interface ReactionData {
   };
 }
 
-//4단계 레이어 
+//4단계 레이어
 
 export type SpreadLayer = {
   type: LayerType.Spread;
@@ -179,10 +181,59 @@ export type Idea = {
   };
 };
 
+// 5단계 기믹 타입 댓글 투표 토론
+export type DiscussionCategory = 'category' | 'problem' | 'solution' | 'target';
 
-//UserStory 레이어 타입
+export type VoteType = 'agree' | 'disagree' | 'neutral';
+
+export type Comment = {
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  content: string;
+  timestamp: number;
+  voteType: VoteType;
+  category: DiscussionCategory;
+  reactions: Record<string, { emoji: string; timestamp: number; }>;
+};
+
+export type DiscussionLayer = {
+  type: LayerType.Discussion;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: Color;
+  category: DiscussionCategory;
+  topic: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  status: 'ongoing' | 'completed';
+  votes: Record<string, { vote: VoteType; timestamp: number; }>;
+  comments: Comment[];
+  creator: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+  connectedTo?: string[]; // 연결된 다른 토론 카드들의 ID
+};
+
+export type DiscussionSummary = {
+  category: string;
+  problems: string[];
+  solutions: string[];
+  targetUsers: {
+    demographics: string[];
+    needs: string[];
+    characteristics: string[];
+  };
+};
+
+//8단계 UserStory 레이어 타입
 export type UserStoryLayer = {
-  type: LayerType.UserStory // 레이어의 타입 (LayerType.UserStory)
+  type: LayerType.UserStory; // 레이어의 타입 (LayerType.UserStory)
   x: number; // 레이어의 x 좌표 위치
   y: number; // 레이어의 y 좌표 위치
   width: number; // 레이어의 가로 크기
