@@ -30,7 +30,7 @@ const nextConfig = {
     return config;
   },
   typescript: {
-    ignoreBuildErrors: false, // 경고를 무시하지 않고 빌드, 테스트용입니다.
+    ignoreBuildErrors: false, // 경고를 무시한채로 빌드 origin true , 테스트용 입니다.
   },
 };
 
