@@ -23,3 +23,9 @@ export interface SpreadBoxProps {
   position: { x: number; y: number };
   color: Color;
 }
+
+export interface DiscussionBoxProps {
+  id: string;
+  position: { x: number; y: number };
+  color: Color;
+}
