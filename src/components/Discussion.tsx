@@ -5,10 +5,12 @@ import {
   DiscussionLayer,
   Comment,
   VoteType,
+  LayerType,
 } from '@/lib/types';
 import { nanoid } from 'nanoid';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { LiveObject } from '@liveblocks/client';
 
 interface DiscussionProps {
   id: string;
@@ -84,12 +86,15 @@ export default function Discussion({
   const addComment = useMutation(
     ({ storage }) => {
       if (!newComment.trim() || !me) return;
-
+  
       const layers = storage.get('layers');
       const currentLayer = layers.get(id);
-
-      if (!currentLayer) return;
-
+  
+     
+  
+      // 타입을 LiveObject<DiscussionLayer>로 캐스팅
+      const discussionLayer = currentLayer as unknown as LiveObject<DiscussionLayer>;
+  
       // 새로운 댓글 객체 생성
       const newCommentObj: Comment = {
         id: nanoid(),
@@ -102,15 +107,15 @@ export default function Discussion({
         category: layer.category,
         reactions: {},
       };
-
+  
       // 기존 댓글을 가져옴
-      const existingComments = currentLayer.get('comments');
-      const commentsArray = Array.isArray(existingComments) ? existingComments : [];
-      
-      // 댓글 추가
-      currentLayer.update({
-        comments: [...commentsArray, newCommentObj],
+      const existingComments = discussionLayer.get('comments') || [];
+  
+      // 댓글 추가 - update 메서드를 사용하여 변경사항 반영
+      discussionLayer.update({
+        comments: [...existingComments, newCommentObj],
       });
+  
       setNewComment('');
     },
     [newComment, voteType, me, layer.category],
