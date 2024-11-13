@@ -220,16 +220,6 @@ export type DiscussionLayer = {
   connectedTo?: string[]; // 연결된 다른 토론 카드들의 ID
 };
 
-export type DiscussionSummary = {
-  category: string;
-  problems: string[];
-  solutions: string[];
-  targetUsers: {
-    demographics: string[];
-    needs: string[];
-    characteristics: string[];
-  };
-};
 
 //8단계 UserStory 레이어 타입
 export type UserStoryLayer = {
