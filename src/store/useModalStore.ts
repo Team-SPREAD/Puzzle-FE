@@ -4,6 +4,8 @@ type ModalType =
   | 'CREATE_TEAM'
   | 'TEAM_SETTING'
   | 'INVITE_TEAM'
+  | 'EDIT_TEAM'
+  | 'DELETE_TEAM'
   | 'DROPDOWN_TEAM_SELECT'
   | 'USER_SELECT'
   | 'PROJECT_SETTING'

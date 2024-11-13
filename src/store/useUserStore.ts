@@ -11,10 +11,11 @@ export type UserStoreType = {
 // Zustand 스토어 생성
 const useUserStore = create<UserStoreType>((set) => ({
   userInfo: {
-    id: '',
+    _id: '',
     name: '',
     avatar: '',
     email: '',
+    token: '',
   },
 
   // 사용자 정보 설정 및 로컬 스토리지 저장
@@ -27,10 +28,11 @@ const useUserStore = create<UserStoreType>((set) => ({
   clearUserInfo: () => {
     set({
       userInfo: {
-        id: '',
+        _id: '',
         name: '',
         avatar: '',
         email: '',
+        token: '',
       },
     });
     localStorage.removeItem('userInfo');
