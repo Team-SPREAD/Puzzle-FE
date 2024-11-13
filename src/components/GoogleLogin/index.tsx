@@ -5,7 +5,7 @@ import googleIcon from '~/images/logo/google-logo.svg';
 
 const GoogleLoginButton = () => {
   const handleGoogleLogin = () => {
-    window.location.href = 'http://kim-sun-woo.com/auth/google/';
+    window.location.href = 'http://kim-sun-woo.com:3000/auth/google/';
   };
   return (
     <div

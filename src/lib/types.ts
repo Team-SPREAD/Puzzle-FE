@@ -6,12 +6,23 @@ export type SoundType = {
 };
 
 export type UserInfo = {
-  id: string;
+  _id: string;
   name: string;
   avatar: string;
   email: string;
+  token: string;
 };
-export type ProjectInfo = {
+
+export type TeamsInfo = {
+  _id: string;
+  teamName: string;
+  users: string[];
+  createdDate: string;
+  updatedDate: string;
+};
+export type TeamsMember = {};
+
+export type BoardInfo = {
   name: string;
   id: string;
   description: string;
