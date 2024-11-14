@@ -1,3 +1,5 @@
+
+
 export interface StageGimmick {
   boxes: {
     id: string;
@@ -71,6 +73,18 @@ export const STAGE_GIMMICKS: { [key: number]: StageGimmick } = {
     title: '페르소나 정의하기',
     description: '우리 서비스의 주요 사용자 페르소나를 정의해봅시다',
   },
+  7: {
+    boxes: [
+      {
+        id: 'fishbone-box',
+        type: 'fishbone',
+        color: { r: 124, g: 58, b: 237 },
+        position: { x: 150, y: 250 },
+      },
+    ],
+    title: '원인 분석하기',
+    description: '서비스 개발의 주요 문제점과 원인을 분석해봅시다',
+  },
   8: {
     boxes: [
       {
@@ -110,3 +124,4 @@ export const getPersonaEmoji = (age: number, gender: string) => {
   }
   return '🧑';
 };
+
