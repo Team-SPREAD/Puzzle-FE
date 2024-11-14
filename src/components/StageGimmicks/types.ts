@@ -35,3 +35,8 @@ export interface PersonaBoxProps {
   position: { x: number; y: number };
   color: Color;
 }
+export interface FishboneBoxProps {
+  id: string;
+  position: { x: number; y: number };
+  color: Color;
+}

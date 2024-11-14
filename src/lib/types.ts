@@ -46,6 +46,8 @@ export enum LayerType {
   Spread, // 4단계 Spread 추가
   Discussion, // 5단계 토론하기
   Persona, // 6단계  Persona
+  Fishbone, // 7단계 문제해결
+  // SolvingProblem, // 7단계 문제해결
   UserStory, //8단계
 }
 
@@ -65,6 +67,8 @@ export type Layer =
   | SpreadLayer
   | DiscussionLayer
   | PersonaLayer
+  | FishboneLayer
+  // | SolvingLayer
   | UserStoryLayer;
 
 export type RectangleLayer = {
@@ -262,6 +266,53 @@ export type PersonaLayer = {
     avatar?: string;
   };
 };
+
+
+export type FishboneCategory = 
+  | 'user'
+  | 'tech'
+  | 'feature'
+  | 'design'
+  | 'business'
+  | 'resource';
+
+export type FishboneCause = {
+  id: string;
+  category: FishboneCategory;
+  content: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  subCauses?: string[];
+  importance: 1 | 2 | 3;
+}
+
+export type FishboneLayer = {
+  type: LayerType.Fishbone;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: Color;
+  mainProblem: string;
+  categories: Record<FishboneCategory, FishboneCause[]>;
+  connections: {
+    from: string;
+    to: string;
+  }[];
+  collaborators: {
+    id: string;
+    cursor: {
+      x: number;
+      y: number;
+    };
+  }[];
+};
+
+
+
+
 
 //8단계 UserStory 레이어 타입
 export type UserStoryLayer = {
