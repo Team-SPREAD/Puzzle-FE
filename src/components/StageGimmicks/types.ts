@@ -29,3 +29,9 @@ export interface DiscussionBoxProps {
   position: { x: number; y: number };
   color: Color;
 }
+
+export interface PersonaBoxProps {
+  id: string;
+  position: { x: number; y: number };
+  color: Color;
+}
