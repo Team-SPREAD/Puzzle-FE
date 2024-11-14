@@ -13,6 +13,7 @@ import Story from './Story';
 import Spread from './Spread';
 import Discussion from './Discussion';
 import Persona from './Persona';
+import Fishbone from './Fishbone';
 
 type Props = {
   id: string;
@@ -126,6 +127,15 @@ const LayerComponent = memo(
         case LayerType.Persona:
         return (
           <Persona
+            id={id}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
+        case LayerType.Fishbone:
+        return (
+          <Fishbone
             id={id}
             layer={layer}
             onPointerDown={onLayerPointerDown}
