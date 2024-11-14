@@ -12,6 +12,7 @@ import TopicVote from './TopicVote';
 import Story from './Story';
 import Spread from './Spread';
 import Discussion from './Discussion';
+import Persona from './Persona';
 
 type Props = {
   id: string;
@@ -116,6 +117,15 @@ const LayerComponent = memo(
         case LayerType.Discussion:
         return (
           <Discussion
+            id={id}
+            layer={layer}
+            onPointerDown={onLayerPointerDown}
+            selectionColor={selectionColor}
+          />
+        );
+        case LayerType.Persona:
+        return (
+          <Persona
             id={id}
             layer={layer}
             onPointerDown={onLayerPointerDown}
