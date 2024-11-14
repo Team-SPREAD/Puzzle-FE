@@ -4,6 +4,7 @@ import { useMutation } from '@/liveblocks.config';
 import { PersonaLayer } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { getPersonaEmoji } from './StageGimmicks';
+import { LiveObject } from '@liveblocks/client';
 
 interface PersonaProps {
   id: string;
@@ -20,11 +21,12 @@ export default function Persona({
 }: PersonaProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [newTrait, setNewTrait] = useState('');
-  const [currentTab, setCurrentTab] = useState<'traits' | 'goals' | 'pain' | 'behavior'>('traits');
+  const [currentTab, setCurrentTab] = useState<
+    'traits' | 'goals' | 'pain' | 'behavior'
+  >('traits');
   const contentRef = useRef<HTMLDivElement>(null);
 
   const personaEmoji = getPersonaEmoji(layer.age, layer.gender);
-
   const addTrait = useMutation(
     ({ storage }) => {
       if (!newTrait.trim()) return;
@@ -32,16 +34,31 @@ export default function Persona({
       const layers = storage.get('layers');
       const currentLayer = layers.get(id);
 
-      const traits = [...(currentLayer.get('traits') || [])];
-      traits.push({
-        category: currentTab,
-        value: newTrait,
+      if (!currentLayer) return;
+
+      // LiveObject를 PersonaLayer로 타입 캐스팅
+      const personaLayer = currentLayer as unknown as LiveObject<PersonaLayer>;
+
+      // 현재 traits 가져오기
+      const currentTraits = personaLayer.get('traits') || [];
+
+      // 새로운 trait 추가
+      const updatedTraits = [
+        ...currentTraits,
+        {
+          category: currentTab,
+          value: newTrait,
+        },
+      ];
+
+      // traits 업데이트
+      personaLayer.update({
+        traits: updatedTraits,
       });
 
-      currentLayer.set('traits', traits);
       setNewTrait('');
     },
-    [newTrait, currentTab]
+    [newTrait, currentTab],
   );
 
   const handleContentScroll = (e: React.WheelEvent) => {
@@ -62,11 +79,13 @@ export default function Persona({
         height={layer.height}
         onPointerDown={(e) => onPointerDown(e, id)}
       >
-        <div className={cn(
-          'h-full flex flex-col',
-          'bg-white/90 backdrop-blur-sm rounded-xl shadow-lg',
-          'border-2 border-indigo-200',
-        )}>
+        <div
+          className={cn(
+            'h-full flex flex-col',
+            'bg-white/90 backdrop-blur-sm rounded-xl shadow-lg',
+            'border-2 border-indigo-200',
+          )}
+        >
           {/* 헤더 */}
           <div className="flex-shrink-0 p-4 border-b">
             <div className="flex justify-between items-start mb-2">
@@ -81,7 +100,13 @@ export default function Persona({
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <span>{layer.age}세</span>
                     <span>•</span>
-                    <span>{layer.gender === 'male' ? '남성' : layer.gender === 'female' ? '여성' : '기타'}</span>
+                    <span>
+                      {layer.gender === 'male'
+                        ? '남성'
+                        : layer.gender === 'female'
+                          ? '여성'
+                          : '기타'}
+                    </span>
                     <span>•</span>
                     <span>{layer.occupation}</span>
                   </div>
@@ -99,7 +124,7 @@ export default function Persona({
             </div>
             {layer.quote && (
               <div className="mt-2 p-3 bg-indigo-50/50 rounded-lg">
-                <p className="text-sm text-gray-600 italic">"{layer.quote}"</p>
+                <p className="text-sm text-gray-600 italic">{layer.quote}</p>
               </div>
             )}
           </div>
@@ -125,7 +150,7 @@ export default function Persona({
                       'flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                       currentTab === tab.id
                         ? 'bg-indigo-100 text-indigo-700'
-                        : 'hover:bg-gray-100 text-gray-600'
+                        : 'hover:bg-gray-100 text-gray-600',
                     )}
                   >
                     {tab.icon} {tab.label}
@@ -134,7 +159,7 @@ export default function Persona({
               </div>
 
               {/* 콘텐츠 영역 */}
-              <div 
+              <div
                 ref={contentRef}
                 onWheel={handleContentScroll}
                 className="flex-1 p-4 overflow-y-auto max-h-[200px] min-h-[100px]"
@@ -167,10 +192,10 @@ export default function Persona({
                       currentTab === 'traits'
                         ? '새로운 특성 추가...'
                         : currentTab === 'goals'
-                        ? '새로운 목표 추가...'
-                        : currentTab === 'pain'
-                        ? '새로운 페인포인트 추가...'
-                        : '새로운 행동 패턴 추가...'
+                          ? '새로운 목표 추가...'
+                          : currentTab === 'pain'
+                            ? '새로운 페인포인트 추가...'
+                            : '새로운 행동 패턴 추가...'
                     }
                     className="flex-1 px-3 py-2 text-sm bg-white/50 border rounded-lg 
                       focus:outline-none focus:ring-1 focus:ring-indigo-300"
