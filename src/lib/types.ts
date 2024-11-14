@@ -45,6 +45,7 @@ export enum LayerType {
   TopicVote, // 3단계
   Spread, // 4단계 Spread 추가
   Discussion, // 5단계 토론하기
+  Persona, // 6단계  Persona
   UserStory, //8단계
 }
 
@@ -61,9 +62,10 @@ export type Layer =
   | NoteLayer
   | VisionLayer
   | TopicVoteLayer
-  | UserStoryLayer
   | SpreadLayer
-  | DiscussionLayer;
+  | DiscussionLayer
+  | PersonaLayer
+  | UserStoryLayer;
 
 export type RectangleLayer = {
   type: LayerType.Rectangle;
@@ -206,7 +208,7 @@ export type Comment = {
   timestamp: number;
   voteType: VoteType;
   category: DiscussionCategory;
-  reactions: Record<string, { emoji: string; timestamp: number; }>;
+  reactions: Record<string, { emoji: string; timestamp: number }>;
 };
 
 export type DiscussionLayer = {
@@ -221,7 +223,7 @@ export type DiscussionLayer = {
   description: string;
   priority: 'high' | 'medium' | 'low';
   status: 'ongoing' | 'completed';
-  votes: Record<string, { vote: VoteType; timestamp: number; }>;
+  votes: Record<string, { vote: VoteType; timestamp: number }>;
   comments: Comment[];
   creator: {
     id: string;
@@ -231,6 +233,35 @@ export type DiscussionLayer = {
   connectedTo?: string[]; // 연결된 다른 토론 카드들의 ID
 };
 
+// 페르소나 특성 타입 정의
+export type PersonaTrait = {
+  category: 'demographic' | 'psychographic' | 'behavioral' | 'needs';
+  value: string;
+};
+
+// 페르소나 레이어 타입 정의
+export type PersonaLayer = {
+  type: LayerType.Persona;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: Color;
+  name: string;
+  age: number;
+  gender: 'male' | 'female' | 'other';
+  occupation: string;
+  quote: string;
+  emoji?: string; // 이모지는 선택적으로 설정
+  traits: Array<{ category: 'traits' | 'goals' | 'pain' | 'behavior'; value: string }>;
+  borderColor: Color;
+  fontStyle: string;
+  creator: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
+};
 
 //8단계 UserStory 레이어 타입
 export type UserStoryLayer = {
