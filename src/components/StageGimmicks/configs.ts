@@ -59,6 +59,18 @@ export const STAGE_GIMMICKS: { [key: number]: StageGimmick } = {
     title: '정하고 토론해보세요',
     description: '대화하며 토론해서 결정하는 순간입니다.',
   },
+  6: {
+    boxes: [
+      {
+        id: 'persona-box',
+        type: 'persona',
+        color: { r: 147, g: 51, b: 134 },
+        position: { x: 150, y: 250 },
+      },
+    ],
+    title: '페르소나 정의하기',
+    description: '우리 서비스의 주요 사용자 페르소나를 정의해봅시다',
+  },
   8: {
     boxes: [
       {
@@ -81,3 +93,20 @@ export const REACTIONS = [
   { emoji: '🤔', label: '고민해봐요' },
   { emoji: '❓', label: '궁금해요' },
 ];
+
+export const getPersonaEmoji = (age: number, gender: string) => {
+  if (gender === 'male') {
+    if (age < 13) return '👦';
+    if (age < 20) return '👨‍🦱';
+    if (age < 40) return '👨';
+    if (age < 60) return '👨‍💼';
+    return '👴';
+  } else if (gender === 'female') {
+    if (age < 13) return '👧';
+    if (age < 20) return '👩‍🦱';
+    if (age < 40) return '👩';
+    if (age < 60) return '👩‍💼';
+    return '👵';
+  }
+  return '🧑';
+};
