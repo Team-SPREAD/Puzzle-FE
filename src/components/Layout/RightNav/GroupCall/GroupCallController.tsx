@@ -9,14 +9,14 @@ import headPhone from '~/images/headPhone.svg';
 import microPhone from '~/images/microphone.svg';
 import Image from 'next/image';
 import testUserIcon from '~/images/testUserIcon.jpeg';
-import useUserInfoStore from '@/hooks/useUserInfoStore';
+import useUserStore from '@/store/useUserStore';
 import SendBirdCall, { Room } from 'sendbird-calls';
 import { useSendBirdInit } from '@/hooks/useSendBirdCalls';
 import { LiveObject, LiveList } from '@liveblocks/client';
 import { addActiveUser, removeActiveUser } from '@/utils/activeUserUtils';
 
 export default function GroupCallController() {
-  const userInfo = useUserInfoStore();
+  const userInfo = useUserStore((state) => state.userInfo);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isCalling, setIsCalling] = useState(false);
 
@@ -139,10 +139,11 @@ export default function GroupCallController() {
       setIsCalling(true);
 
       addToActiveUsers({
+        _id: userInfo._id,
         name: userInfo.name,
-        id: userInfo._id,
         avatar: userInfo.avatar,
         email: userInfo.email,
+        token: userInfo.token,
         enteredAt: Date.now(),
       });
     } catch (error) {
@@ -200,7 +201,9 @@ export default function GroupCallController() {
       <div className="flex w-full justify-between">
         <div className="flex">
           <Image
-            src={testUserIcon}
+            src={userInfo.avatar}
+            width={16}
+            height={16}
             alt="userIcon"
             className="w-6 h-6 bg-gray-300 rounded-full mr-1"
           />

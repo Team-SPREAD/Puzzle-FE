@@ -8,7 +8,7 @@ export default function LiveCallUsers() {
   return (
     <div className="w-full h-[180px] px-2">
       {activeUsers.map((user) => (
-        <LiveCallUser key={user.id} user={user} />
+        <LiveCallUser key={user._id} user={user} />
       ))}
     </div>
   );

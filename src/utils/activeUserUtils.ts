@@ -19,12 +19,12 @@ export function addActiveUser(
   }
 
   const existingUserIndex = groupCallActiveUsers.findIndex(
-    (activeUser) => activeUser.id === user.id,
+    (activeUser) => activeUser._id === user._id,
   );
 
   if (existingUserIndex !== -1) {
     groupCallActiveUsers.delete(existingUserIndex);
-    console.log('중복된 사용자 삭제:', user.id);
+    console.log('중복된 사용자 삭제:', user._id);
   }
 
   groupCallActiveUsers.push(user);
@@ -49,7 +49,7 @@ export function removeActiveUser(
   }
 
   const userIndex = groupCallActiveUsers.findIndex(
-    (user) => user.id === userId,
+    (user) => user._id === userId,
   );
 
   if (userIndex !== -1) {

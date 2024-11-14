@@ -17,8 +17,8 @@ const GroupCall = () => {
         />
         <p>음성 채팅</p>
       </div>
-      {/* <LiveCallUsers />
-      <GroupCallButton /> */}
+      <LiveCallUsers />
+      <GroupCallButton />
     </div>
   );
 };
