@@ -21,6 +21,17 @@ type Presence = {
   currentProcess: number;
 };
 
+export type Vote = {
+  userId: string;
+  timestamp: number;
+};
+
+export type VotingState = {
+  votes: Record<string, Vote>;
+  currentStep: number;
+  isCompleted: boolean;
+};
+
 export type MusicStates = 'playing' | 'seeking' | 'paused';
 
 export type ActiveUserInfo = UserInfo & {
@@ -39,6 +50,12 @@ type Storage = {
     activeUsers: LiveList<ActiveUserInfo>;
   }>;
   process: LiveList<Process>;
+  // 투표 상태 추가
+  voting: LiveObject<{
+    votes: Record<string, Vote>;
+    currentStep: number;
+    isCompleted: boolean;
+  }>;
 };
 
 // UserMeta represents static/readonly metadata on each User
@@ -59,7 +76,10 @@ export type RoomEvent =
   | { type: 'AUDIO_PLAY' }
   | { type: 'AUDIO_PAUSE' }
   | { type: 'START_TIMER'; time: number }
-  | { type: 'STOP_TIMER' };
+  | { type: 'STOP_TIMER' }
+  // 투표 관련 이벤트 추가
+  | { type: 'VOTE_COMPLETE' }
+  | { type: 'NEXT_STEP' };
 
 export const {
   suspense: {
@@ -86,5 +106,6 @@ export const {
     useCanUndo,
     useCanRedo,
     useMutation,
+    
   },
 } = createRoomContext<Presence, Storage, UserMeta, RoomEvent>(client);
