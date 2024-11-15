@@ -65,11 +65,20 @@ import {
   Result,
 } from '../Templates';
 import { StageGimmicks } from '@/components/StageGimmicks';
+import VotingSystem from '../Layout/VoteNav/VotingSystem';
+import useUserStore from '@/store/useUserStore';
+import useTeamsStore from '@/store/useTeamsStore';
+import VotingModal from '../modal/VotingModal';
+
 
 const MAX_LAYERS = 100;
 
 const Canvas = () => {
-  const userInfo = useUserInfoStore();
+  const userInfoReal = useUserStore((state) => state.userInfo);
+  const teams = useTeamsStore((state) => state.teams);
+
+  const userInfo = useUserInfoStore(); //이거 목데이터라 수정해야함
+  const [showVoteModal, setShowVoteModal] = useState(false); //투표 모달
   const layerIds = useStorage((root) => root.layerIds);
   const cursorPanel = useRef(null);
   const [currentStep, setCurrentStep] = useState(1); //프로젝트 1단계
@@ -102,6 +111,27 @@ const Canvas = () => {
   useDisableScrollBounce();
 
   const deleteLayers = useDeleteLayers();
+
+  //투표 기믹
+  const handleVoteComplete = () => {
+    setShowVoteModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowVoteModal(false);
+  };
+
+  const handleNextStep = () => {
+    const nextStep = currentStep + 1;
+    if (nextStep <= steps.length) {
+      const nextStepData = steps[nextStep - 1];
+      setCurrentStep(nextStep);
+      handleSetCamera({
+        x: nextStepData.camera.x,
+        y: nextStepData.camera.y,
+      });
+    }
+  };
 
   const renderStageTemplate = () => {
     switch (currentStep) {
@@ -689,6 +719,16 @@ const Canvas = () => {
             </g>
           </svg>
         </div>
+
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30">
+          <VotingSystem
+            currentStep={currentStep}
+            onStepComplete={handleNextStep}
+          />
+        </div>
+        {/* 모달 컴포넌트 */}
+        <VotingModal onNextStep={handleNextStep} />
+
 
         <div className="absolute bottom-4 left-4 z-30">
           <ToolsBar
