@@ -126,3 +126,45 @@ export const getPersonaEmoji = (age: number, gender: string) => {
   return '🧑';
 };
 
+
+export const BOX_CONFIG = {
+  define: {
+    title: 'How Bad?',
+    description: '현재 상황을 정의해주세요',
+    icon: '❓',
+    color: 'bg-blue-50 border-blue-200 text-blue-600',
+    maxCount: 5,
+    minLength: 20,
+    guideQuestions: [
+      '어떤 문제가 있나요?',
+      '문제의 심각성은 어느 정도인가요?',
+      '누구에게 영향을 미치나요?'
+    ]
+  },
+  analyze: {
+    title: 'How Come?',
+    description: '원인을 분석해주세요',
+    icon: '🔍',
+    color: 'bg-amber-50 border-amber-200 text-amber-600',
+    maxCount: 3,
+    minLength: 30,
+    guideQuestions: [
+      '왜 이 문제가 발생했나요?',
+      '어떤 요인들이 영향을 미쳤나요?',
+      '근본적인 원인은 무엇인가요?'
+    ]
+  },
+  solve: {
+    title: 'How To?',
+    description: '해결 방안을 제시해주세요',
+    icon: '💡',
+    color: 'bg-green-50 border-green-200 text-green-600',
+    maxCount: 1,
+    minLength: 40,
+    guideQuestions: [
+      '어떻게 해결할 수 있을까요?',
+      '필요한 자원은 무엇인가요?',
+      '실현 가능한 방법은 무엇인가요?'
+    ]
+  }
+} as const;
