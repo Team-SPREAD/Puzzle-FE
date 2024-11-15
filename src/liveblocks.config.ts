@@ -39,6 +39,8 @@ type Storage = {
     activeUsers: LiveList<ActiveUserInfo>;
   }>;
   process: LiveList<Process>;
+  nodes: any; //gimic9 테스트
+  edges: any; //gimic9 테스트
 };
 
 // UserMeta represents static/readonly metadata on each User
