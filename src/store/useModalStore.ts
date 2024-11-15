@@ -8,7 +8,8 @@ type ModalType =
   | 'DELETE_TEAM'
   | 'DROPDOWN_TEAM_SELECT'
   | 'USER_SELECT'
-  | 'PROJECT_SETTING'
+  | 'PROJECT_SETTING' // 여기까지 대시보드 모달
+  | 'VOTE_COMPLETE' //투표 모달
   | null;
 
 interface ModalState {
