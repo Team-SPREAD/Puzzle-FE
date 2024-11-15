@@ -46,8 +46,7 @@ export enum LayerType {
   Spread, // 4단계 Spread 추가
   Discussion, // 5단계 토론하기
   Persona, // 6단계  Persona
-  Fishbone, // 7단계 문제해결
-  // SolvingProblem, // 7단계 문제해결
+  SolvingProblem, //7단계 문제해결
   UserStory, //8단계
 }
 
@@ -67,8 +66,7 @@ export type Layer =
   | SpreadLayer
   | DiscussionLayer
   | PersonaLayer
-  | FishboneLayer
-  // | SolvingLayer
+  | SolvingProblemLayer
   | UserStoryLayer;
 
 export type RectangleLayer = {
@@ -257,7 +255,10 @@ export type PersonaLayer = {
   occupation: string;
   quote: string;
   emoji?: string; // 이모지는 선택적으로 설정
-  traits: Array<{ category: 'traits' | 'goals' | 'pain' | 'behavior'; value: string }>;
+  traits: Array<{
+    category: 'traits' | 'goals' | 'pain' | 'behavior';
+    value: string;
+  }>;
   borderColor: Color;
   fontStyle: string;
   creator: {
@@ -268,51 +269,23 @@ export type PersonaLayer = {
 };
 
 
-export type FishboneCategory = 
-  | 'user'
-  | 'tech'
-  | 'feature'
-  | 'design'
-  | 'business'
-  | 'resource';
-
-export type FishboneCause = {
-  id: string;
-  category: FishboneCategory;
-  content: string;
-  position: {
-    x: number;
-    y: number;
-  };
-  subCauses?: string[];
-  importance: 1 | 2 | 3;
-}
-
-export type FishboneLayer = {
-  type: LayerType.Fishbone;
+export type SolvingProblemLayer = {
+  type: LayerType.SolvingProblem;
   x: number;
   y: number;
   width: number;
   height: number;
   fill: Color;
-  mainProblem: string;
-  categories: Record<FishboneCategory, FishboneCause[]>;
-  connections: {
-    from: string;
-    to: string;
-  }[];
-  collaborators: {
+  boxType: 'define' | 'analyze' | 'solve';
+  content: string;
+  isLocked: boolean;
+  dependencies?: string[]; // 이전 박스들과의 연결 관계
+  creator: {
     id: string;
-    cursor: {
-      x: number;
-      y: number;
-    };
-  }[];
+    name: string;
+    avatar?: string;
+  };
 };
-
-
-
-
 
 //8단계 UserStory 레이어 타입
 export type UserStoryLayer = {

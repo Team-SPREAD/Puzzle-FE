@@ -35,7 +35,7 @@ export interface PersonaBoxProps {
   position: { x: number; y: number };
   color: Color;
 }
-export interface FishboneBoxProps {
+export interface SolvingProblemBoxProps {
   id: string;
   position: { x: number; y: number };
   color: Color;

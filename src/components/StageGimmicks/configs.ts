@@ -76,15 +76,16 @@ export const STAGE_GIMMICKS: { [key: number]: StageGimmick } = {
   7: {
     boxes: [
       {
-        id: 'fishbone-box',
-        type: 'fishbone',
-        color: { r: 124, g: 58, b: 237 },
+        id: 'solving-problem-box',
+        type: 'solvingProblem',
+        color: { r: 59, g: 130, b: 246 },
         position: { x: 150, y: 250 },
       },
     ],
-    title: '원인 분석하기',
-    description: '서비스 개발의 주요 문제점과 원인을 분석해봅시다',
+    title: '단계별 문제해결',
+    description: 'How를 통해 문제를 단계별로 해결해보세요',
   },
+  
   8: {
     boxes: [
       {

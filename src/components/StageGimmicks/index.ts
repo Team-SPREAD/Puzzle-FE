@@ -5,6 +5,6 @@ export { default as UserStoryTemplate } from './UserStoryTemplate';
 export { default as SparedBoxTemplate } from './SpreadBoxTemplate';
 export { default as DiscussionBoxTemplate } from './DiscussionBoxTemplate';
 export { default as PersonaBoxTemplate } from './PersonaBoxTemplate';
-export { default as FishboneBoxTemplate } from './FishboneBoxTemplate';
+export { default as ProblemSolvingBoxTemplate } from './ProblemSolvingBoxTemplate';
 export * from './types';
 export * from './configs';
