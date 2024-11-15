@@ -268,7 +268,6 @@ export type PersonaLayer = {
   };
 };
 
-
 export type SolvingProblemLayer = {
   type: LayerType.SolvingProblem;
   x: number;
