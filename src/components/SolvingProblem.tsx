@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';  
 import { motion } from 'framer-motion';
 import { useMutation, useSelf, useStorage } from '@/liveblocks.config';
 import { LayerType, SolvingProblemLayer } from '@/lib/types';
@@ -53,7 +53,7 @@ export default function SolvingProblem({
   selectionColor,
 }: SolvingProblemProps) {
   const layers = useStorage((root) => root.layers);
-
+  const containerRef = useRef<HTMLDivElement>(null);
   const updateContent = useMutation(
     ({ storage }, content: string) => {
       const layers = storage.get('layers');
@@ -122,6 +122,20 @@ export default function SolvingProblem({
     }
   };
 
+  // 스크롤 이벤트 처리
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // 스크롤 이벤트 전파 중지
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const target = e.currentTarget;
+    const isScrollable = target.scrollHeight > target.clientHeight;
+
+    if (isScrollable) {
+      e.stopPropagation(); // 스크롤 가능한 경우에만 이벤트 전파 중지
+    }
+  };
+
   const currentBoxStyle = boxConfig[layer.boxType];
   if (!currentBoxStyle) return null;
 
@@ -142,6 +156,7 @@ export default function SolvingProblem({
         }}
       >
         <div
+         ref={containerRef}  
           className={cn(
             'h-full flex flex-col',
             'backdrop-blur-sm rounded-xl shadow-lg',
@@ -184,7 +199,21 @@ export default function SolvingProblem({
           </div>
 
           {/* 내용 */}
-          <div className={cn('flex-1 p-4', currentBoxStyle.bgColor)}>
+          <div
+            className={cn('flex-1 p-4 overflow-y-auto', currentBoxStyle.bgColor)}
+            onWheel={(e) => {
+              e.stopPropagation();
+              if (containerRef.current) {
+                const container = containerRef.current;
+                const isScrollable =
+                  container.scrollHeight > container.clientHeight;
+                if (isScrollable) {
+                  e.preventDefault();
+                  container.scrollTop += e.deltaY;
+                }
+              }
+            }}
+          >
             <div
               className="w-full h-full relative"
               onClick={handleTextAreaClick}
