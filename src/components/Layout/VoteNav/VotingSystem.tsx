@@ -4,6 +4,8 @@ import useProcessStore from '@/store/useProcessStore';
 import useModalStore from '@/store/useModalStore';
 import { useParams } from 'next/navigation';
 import axiosInstance from '@/app/api/axiosInstance';
+import { motion } from 'framer-motion';
+import { CheckCircle2, Save, Vote } from 'lucide-react';
 
 interface BoardInfo {
   _id: string;
@@ -131,41 +133,108 @@ const VotingSystem: React.FC<VotingSystemProps> = ({ currentStep }) => {
     }
   }, [boardId, currentStep, isHost]);
 
-  return (
-    <div className="flex items-center gap-4">
-      {!isHost && (
-        <button
-          onClick={() => vote()}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all
-            ${votes[self.id?.toString() || ''] 
-              ? 'bg-green-500 text-white cursor-not-allowed'
-              : 'bg-primary text-white hover:opacity-90'}`}
-          disabled={!!votes[self.id?.toString() || '']}
-        >
-          {votes[self.id?.toString() || ''] ? '투표 완료' : '투표하기'}
-        </button>
-      )}
 
-      <div className="flex items-center gap-2">
-        {Array.from({ length: TOTAL_USERS }).map((_, index) => (
-          <div
-            key={index}
-            className={`w-4 h-4 rounded-full transition-all duration-300 
-              ${index < voteCount ? 'bg-green-500 scale-110' : 'bg-gray-300'}`}
-          />
-        ))}
+  return (
+    <div className="flex flex-col items-center gap-4">
+      {/* 투표 진행 상태 표시 */}
+      <div className="bg-white/90 backdrop-blur-sm shadow-lg rounded-xl px-4 py-2 flex items-center gap-4">
+        {/* 투표 카운터 */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: TOTAL_USERS }).map((_, index) => (
+              <motion.div
+                key={index}
+                initial={{ scale: 0.8 }}
+                animate={{
+                  scale: index < voteCount ? 1.1 : 1,
+                }}
+                className={`w-3 h-3 rounded-full transition-all duration-300 
+                  ${index < voteCount 
+                    ? 'bg-green-500 ring-2 ring-green-200' 
+                    : 'bg-gray-200'
+                  }`}
+              />
+            ))}
+          </div>
+          <span className="text-sm text-gray-600 font-medium">
+            {voteCount}/{TOTAL_USERS}
+          </span>
+        </div>
+
+        {/* 투표/저장 버튼 */}
+        {!isHost ? (
+          <motion.button
+            initial={false}
+            animate={{ 
+              backgroundColor: votes[self.id?.toString() || ''] ? '#22c55e' : '#3b82f6',
+              scale: votes[self.id?.toString() || ''] ? 0.98 : 1
+            }}
+            onClick={() => vote()}
+            disabled={!!votes[self.id?.toString() || '']}
+            className="px-4 py-1.5 rounded-lg flex items-center gap-2 text-white font-medium shadow-sm hover:shadow transition-all"
+          >
+            {votes[self.id?.toString() || ''] ? (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>투표 완료</span>
+              </>
+            ) : (
+              <>
+                <Vote className="w-4 h-4" />
+                <span>투표하기</span>
+              </>
+            )}
+          </motion.button>
+        ) : voting?.isCompleted ? (
+          <motion.button
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onClick={() => saveProgress()}
+            className="px-4 py-1.5 rounded-lg flex items-center gap-2 bg-green-500 text-white font-medium shadow-sm hover:bg-green-600 hover:shadow transition-all"
+          >
+            <Save className="w-4 h-4" />
+            <span>저장하기</span>
+          </motion.button>
+        ) : (
+          // 호스트도 투표할 수 있도록 투표 버튼 표시
+          <motion.button
+            initial={false}
+            animate={{ 
+              backgroundColor: votes[self.id?.toString() || ''] ? '#22c55e' : '#3b82f6',
+              scale: votes[self.id?.toString() || ''] ? 0.98 : 1
+            }}
+            onClick={() => vote()}
+            disabled={!!votes[self.id?.toString() || '']}
+            className="px-4 py-1.5 rounded-lg flex items-center gap-2 text-white font-medium shadow-sm hover:shadow transition-all"
+          >
+            {votes[self.id?.toString() || ''] ? (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>투표 완료</span>
+              </>
+            ) : (
+              <>
+                <Vote className="w-4 h-4" />
+                <span>투표하기</span>
+              </>
+            )}
+          </motion.button>
+        )}
       </div>
 
-      {isHost && voting?.isCompleted && (
-        <button
-          onClick={() => saveProgress()}
-          className="px-4 py-2 rounded-lg flex items-center gap-2 transition-all bg-green-500 text-white hover:bg-green-600"
+      {/* 추가 정보 표시 (선택적) */}
+      {voting?.isCompleted && !isHost && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-gray-500 bg-white/80 px-3 py-1 rounded-full shadow-sm"
         >
-          저장하기
-        </button>
+          호스트의 저장을 기다리는 중...
+        </motion.div>
       )}
     </div>
   );
 };
+
 
 export default VotingSystem;
