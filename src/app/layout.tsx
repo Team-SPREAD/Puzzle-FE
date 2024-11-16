@@ -1,6 +1,6 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
-import { Toaster } from '@/components/ui/Toaster';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
   title: '퍼즐',
