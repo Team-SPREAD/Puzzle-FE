@@ -62,6 +62,8 @@ const useProcessStore = create<ProcessState>()(
           },
         }));
       },
+
+      
       initializeBoardProgress: (
         boardId: string,
         initialStep: number = 1,
@@ -98,44 +100,50 @@ const useProcessStore = create<ProcessState>()(
         if (!boardState) return step === 1;
         if (boardState.isLocked) return false;
 
-        // 완료된 단계들 중 가장 높은 단계까지 접근 가능
-        const maxCompletedStep = Math.max(...boardState.completedSteps);
-        return step <= maxCompletedStep;
+        // 완료된 단계 또는 다음 진행 가능한 단계까지 접근 가능
+        const maxCompletedStep = Math.max(...(boardState.completedSteps || [1]));
+        return step <= maxCompletedStep + 1;
       },
+
 
       getCompletedSteps: (boardId: string) => {
         const { boardProgress } = get();
         return boardProgress[boardId]?.completedSteps || [1];
       },
 
+    
       setCurrentStep: async (boardId: string, step: number) => {
         try {
-          const response = await axiosInstance.patch(
-            `/api/board/currentStep/${boardId}`,
-            {
-              currentStep: step,
-            },
-          );
+          const response = await axiosInstance.patch(`/api/board/currentStep/${boardId}`, {
+            currentStep: step
+          });
 
           if (response.status === 200) {
             set((state) => {
               const existingState = state.boardProgress[boardId];
-              // 현재 단계와 이전에 완료된 단계들 중 더 큰 값까지의 단계들을 completedSteps로 설정
-              const maxStep = Math.max(
-                step,
-                ...(existingState?.completedSteps || [1]),
-              );
+              const maxCompletedStep = Math.max(...(existingState?.completedSteps || [1]));
 
+              // 최대 완료 단계보다 큰 단계로 이동하려는 경우에만 completedSteps 업데이트
+              if (step > maxCompletedStep) {
+                return {
+                  boardProgress: {
+                    ...state.boardProgress,
+                    [boardId]: {
+                      ...existingState,
+                      currentStep: step,
+                      completedSteps: Array.from({ length: step - 1 }, (_, i) => i + 1),
+                    },
+                  },
+                };
+              }
+
+              // 완료된 단계 내에서 이동하는 경우 currentStep만 업데이트
               return {
                 boardProgress: {
                   ...state.boardProgress,
                   [boardId]: {
                     ...existingState,
                     currentStep: step,
-                    completedSteps: Array.from(
-                      { length: maxStep },
-                      (_, i) => i + 1,
-                    ),
                   },
                 },
               };
@@ -148,12 +156,9 @@ const useProcessStore = create<ProcessState>()(
 
       addCompletedStep: async (boardId: string, step: number) => {
         try {
-          const response = await axiosInstance.patch(
-            `/api/board/currentStep/${boardId}`,
-            {
-              currentStep: step,
-            },
-          );
+          const response = await axiosInstance.patch(`/api/board/currentStep/${boardId}`, {
+            currentStep: step
+          });
 
           if (response.status === 200) {
             set((state) => {
@@ -163,11 +168,10 @@ const useProcessStore = create<ProcessState>()(
                 isLocked: false,
               };
 
-              // 이전에 완료된 단계들을 유지하면서 새로운 단계 추가
-              const maxStep = Math.max(step, ...boardState.completedSteps);
-              const newCompletedSteps = Array.from(
-                { length: maxStep },
-                (_, i) => i + 1,
+              // 이전 단계들을 완료 상태로 설정
+              const completedSteps = Array.from(
+                { length: step - 1 }, 
+                (_, i) => i + 1
               );
 
               return {
@@ -176,7 +180,7 @@ const useProcessStore = create<ProcessState>()(
                   [boardId]: {
                     ...boardState,
                     currentStep: step,
-                    completedSteps: newCompletedSteps,
+                    completedSteps: [...new Set([...completedSteps])].sort((a, b) => a - b),
                   },
                 },
                 isVotingCompleted: false,
