@@ -32,6 +32,10 @@ export type VotingState = {
   isCompleted: boolean;
 };
 
+
+export type ModalType = 'VOTE_COMPLETE' | 'NEXT_STEP' | 'OTHER_MODAL_TYPES';
+
+
 export type MusicStates = 'playing' | 'seeking' | 'paused';
 
 export type ActiveUserInfo = UserInfo & {
@@ -55,6 +59,12 @@ type Storage = {
     votes: Record<string, Vote>;
     currentStep: number;
     isCompleted: boolean;
+    showCompletionModal?: boolean; 
+    moveToNextStep?: boolean;  
+  }>;
+  // 호스트 정보 추가
+  host: LiveObject<{
+    userId: string;
   }>;
 };
 
@@ -79,7 +89,17 @@ export type RoomEvent =
   | { type: 'STOP_TIMER' }
   // 투표 관련 이벤트 추가
   | { type: 'VOTE_COMPLETE' }
-  | { type: 'NEXT_STEP' };
+  | { type: 'NEXT_STEP'; nextStep: number }
+  | { type: 'RESET_VOTES';}
+  | {type: 'SHOW_COMPLETION_MODAL';}
+  | {type: 'OPEN_MODAL'}
+
+
+  export interface RoomEventMessage {
+    event: any;
+    type: string;
+    data: RoomEvent;
+  }
 
 export const {
   suspense: {
