@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Process } from '@/lib/types';
 import {
   Star,
@@ -11,19 +11,30 @@ import {
   UserPlus,
   CheckSquare,
 } from 'lucide-react';
-import Image from 'next/image';
+import { useToast } from '@/components/ui/use-toast';
+import { useParams } from 'next/navigation';
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from '@/components/ui/tooltip';
+import { motion } from 'framer-motion';
+import { useColorStore } from '@/store/vote/colorStore';
+import { useProcessStore } from '@/store/vote/processStore';
+import { ColorState } from '@/store/vote/types';
 
 const icons = [
-  Star, // 1단계: 아이스브레이킹
-  Flag, // 2단계: 비전 설정
-  Pencil, // 3단계: 주제 선정
-  Star, // 4단계: 스프레드
-  Cloud, // 5단계: 토론하기
-  UserCircle, // 6단계: 페르소나
-  Users, // 7단계: 문제해결
-  FileText, // 8단계: 사용자 스토리
-  UserPlus, // 9단계: 역할분담
-  CheckSquare, // 10단계: 마무리
+  Star,
+  Flag,
+  Pencil,
+  Star,
+  Cloud,
+  UserCircle,
+  Users,
+  FileText,
+  UserPlus,
+  CheckSquare,
 ];
 
 interface ProcessBarProps {
@@ -45,42 +56,174 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
   userInfo,
   updateCurrentProcess,
 }) => {
+  const params = useParams();
+  const boardId = Array.isArray(params.boardId)
+    ? params.boardId[0]
+    : params.boardId;
+
+  // useColorStore를 타입과 함께 사용
+  const progressColor = useColorStore(
+    (state: ColorState) => state.progressColor,
+  );
+  const setProgressColor = useColorStore(
+    (state: ColorState) => state.setProgressColor,
+  );
+
+  // ProcessStore 사용
+  const { getCompletedSteps, isStepAccessible, setCurrentStep } =
+    useProcessStore();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setProgressColor();
+  }, [setProgressColor]);
+
+  const completedSteps = boardId ? getCompletedSteps(boardId) : [];
+
+  const handleStepClick = async (process: {
+    step: number;
+    title: string;
+    camera: { x: number; y: number };
+  }) => {
+    if (!boardId) {
+      toast({
+        variant: 'destructive',
+        title: '오류 발생',
+        description: '보드 정보를 찾을 수 없습니다.',
+      });
+      return;
+    }
+
+    const isCompleted = completedSteps.includes(process.step);
+    const isAccessible = isStepAccessible(boardId, process.step);
+
+    if (!isCompleted && !isAccessible) {
+      toast({
+        variant: 'destructive',
+        title: '접근할 수 없는 단계입니다',
+        description: '이전 단계를 먼저 완료해주세요.',
+      });
+      return;
+    }
+
+    try {
+      await setCurrentStep(boardId, process.step);
+
+      if (process.step < currentStep) {
+        toast({
+          title: '이전 단계로 이동합니다',
+          description: `${process.title} 단계로 이동합니다.`,
+          duration: 2000,
+        });
+      }
+
+      setCamera({
+        x: process.camera.x,
+        y: process.camera.y,
+      });
+      updateCurrentProcess(process.step);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: '단계 이동 실패',
+        description: '서버와의 통신 중 오류가 발생했습니다.',
+      });
+    }
+  };
+
   return (
-    <div className="flex items-center">
-      {processes.map((process, index) => (
-        <React.Fragment key={process.step}>
-          {index > 0 && <div className="w-4 h-[1px] bg-gray-300 mx-1" />}
-          <div className="relative group">
-            {process.step === currentStep && (
-              <Image
-                src={userInfo.avatar}
-                alt={userInfo.name}
-                className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-6 h-6 rounded-full border-2 border-white"
-              />
+    <div className="flex items-center px-6 py-2">
+      {processes.map((process, index) => {
+        const isCompleted = completedSteps.includes(process.step);
+        const isAccessible = isStepAccessible(boardId as string, process.step);
+        const isCurrent = process.step === currentStep;
+
+        return (
+          <React.Fragment key={process.step}>
+            {index > 0 && (
+              <div className="relative w-8 mx-2">
+                <div className="absolute top-1/2 -translate-y-1/2 w-full h-[2px] bg-gray-200" />
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: isCompleted ? '100%' : '0%',
+                  }}
+                  className="absolute top-1/2 -translate-y-1/2 h-[2px]"
+                  style={{ backgroundColor: progressColor }}
+                  transition={{ duration: 0.3 }}
+                />
+              </div>
             )}
-            <button
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                process.step <= currentStep
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-600'
-              } transition-colors duration-200 hover:bg-blue-600`}
-              onClick={() => {
-                setCamera({
-                  x: process.camera.x,
-                  y: process.camera.y,
-                });
-                updateCurrentProcess(process.step);
-              }}
-              title={process.title}
-            >
-              {React.createElement(icons[index], { size: 20 })}
-            </button>
-            <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 text-xs whitespace-nowrap bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              {process.title}
-            </span>
-          </div>
-        </React.Fragment>
-      ))}
+
+            <div className="relative group">
+              {isCurrent && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.3, 0.1, 0.3],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                  className="absolute inset-0 rounded-full bg-slate-400 -m-1"
+                />
+              )}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.button
+                      whileHover={isAccessible ? { scale: 1.05 } : {}}
+                      whileTap={isAccessible ? { scale: 0.95 } : {}}
+                      style={
+                        isCompleted
+                          ? {
+                              backgroundColor: progressColor,
+                              color: 'white',
+                            }
+                          : undefined
+                      }
+                      className={`
+                       relative w-9 h-9 rounded-full flex items-center justify-center 
+                       transition-all duration-200
+                       ${
+                         isCompleted
+                           ? 'hover:brightness-110'
+                           : isCurrent
+                             ? 'bg-indigo-500 text-white'
+                             : isAccessible
+                               ? 'bg-white text-gray-600 hover:bg-blue-500 hover:text-white'
+                               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                       }
+                     `}
+                      onClick={() => handleStepClick(process)}
+                      disabled={!isCompleted && !isAccessible}
+                    >
+                      {React.createElement(icons[index], {
+                        size: 16,
+                        className:
+                          'transform transition-transform group-hover:scale-110',
+                      })}
+                    </motion.button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div className="text-center px-2 py-1">
+                      <p className="font-medium text-sm">{process.title}</p>
+                      <p className="text-xs mt-0.5">
+                        {isCompleted && '✓ 완료됨'}
+                        {!isCompleted && !isAccessible && '🔒 잠김'}
+                        {!isCompleted && isAccessible && '👉 진행 가능'}
+                      </p>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </React.Fragment>
+        );
+      })}
     </div>
   );
 };

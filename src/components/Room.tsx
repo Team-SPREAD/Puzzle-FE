@@ -2,7 +2,7 @@
 
 import { ReactNode, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { RoomProvider } from '@/liveblocks.config';
+import { RoomProvider, VotingState } from '@/liveblocks.config';
 import { ClientSideSuspense } from '@liveblocks/react';
 import { LiveList, LiveMap, LiveObject } from '@liveblocks/client';
 import { Layer } from '@/lib/types';
@@ -13,7 +13,6 @@ import { SerializableNode } from '@/lib/types';
 interface RoomProps {
   roomId: string;
 }
-
 const Room = ({ roomId }: RoomProps) => {
   return (
     <RoomProvider
@@ -37,6 +36,13 @@ const Room = ({ roomId }: RoomProps) => {
         person: new LiveObject({ name: 'Marie', age: 30 }),
         nodes: new LiveMap<string, LiveObject<SerializableNode>>(),
         edges: [], //이거 중요함 수정 x
+        host: new LiveObject({ userId: '' }), // 호스트 정보
+        voting: new LiveObject({
+          votes: {},
+          currentStep: 1,
+          isCompleted: false,
+          showCompletionModal: false,
+        }),
       }}
     >
       <ClientSideSuspense fallback={<Loading />}>

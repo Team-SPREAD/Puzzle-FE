@@ -50,6 +50,8 @@ const Cursors = ({ cursorPanel }: Props) => {
     };
   }, [updateMyPresence, cursorPanel, rectRef]);
 
+  
+
   return (
     <>
       {others.map(([id, other]) => {

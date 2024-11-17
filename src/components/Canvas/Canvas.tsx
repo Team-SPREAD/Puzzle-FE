@@ -17,6 +17,8 @@ import {
   useCanUndo,
   useCanRedo,
   useMyPresence,
+  useUpdateMyPresence,
+  useEventListener,
 } from '@/liveblocks.config';
 import { LiveObject } from '@liveblocks/client';
 import {
@@ -49,7 +51,6 @@ import ToolsBar from '@/components/ToolsBar';
 import Cursors from '@/components/Cursors';
 import useUserInfoStore from '@/hooks/useUserInfoStore';
 import RightNav from '../Layout/RightNav';
-import Avatar from '@/components/Avatar';
 import ProcessNav from '@/components/Layout/ProcessNav/Index';
 import { steps } from '@/lib/process-data';
 import {
@@ -65,6 +66,7 @@ import {
   Result,
 } from '../Templates';
 import { StageGimmicks } from '@/components/StageGimmicks';
+
 import {
   Connection,
   EdgeChange,
@@ -75,15 +77,80 @@ import {
 } from 'reactflow';
 import ReactFlowCanvas from '../ReactFlowCanvas';
 
+import { VotingSystem } from '@/components/Layout/Vote';
+import useUserStore from '@/store/useUserStore';
+import useTeamsStore from '@/store/useTeamsStore';
+import { useProcessStore } from '@/store/vote/processStore';
+import { useParams } from 'next/navigation';
+import { RoomEvent } from '@/liveblocks.config';
+import useModalStore from '@/store/useModalStore';
+import VotingModal from '../Layout/Vote/Modal/VotingModal';
+
 const MAX_LAYERS = 100;
 
 const Canvas = () => {
-  const userInfo = useUserInfoStore();
+  const userInfoReal = useUserStore((state) => state.userInfo);
+  const teams = useTeamsStore((state) => state.teams);
+
+  const userInfo = useUserInfoStore(); //이거 목데이터라 수정해야함
+  const [showVoteModal, setShowVoteModal] = useState(false); //투표 모달
   const layerIds = useStorage((root) => root.layerIds);
   const nodes = useStorage((root) => root.nodes);
   const edges = useStorage((root) => root.edges);
   const cursorPanel = useRef(null);
-  const [currentStep, setCurrentStep] = useState(1); //프로젝트 1단계
+  const { setCurrentStep: setBoardStep, getCurrentStep } = useProcessStore();
+  const { setCurrentStep: setGlobalCurrentStep } = useProcessStore();
+
+  //모달 스토어
+  const { modalType, closeModal } = useModalStore();
+
+  //투표 상태 관리
+  const voting = useStorage((root) => root.voting);
+  const hostId = useStorage((root) => root?.host?.userId);
+  const self = useSelf();
+  const isHost = hostId === self.id;
+
+  // 로컬 상태 관리
+  const [currentStep, setLocalCurrentStep] = useState(1);
+
+  const params = useParams();
+  const boardId = Array.isArray(params.boardId)
+    ? params.boardId[0]
+    : params.boardId;
+
+  // NEXT_STEP 이벤트 수신 리스너 수정
+  useEventListener((eventData) => {
+    const event = (eventData as any).event;
+    if (event && event.type === 'NEXT_STEP' && boardId) {
+      const nextStep = event.nextStep;
+      if (typeof nextStep === 'number') {
+        setGlobalCurrentStep(boardId, nextStep);
+        setLocalCurrentStep(nextStep);
+        handleModalClose();
+
+        // 카메라 위치 업데이트
+        const nextStepData = steps[nextStep - 1];
+        if (nextStepData) {
+          setCamera({
+            x: nextStepData.camera.x,
+            y: nextStepData.camera.y,
+          });
+        }
+      }
+    }
+  });
+
+  // 현재 단계를 Liveblocks presence에서 관리
+  const { currentProcess } = useSelf((me) => me.presence);
+
+  // 다른 사용자들의 현재 단계와 커서 정보를 가져오기
+  const others = useOthersMapped((other) => ({
+    cursor: other.presence.cursor,
+    currentProcess: other.presence.currentProcess,
+  }));
+
+  const updateMyPresence = useUpdateMyPresence();
+
   const [penSize, setPenSize] = useState(8); //펜 사이즈 use
   const pencilDraft = useSelf((me) => me.presence.pencilDraft);
   const [selectedLayerId, setSelectedLayerId] = useState<string | undefined>(); //text 컬러 상태관리
@@ -91,15 +158,26 @@ const Canvas = () => {
     mode: CanvasMode.None,
   });
   const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
-  const handleSetCamera = useCallback((position: { x: number; y: number }) => {
-    //postion 객체 안에 zoom: number 제거함
-    setCamera({ x: position.x, y: position.y });
-    const newStep =
-      steps.findIndex(
-        (step) => step.camera.x === position.x && step.camera.y === position.y,
-      ) + 1;
-    setCurrentStep(newStep);
-  }, []);
+
+  const handleSetCamera = useCallback(
+    (position: { x: number; y: number }) => {
+      setCamera({ x: position.x, y: position.y });
+      const newStep =
+        steps.findIndex(
+          (step) =>
+            step.camera.x === position.x && step.camera.y === position.y,
+        ) + 1;
+      setBoardStep(boardId, newStep);
+      setLocalCurrentStep(newStep);
+      updateMyPresence({ currentProcess: newStep }); // 현재 단계 업데이트
+    },
+    [updateMyPresence, setBoardStep, boardId],
+  );
+
+  // Cursors 컴포넌트에 전달할 커서 정보 필터링
+  const filteredOthers = useMemo(() => {
+    return others.filter(([_, data]) => data.currentProcess === currentStep);
+  }, [others, currentStep]);
 
   const [lastUsedColor, setLastUsedColor] = useState<Color>({
     r: 252,
@@ -113,6 +191,29 @@ const Canvas = () => {
   useDisableScrollBounce();
 
   const deleteLayers = useDeleteLayers();
+
+  //투표 기믹
+  const handleVoteComplete = () => {
+    setShowVoteModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowVoteModal(false);
+  };
+
+  const { setCurrentStep, resetVotingState } = useProcessStore();
+  const handleNextStep = () => {
+    const nextStep = currentStep + 1;
+    if (nextStep <= steps.length) {
+      const nextStepData = steps[nextStep - 1];
+      setCurrentStep(boardId, nextStep);
+      resetVotingState(); // 각 단계 저장 시 투표 상태 초기화
+      handleSetCamera({
+        x: nextStepData.camera.x,
+        y: nextStepData.camera.y,
+      });
+    }
+  };
 
   const renderStageTemplate = () => {
     switch (currentStep) {
@@ -705,6 +806,12 @@ const Canvas = () => {
             </g>
           </svg>
         </div>
+
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30">
+          <VotingSystem currentStep={currentStep} />
+        </div>
+        {/* 모달 컴포넌트 */}
+        {modalType === 'VOTE_COMPLETE' && <VotingModal />}
 
         <div className="absolute bottom-4 left-4 z-30">
           <ToolsBar

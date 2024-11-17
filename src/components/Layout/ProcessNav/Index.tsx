@@ -1,4 +1,4 @@
-import React from 'react';
+import React  from 'react';
 import ProcessBar from './ProcessBar';
 import { Process } from '@/lib/types';
 import { HelpCircle, Plus } from 'lucide-react';
@@ -6,6 +6,10 @@ import Avatar from '@/components/Avatar';
 import Image from 'next/image';
 import { useUpdateMyPresence } from '@/liveblocks.config';
 import puzzleLogo from '~/images/logo/logo.svg';
+import { useProcessStore } from '@/store/vote/processStore'; 
+import { useParams } from 'next/navigation';
+
+
 interface ProcessNavProps {
   userInfo: {
     _id: string;
@@ -16,7 +20,6 @@ interface ProcessNavProps {
   currentStep: number;
   processes: Process[];
 }
-
 const ProcessNav: React.FC<ProcessNavProps> = ({
   userInfo,
   setCamera,
@@ -24,12 +27,21 @@ const ProcessNav: React.FC<ProcessNavProps> = ({
   processes,
 }) => {
   const updateMyPresence = useUpdateMyPresence();
+  const { isStepAccessible, getCompletedSteps } = useProcessStore();
+  const { boardId } = useParams();
 
   const updateCurrentProcess = (step: number) => {
+    // 이전 단계 이동을 위한 조건 수정
+    const completedSteps = boardId ? getCompletedSteps(boardId as string) : [];
+    const canAccess = completedSteps.includes(step) || isStepAccessible(boardId as string, step);
+
+    if (!canAccess) return;
+    
     updateMyPresence({
       currentProcess: step,
     });
   };
+
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-10 px-4 py-3">
@@ -45,7 +57,6 @@ const ProcessNav: React.FC<ProcessNavProps> = ({
           userInfo={userInfo}
         />
         <div className="flex items-center space-x-2">
-          {/* <Avatar userInfo={userInfo} /> */}
           <button className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white">
             <Plus size={20} />
           </button>
