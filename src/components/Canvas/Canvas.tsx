@@ -65,12 +65,23 @@ import {
   Result,
 } from '../Templates';
 import { StageGimmicks } from '@/components/StageGimmicks';
+import {
+  Connection,
+  EdgeChange,
+  NodeChange,
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+} from 'reactflow';
+import ReactFlowCanvas from '../ReactFlowCanvas';
 
 const MAX_LAYERS = 100;
 
 const Canvas = () => {
   const userInfo = useUserInfoStore();
   const layerIds = useStorage((root) => root.layerIds);
+  const nodes = useStorage((root) => root.nodes);
+  const edges = useStorage((root) => root.edges);
   const cursorPanel = useRef(null);
   const [currentStep, setCurrentStep] = useState(1); //프로젝트 1단계
   const [penSize, setPenSize] = useState(8); //펜 사이즈 use
@@ -624,6 +635,11 @@ const Canvas = () => {
         {/* 현재 단계의 템플릿 렌더링 */}
         <StageGimmicks currentStep={currentStep} />
         {renderStageTemplate()}
+        {[9].includes(currentStep) && (
+          <div className="relative h-screen w-screen bg-white">
+            <ReactFlowCanvas />
+          </div>
+        )}
         <div
           className="w-full h-full relative bg-surface-canvas touch-none"
           ref={cursorPanel}
