@@ -9,7 +9,7 @@ import { Layer } from '@/lib/types';
 import { Loading } from '@/components/Loading';
 import Canvas from '@/components/Canvas/Canvas';
 import { steps } from '@/lib/process-data';
-
+import { SerializableNode } from '@/lib/types';
 interface RoomProps {
   roomId: string;
 }
@@ -35,6 +35,8 @@ const Room = ({ roomId }: RoomProps) => {
         layers: new LiveMap<string, LiveObject<Layer>>(),
         layerIds: new LiveList([]),
         person: new LiveObject({ name: 'Marie', age: 30 }),
+        nodes: new LiveMap<string, LiveObject<SerializableNode>>(),
+        edges: [], //이거 중요함 수정 x
       }}
     >
       <ClientSideSuspense fallback={<Loading />}>
