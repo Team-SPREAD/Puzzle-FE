@@ -1,4 +1,4 @@
-import { useMutation, useSelf, useStorage } from '@/liveblocks.config';
+import { useBroadcastEvent, useMutation, useSelf, useStorage } from '@/liveblocks.config';
 import { useVoteStore } from '@/store/vote/voteStore';
 import { useProcessStore } from '@/store/vote/processStore';
 import useModalStore from '@/store/useModalStore';
@@ -6,7 +6,7 @@ import useModalStore from '@/store/useModalStore';
 
 export const useVoteProgress = (boardId: string, currentStep: number) => {
   const { openModal } = useModalStore(); // 추가
-  
+  const broadcastEvent = useBroadcastEvent();
   const self = useSelf();
   const { host, voting } = useStorage((root) => ({ 
     host: root.host,
@@ -60,6 +60,10 @@ export const useVoteProgress = (boardId: string, currentStep: number) => {
         }
 
         openModal('VOTE_COMPLETE');
+        broadcastEvent({
+          type: 'NEXT_STEP',
+          nextStep,
+        });
       }
     } catch (error) {
       console.error('Failed to save progress:', error);

@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'next/navigation';
 import { useVoteAnimation } from '@/hooks/vote/useVoteAnimation';
@@ -8,6 +7,7 @@ import { PuzzlePiece } from './components/PuzzlePiece';
 import { SaveButton } from './components/SaveButton';
 import { PuzzleText } from './components/PuzzleText';
 import { useVoteProgress } from '@/hooks/vote/useVoteProgress';
+import { generateRandomColor } from '@/utils/getRandomColor';
 
 interface VotingSystemProps {
   currentStep: number;
@@ -15,15 +15,26 @@ interface VotingSystemProps {
 
 export const VotingSystem: React.FC<VotingSystemProps> = ({ currentStep }) => {
   const params = useParams();
-  const boardId = Array.isArray(params.boardId) ? params.boardId[0] : params.boardId;
-  const { vote, saveProgress, isHost, hasVoted, voteCount, isCompleted, TOTAL_USERS } = 
-    useVoteProgress(boardId, currentStep);
+  const boardId = Array.isArray(params.boardId)
+    ? params.boardId[0]
+    : params.boardId;
+  const {
+    vote,
+    saveProgress,
+    isHost,
+    hasVoted,
+    voteCount,
+    isCompleted,
+    TOTAL_USERS,
+  } = useVoteProgress(boardId, currentStep);
   const { showTransform } = useVoteAnimation(isCompleted, TOTAL_USERS);
-  const { progressColor, puzzleColors } = useColorStore();
-  
-  
-  
-  
+  const { progressColor, puzzleColors, setPuzzleColors } = useColorStore();
+
+  useEffect(() => {
+    if (!puzzleColors || puzzleColors.length === 0) {
+      setPuzzleColors(TOTAL_USERS);
+    }
+  }, [puzzleColors, setPuzzleColors, TOTAL_USERS]);
 
 
   const handleVote = () => {
@@ -69,9 +80,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({ currentStep }) => {
           </AnimatePresence>
 
           <AnimatePresence>
-            {showTransform && !isHost && (
-              <PuzzleText color={progressColor} />
-            )}
+            {showTransform && !isHost && <PuzzleText color={progressColor} />}
           </AnimatePresence>
         </div>
       </div>
