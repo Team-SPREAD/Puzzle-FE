@@ -1,12 +1,12 @@
 import React from 'react';
 import { useParams } from 'next/navigation';
-import useProcessStore from '@/store/useProcessStore';
 import useModalStore from '@/store/useModalStore';
 import { motion } from 'framer-motion';
 import { useStorage } from '@/liveblocks.config';
 import Lottie from 'lottie-react';
 import think from '~/lotties/think.json'; //이건 나중에 변경
-import { useColorStore } from '@/store/useColorStore';
+import { useProcessStore } from '@/store/vote/processStore';
+import { useColorStore } from '@/store/vote/colorStore';
 
 const VotingModal = () => {
   const { closeModal } = useModalStore();

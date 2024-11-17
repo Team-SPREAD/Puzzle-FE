@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { Camera } from '@/lib/types';
 import { useMutation, useStorage, useSelf } from '@/liveblocks.config';
 import { LiveObject } from '@liveblocks/client';
-import useProcessStore from '@/store/useProcessStore';
+import { useProcessStore } from '@/store/vote/processStore'; // 수정된 경로
 import { useParams } from 'next/navigation';
-// import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 interface IceBreakingAreaProps {
  camera: Camera;
@@ -28,10 +28,10 @@ export default function IceBreakingArea({ camera }: IceBreakingAreaProps) {
    if (boardId && self.id) {
      storage.set('host', new LiveObject({ userId: self.id }));
      useProcessStore.getState().setHost(boardId, self.id);
-    //  toast({
-    //    title: "호스트로 설정되었습니다",
-    //    description: "이제 단계 진행을 관리할 수 있습니다."
-    //  });
+     toast({
+       title: "호스트로 설정되었습니다",
+       description: "이제 단계 진행을 관리할 수 있습니다."
+     });
      console.log('Host set to:', self.id);
    }
  }, [self.id, boardId]);
@@ -261,59 +261,74 @@ function DrawingGame({ onClose }: { onClose: () => void }) {
       hints: ['커리어', '기술', '자기발전', '팀워크', '도전'],
     },
   ];
-
   const [currentPrompt, setCurrentPrompt] = useState(
     () => drawingPrompts[Math.floor(Math.random() * drawingPrompts.length)],
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold">🎨 그림으로 표현하기</h2>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M18 6L6 18M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-
-      <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-        <h3 className="font-semibold text-blue-800">{currentPrompt.topic}</h3>
-        <p className="text-blue-700">{currentPrompt.description}</p>
-        <div className="flex flex-wrap gap-2 mt-2">
-          {currentPrompt.hints.map((hint, index) => (
-            <span
-              key={index}
-              className="text-sm bg-blue-100 text-blue-600 px-2 py-1 rounded"
-            >
-              {hint}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="text-sm text-gray-600">
-        <p>❗ 팁: 펜 툴을 사용해서 자유롭게 그려보세요!</p>
-        <p>👥 팀원들과 함께 그림을 맞춰보세요</p>
-      </div>
-
-      <button
-        onClick={() =>
-          setCurrentPrompt(
-            drawingPrompts[Math.floor(Math.random() * drawingPrompts.length)],
-          )
-        }
-        className="w-full py-2 px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="relative bg-white rounded-xl p-6 shadow-xl max-w-md w-full mx-4"
+        onClick={(e) => e.stopPropagation()}
       >
-        다음 주제 보기
-      </button>
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold">🎨 그림으로 표현하기</h2>
+            <button 
+              onClick={onClose} 
+              className="text-gray-400 hover:text-gray-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+            <h3 className="font-semibold text-blue-800">{currentPrompt.topic}</h3>
+            <p className="text-blue-700">{currentPrompt.description}</p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {currentPrompt.hints.map((hint, index) => (
+                <span
+                  key={index}
+                  className="text-sm bg-blue-100 text-blue-600 px-2 py-1 rounded"
+                >
+                  {hint}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="text-sm text-gray-600">
+            <p>❗ 팁: 펜 툴을 사용해서 자유롭게 그려보세요!</p>
+            <p>👥 팀원들과 함께 그림을 맞춰보세요</p>
+          </div>
+
+          <button
+            onClick={() =>
+              setCurrentPrompt(
+                drawingPrompts[Math.floor(Math.random() * drawingPrompts.length)],
+              )
+            }
+            className="w-full py-2 px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+          >
+            다음 주제 보기
+          </button>
+        </div>
+      </motion.div>
     </div>
   );
 }

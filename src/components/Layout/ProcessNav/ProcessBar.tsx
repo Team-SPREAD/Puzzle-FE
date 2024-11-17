@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Process } from '@/lib/types';
 import {
   Star,
@@ -11,8 +11,6 @@ import {
   UserPlus,
   CheckSquare,
 } from 'lucide-react';
-import Image from 'next/image';
-import useProcessStore from '@/store/useProcessStore';
 import { useToast } from '@/components/ui/use-toast';
 import { useParams } from 'next/navigation';
 import {
@@ -22,7 +20,9 @@ import {
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
-import { useColorStore } from '@/store/useColorStore';
+import { useColorStore } from '@/store/vote/colorStore';
+import { useProcessStore } from '@/store/vote/processStore';
+import { ColorState } from '@/store/vote/types';
 
 const icons = [
   Star,
@@ -60,19 +60,24 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
   const boardId = Array.isArray(params.boardId)
     ? params.boardId[0]
     : params.boardId;
-  // useColorStore 사용 방식 수정
-  const progressColor = useColorStore((state) => state.progressColor);
-  const setProgressColor = useColorStore((state) => state.setProgressColor);
 
+  // useColorStore를 타입과 함께 사용
+  const progressColor = useColorStore(
+    (state: ColorState) => state.progressColor,
+  );
+  const setProgressColor = useColorStore(
+    (state: ColorState) => state.setProgressColor,
+  );
+
+  // ProcessStore 사용
+  const { getCompletedSteps, isStepAccessible, setCurrentStep } =
+    useProcessStore();
+  const { toast } = useToast();
 
   useEffect(() => {
     setProgressColor();
   }, [setProgressColor]);
 
-
-  const { getCompletedSteps, isStepAccessible, setCurrentStep } =
-    useProcessStore();
-  const { toast } = useToast();
   const completedSteps = boardId ? getCompletedSteps(boardId) : [];
 
   const handleStepClick = async (process: {
@@ -181,18 +186,18 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
                           : undefined
                       }
                       className={`
-                        relative w-9 h-9 rounded-full flex items-center justify-center 
-                        transition-all duration-200
-                        ${
-                          isCompleted
-                            ? 'hover:brightness-110'
-                            : isCurrent
-                              ? 'bg-indigo-500 text-white'
-                              : isAccessible
-                                ? 'bg-white text-gray-600 hover:bg-blue-500 hover:text-white'
-                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        }
-                      `}
+                       relative w-9 h-9 rounded-full flex items-center justify-center 
+                       transition-all duration-200
+                       ${
+                         isCompleted
+                           ? 'hover:brightness-110'
+                           : isCurrent
+                             ? 'bg-indigo-500 text-white'
+                             : isAccessible
+                               ? 'bg-white text-gray-600 hover:bg-blue-500 hover:text-white'
+                               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                       }
+                     `}
                       onClick={() => handleStepClick(process)}
                       disabled={!isCompleted && !isAccessible}
                     >

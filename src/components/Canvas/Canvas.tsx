@@ -67,14 +67,14 @@ import {
   Result,
 } from '../Templates';
 import { StageGimmicks } from '@/components/StageGimmicks';
-import VotingSystem from '../Layout/VoteNav/VotingSystem';
+import { VotingSystem } from '@/components/Layout/Vote';
 import useUserStore from '@/store/useUserStore';
 import useTeamsStore from '@/store/useTeamsStore';
-import VotingModal from '../Modal/VotingModal';
-import useProcessStore from '@/store/useProcessStore';
+import { useProcessStore } from '@/store/vote/processStore';;
 import { useParams } from 'next/navigation';
 import { RoomEvent } from '@/liveblocks.config';
 import useModalStore from '@/store/useModalStore';
+import VotingModal from '../Layout/Vote/Modal/VotingModal';
 
 const MAX_LAYERS = 100;
 
@@ -128,8 +128,9 @@ const Canvas = () => {
       }
     }
   });
-  // 현재 단계를 Liveblocks presence에서 관리
 
+
+  // 현재 단계를 Liveblocks presence에서 관리
   const { currentProcess } = useSelf((me) => me.presence);
 
   // 다른 사용자들의 현재 단계와 커서 정보를 가져오기
@@ -137,6 +138,8 @@ const Canvas = () => {
     cursor: other.presence.cursor,
     currentProcess: other.presence.currentProcess,
   }));
+
+
   const updateMyPresence = useUpdateMyPresence();
 
   const [penSize, setPenSize] = useState(8); //펜 사이즈 use

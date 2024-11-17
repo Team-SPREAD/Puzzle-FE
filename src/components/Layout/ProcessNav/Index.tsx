@@ -6,7 +6,7 @@ import Avatar from '@/components/Avatar';
 import Image from 'next/image';
 import { useUpdateMyPresence } from '@/liveblocks.config';
 import puzzleLogo from '~/images/logo/logo.svg';
-import useProcessStore from '@/store/useProcessStore';
+import { useProcessStore } from '@/store/vote/processStore'; 
 import { useParams } from 'next/navigation';
 
 
