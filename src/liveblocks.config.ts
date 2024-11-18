@@ -32,9 +32,7 @@ export type VotingState = {
   isCompleted: boolean;
 };
 
-
 export type ModalType = 'VOTE_COMPLETE' | 'NEXT_STEP' | 'OTHER_MODAL_TYPES';
-
 
 export type MusicStates = 'playing' | 'seeking' | 'paused';
 
@@ -54,13 +52,16 @@ type Storage = {
     activeUsers: LiveList<ActiveUserInfo>;
   }>;
   process: LiveList<Process>;
+  nodes: any; //gimic9 테스트
+  edges: any; //gimic9 테스트
+
   // 투표 상태 추가
   voting: LiveObject<{
     votes: Record<string, Vote>;
     currentStep: number;
     isCompleted: boolean;
-    showCompletionModal?: boolean; 
-    moveToNextStep?: boolean;  
+    showCompletionModal?: boolean;
+    moveToNextStep?: boolean;
   }>;
   // 호스트 정보 추가
   host: LiveObject<{
@@ -90,16 +91,15 @@ export type RoomEvent =
   // 투표 관련 이벤트 추가
   | { type: 'VOTE_COMPLETE' }
   | { type: 'NEXT_STEP'; nextStep: number }
-  | { type: 'RESET_VOTES';}
-  | {type: 'SHOW_COMPLETION_MODAL';}
-  | {type: 'OPEN_MODAL'}
+  | { type: 'RESET_VOTES' }
+  | { type: 'SHOW_COMPLETION_MODAL' }
+  | { type: 'OPEN_MODAL' };
 
-
-  export interface RoomEventMessage {
-    event: any;
-    type: string;
-    data: RoomEvent;
-  }
+export interface RoomEventMessage {
+  event: any;
+  type: string;
+  data: RoomEvent;
+}
 
 export const {
   suspense: {
@@ -126,6 +126,5 @@ export const {
     useCanUndo,
     useCanRedo,
     useMutation,
-    
   },
 } = createRoomContext<Presence, Storage, UserMeta, RoomEvent>(client);

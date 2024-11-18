@@ -11,7 +11,6 @@ const Dashboard = () => {
       const token = urlParams.get('token');
       if (token) {
         localStorage.setItem('token', token);
-
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           const userId = payload.userId;

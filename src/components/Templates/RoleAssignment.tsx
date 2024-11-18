@@ -4,7 +4,6 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface RoleAssignmentProps {
   camera: Camera;
- 
 }
 
 export default function RoleAssignment({ camera }: RoleAssignmentProps) {
@@ -36,7 +35,7 @@ export default function RoleAssignment({ camera }: RoleAssignmentProps) {
                     <span className="bg-cyan-100 text-cyan-600 text-xs px-2 py-0.5 rounded-full font-medium">
                       Step 9
                     </span>
-                    <h2 className="font-semibold text-gray-800">역할 분담</h2>
+                    <h2 className="font-semibold text-gray-800">메뉴 트리</h2>
                   </div>
                   <p className="text-xs text-gray-500">
                     프로젝트 수행을 위한 역할을 나누어보세요
@@ -49,25 +48,19 @@ export default function RoleAssignment({ camera }: RoleAssignmentProps) {
                     <h3 className="font-medium text-cyan-800 mb-1 text-sm flex items-center gap-1">
                       <span>👨‍💻</span> 개발
                     </h3>
-                    <p className="text-xs text-cyan-600">
-                      기술 구현
-                    </p>
+                    <p className="text-xs text-cyan-600">기술 구현</p>
                   </div>
                   <div className="bg-cyan-50 rounded-lg p-3 hover:bg-cyan-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-cyan-800 mb-1 text-sm flex items-center gap-1">
                       <span>🎨</span> 디자인
                     </h3>
-                    <p className="text-xs text-cyan-600">
-                      UI/UX 설계
-                    </p>
+                    <p className="text-xs text-cyan-600">UI/UX 설계</p>
                   </div>
                   <div className="bg-cyan-50 rounded-lg p-3 hover:bg-cyan-100 transition-colors cursor-pointer">
                     <h3 className="font-medium text-cyan-800 mb-1 text-sm flex items-center gap-1">
                       <span>📋</span> 기획
                     </h3>
-                    <p className="text-xs text-cyan-600">
-                      서비스 설계
-                    </p>
+                    <p className="text-xs text-cyan-600">서비스 설계</p>
                   </div>
                 </div>
               </motion.div>

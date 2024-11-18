@@ -19,7 +19,6 @@ import {
   useMyPresence,
   useUpdateMyPresence,
   useEventListener,
-  
 } from '@/liveblocks.config';
 import { LiveObject } from '@liveblocks/client';
 import {
@@ -67,10 +66,21 @@ import {
   Result,
 } from '../Templates';
 import { StageGimmicks } from '@/components/StageGimmicks';
+
+import {
+  Connection,
+  EdgeChange,
+  NodeChange,
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+} from 'reactflow';
+import ReactFlowCanvas from '../ReactFlowCanvas';
+
 import { VotingSystem } from '@/components/Layout/Vote';
 import useUserStore from '@/store/useUserStore';
 import useTeamsStore from '@/store/useTeamsStore';
-import { useProcessStore } from '@/store/vote/processStore';;
+import { useProcessStore } from '@/store/vote/processStore';
 import { useParams } from 'next/navigation';
 import { RoomEvent } from '@/liveblocks.config';
 import useModalStore from '@/store/useModalStore';
@@ -85,14 +95,16 @@ const Canvas = () => {
   const userInfo = useUserInfoStore(); //이거 목데이터라 수정해야함
   const [showVoteModal, setShowVoteModal] = useState(false); //투표 모달
   const layerIds = useStorage((root) => root.layerIds);
+  const nodes = useStorage((root) => root.nodes);
+  const edges = useStorage((root) => root.edges);
   const cursorPanel = useRef(null);
   const { setCurrentStep: setBoardStep, getCurrentStep } = useProcessStore();
   const { setCurrentStep: setGlobalCurrentStep } = useProcessStore();
-  
+
   //모달 스토어
   const { modalType, closeModal } = useModalStore();
 
-//투표 상태 관리
+  //투표 상태 관리
   const voting = useStorage((root) => root.voting);
   const hostId = useStorage((root) => root?.host?.userId);
   const self = useSelf();
@@ -106,7 +118,6 @@ const Canvas = () => {
     ? params.boardId[0]
     : params.boardId;
 
- 
   // NEXT_STEP 이벤트 수신 리스너 수정
   useEventListener((eventData) => {
     const event = (eventData as any).event;
@@ -116,7 +127,7 @@ const Canvas = () => {
         setGlobalCurrentStep(boardId, nextStep);
         setLocalCurrentStep(nextStep);
         handleModalClose();
-        
+
         // 카메라 위치 업데이트
         const nextStepData = steps[nextStep - 1];
         if (nextStepData) {
@@ -129,7 +140,6 @@ const Canvas = () => {
     }
   });
 
-
   // 현재 단계를 Liveblocks presence에서 관리
   const { currentProcess } = useSelf((me) => me.presence);
 
@@ -138,7 +148,6 @@ const Canvas = () => {
     cursor: other.presence.cursor,
     currentProcess: other.presence.currentProcess,
   }));
-
 
   const updateMyPresence = useUpdateMyPresence();
 
@@ -192,7 +201,7 @@ const Canvas = () => {
     setShowVoteModal(false);
   };
 
-   const { setCurrentStep, resetVotingState } = useProcessStore();
+  const { setCurrentStep, resetVotingState } = useProcessStore();
   const handleNextStep = () => {
     const nextStep = currentStep + 1;
     if (nextStep <= steps.length) {
@@ -727,6 +736,11 @@ const Canvas = () => {
         {/* 현재 단계의 템플릿 렌더링 */}
         <StageGimmicks currentStep={currentStep} />
         {renderStageTemplate()}
+        {[9].includes(currentStep) && (
+          <div className="relative h-screen w-screen bg-white">
+            <ReactFlowCanvas />
+          </div>
+        )}
         <div
           className="w-full h-full relative bg-surface-canvas touch-none"
           ref={cursorPanel}
@@ -793,10 +807,8 @@ const Canvas = () => {
           </svg>
         </div>
 
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30">
-          <VotingSystem
-            currentStep={currentStep}
-          />
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
+          <VotingSystem currentStep={currentStep} />
         </div>
         {/* 모달 컴포넌트 */}
         {modalType === 'VOTE_COMPLETE' && <VotingModal />}
