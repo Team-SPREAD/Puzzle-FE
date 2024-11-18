@@ -807,7 +807,7 @@ const Canvas = () => {
           </svg>
         </div>
 
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30">
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
           <VotingSystem currentStep={currentStep} />
         </div>
         {/* 모달 컴포넌트 */}
