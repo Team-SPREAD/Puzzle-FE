@@ -25,6 +25,7 @@
     "jwt-decode": "^4.0.0",
     "lottie-react": "^2.4.0",
     "lucide-react": "^0.452.0",
+    "matter-js": "^0.20.0",
     "nanoid": "^5.0.7",
     "next": "^14.2.11",
     "nookies": "^2.5.2",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@types/jwt-decode": "^3.1.0",
+    "@types/matter-js": "^0.19.7",
     "@types/react": "^18.3.3",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
