@@ -83,10 +83,10 @@ export default function LandingPage() {
         {/* 첫 번째 섹션 */}
         <section className="relative h-screen w-full snap-start flex items-center justify-center">
           <div className="absolute inset-0">
-            <PuzzlePiece />
+            <PuzzlePiece currentSection={currentSection} />
           </div>
           <motion.div
-            className="container mx-auto px-4 text-center z-40"
+            className="container mx-auto px-4 text-center z-40 relative"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 0.8 }}

@@ -3,14 +3,22 @@
 import { useEffect, useRef } from 'react';
 import Matter from 'matter-js';
 
-export default function PuzzleMatter() {
+interface PuzzleMatterProps {
+  currentSection: number;
+}
+
+export default function PuzzleMatter({ currentSection }: PuzzleMatterProps) {
   const sceneRef = useRef<HTMLDivElement>(null);
+  const engineRef = useRef<Matter.Engine | null>(null);
+  const worldRef = useRef<Matter.World | null>(null);
 
   useEffect(() => {
     const { Engine, Render, Runner, World, Bodies, MouseConstraint, Mouse } = Matter;
 
     // 엔진 생성
     const engine = Engine.create();
+    engineRef.current = engine;
+    worldRef.current = engine.world;
     
     // 렌더러 설정
     const render = Render.create({
@@ -24,7 +32,6 @@ export default function PuzzleMatter() {
       }
     });
 
-    // Runner 생성 (새로운 방식)
     const runner = Runner.create();
 
     // 퍼즐 조각 생성 함수
@@ -57,10 +64,10 @@ export default function PuzzleMatter() {
       return createPuzzlePiece(x, y, letter, colors[i % colors.length]);
     });
 
-    // 바닥 생성
+    // 바닥 위치를 첫 번째 섹션의 끝으로 조정
     const ground = Bodies.rectangle(
       window.innerWidth / 2,
-      window.innerHeight + 30,
+      window.innerHeight - 100, // 첫 번째 섹션의 바닥
       window.innerWidth,
       60,
       { 
@@ -68,6 +75,29 @@ export default function PuzzleMatter() {
         render: {
           fillStyle: 'transparent'
         }
+      }
+    );
+
+    // 좌우 벽 추가
+    const leftWall = Bodies.rectangle(
+      0,
+      window.innerHeight / 2,
+      60,
+      window.innerHeight,
+      {
+        isStatic: true,
+        render: { fillStyle: 'transparent' }
+      }
+    );
+
+    const rightWall = Bodies.rectangle(
+      window.innerWidth,
+      window.innerHeight / 2,
+      60,
+      window.innerHeight,
+      {
+        isStatic: true,
+        render: { fillStyle: 'transparent' }
       }
     );
 
@@ -99,21 +129,29 @@ export default function PuzzleMatter() {
     });
 
     // 월드에 객체 추가
-    World.add(engine.world, [...pieces, ground, mouseConstraint]);
+    World.add(engine.world, [...pieces, ground, leftWall, rightWall, mouseConstraint]);
 
     // 렌더러 실행
     Render.run(render);
-    
-    // Runner로 엔진 실행 (새로운 방식)
     Runner.run(runner, engine);
 
     // 리사이즈 핸들러
     const handleResize = () => {
       render.canvas.width = window.innerWidth;
       render.canvas.height = window.innerHeight;
+      
+      // 벽과 바닥 위치 업데이트
       Matter.Body.setPosition(ground, {
         x: window.innerWidth / 2,
-        y: window.innerHeight + 30
+        y: window.innerHeight - 100
+      });
+      Matter.Body.setPosition(leftWall, {
+        x: 0,
+        y: window.innerHeight / 2
+      });
+      Matter.Body.setPosition(rightWall, {
+        x: window.innerWidth,
+        y: window.innerHeight / 2
       });
     };
 
@@ -129,11 +167,22 @@ export default function PuzzleMatter() {
     };
   }, []);
 
+  // currentSection이 변경될 때 opacity 조절
+  useEffect(() => {
+    if (sceneRef.current) {
+      sceneRef.current.style.opacity = currentSection === 0 ? '1' : '0';
+      sceneRef.current.style.pointerEvents = currentSection === 0 ? 'auto' : 'none';
+    }
+  }, [currentSection]);
+
   return (
     <div 
       ref={sceneRef} 
-      className="fixed inset-0 z-20"
-      style={{ touchAction: 'none' }}
+      className="fixed inset-0 transition-opacity duration-500"
+      style={{ 
+        touchAction: 'none',
+        pointerEvents: currentSection === 0 ? 'auto' : 'none',
+      }}
     />
   );
 }
