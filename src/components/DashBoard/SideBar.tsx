@@ -7,9 +7,10 @@ import dots from '~/images/dots.svg';
 import star from '~/images/star.svg';
 import projects from '~/images/projects.svg';
 import arrowBottom from '~/images/arrow-bottom.svg';
-import UserSelectModal from './Modal/UserSelectModal';
+import UserSelectModal from './Modals/UserSelectModal';
 import defaultIcon from '~/images/testUserIcon.jpeg';
 import { generateRandomColor } from '@/utils/getRandomColor';
+import house from '~/images/house.svg';
 
 interface SidebarProps {
   selectedTeamId: string | null;
@@ -18,6 +19,8 @@ interface SidebarProps {
   favoriteProjects: { id: string; name: string; isFavorite: boolean }[];
   teams: { _id: string; teamName: string }[];
   userInfo: UserInfo;
+  boardView: 'MyBoards' | 'FavoriteBoards'; // 현재 보드 상태
+  setBoardView: (view: 'MyBoards' | 'FavoriteBoards') => void; // 상태 변경 함수
 }
 
 export default function Sidebar({
@@ -27,6 +30,8 @@ export default function Sidebar({
   favoriteProjects,
   teams,
   userInfo,
+  boardView,
+  setBoardView,
 }: SidebarProps) {
   const { openModal, closeModal, modalType } = useModalStore();
   const [isUserSelectThrottled, setIsUserSelectThrottled] = useState(false); // 딜레이 상태 추가
@@ -83,7 +88,7 @@ export default function Sidebar({
                   ? closeModal()
                   : openModal('DROPDOWN_TEAM_SELECT')
               }
-              className="w-full h-[48px] text-left px-4 py-2 border rounded-md flex justify-between items-center"
+              className="w-full h-[48px] text-left px-3 py-2 border rounded-md flex justify-between items-center"
             >
               <div className="flex items-center">
                 {selectedTeamId ? (
@@ -102,12 +107,12 @@ export default function Sidebar({
                     className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
                     style={{ backgroundColor: buttonColor }}
                   >
-                    개인
+                    <Image src={house} width={16} height={16} alt="home" />
                   </div>
                 )}
                 {selectedTeamId
                   ? teams.find((t) => t._id === selectedTeamId)?.teamName
-                  : '개인 대시보드'}
+                  : 'Home'}
               </div>
               <Image
                 src={arrowBottom}
@@ -120,21 +125,21 @@ export default function Sidebar({
               <div className="mt-2 bg-white rounded-md shadow-lg absolute z-50 w-[14%]">
                 <button
                   onClick={() => handleTeamSelect(null)}
-                  className="w-full text-left px-2 py-2 hover:bg-gray-100 flex items-center"
+                  className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center"
                 >
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
                     style={{ backgroundColor: buttonColor }}
                   >
-                    개인
+                    <Image src={house} width={16} height={16} alt="home" />
                   </div>
-                  개인 대시보드
+                  Home
                 </button>
                 {teams.map((team) => (
                   <button
                     key={team._id}
                     onClick={() => handleTeamSelect(team._id)}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center"
+                    className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center"
                   >
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
@@ -155,8 +160,14 @@ export default function Sidebar({
             )}
           </div>
 
+          {/* My boards 버튼 */}
           <div className="mb-3">
-            <button className="w-full h-[48px] text-left px-4 py-2 border rounded-md flex items-center">
+            <button
+              onClick={() => setBoardView('MyBoards')}
+              className={`w-full h-[48px] text-left px-4 py-2 border rounded-md flex items-center ${
+                boardView === 'MyBoards' ? 'bg-gray-200' : ''
+              }`}
+            >
               <Image
                 src={projects}
                 width={18}
@@ -167,8 +178,15 @@ export default function Sidebar({
               <span>My boards</span>
             </button>
           </div>
-          <div className="">
-            <button className="w-full h-[48px] text-left px-4 py-2 border rounded-md flex items-center">
+
+          {/* Favorite boards 버튼 */}
+          <div>
+            <button
+              onClick={() => setBoardView('FavoriteBoards')}
+              className={`w-full h-[48px] text-left px-4 py-2 border rounded-md flex items-center ${
+                boardView === 'FavoriteBoards' ? 'bg-gray-200' : ''
+              }`}
+            >
               <Image
                 src={star}
                 width={18}
