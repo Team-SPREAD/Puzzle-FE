@@ -7,12 +7,14 @@ interface HeaderProps {
   isDashboardPersonal: boolean;
   buttonColor: string;
   userName: string;
+  onSearch: (searchTerm: string) => void;
 }
 
 export default function Header({
   isDashboardPersonal,
   buttonColor,
   userName,
+  onSearch,
 }: HeaderProps) {
   const { openModal } = useModalStore();
 
@@ -29,6 +31,7 @@ export default function Header({
           type="text"
           placeholder="프로젝트 검색..."
           className="px-4 py-2 border rounded-md "
+          onChange={(e) => onSearch(e.target.value)}
         />
         <div className="flex items-center space-x-4">
           {isDashboardPersonal ? (
