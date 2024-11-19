@@ -21,8 +21,8 @@ jobs:
           API_TOKEN_GITHUB: ${{ secrets.HO8AE_GITHUB_KEY }}
         with:
           source-directory: 'output'
-          destination-github-username: your-github-username
-          destination-repository-name: your-github-repository-name
+          destination-github-username: ho8ae
+          destination-repository-name: vercel-Puzzle-FE
           user-email: ${{ secrets.HO8AE_ACCOUNT_EMAIL }}
           commit-message: ${{ github.event.commits[0].message }}
           target-branch: main
