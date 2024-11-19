@@ -5,19 +5,21 @@ import dots from '~/images/dots.svg';
 import testImage from '~/images/testUserIcon.jpeg';
 import useModalStore from '@/store/useModalStore';
 import { useState } from 'react';
-import BoardSettingModal from '@/components/DashBoard/Modal/BoardSettingModal';
+import CreateBoardModal from './Modals/CreateBoardModal';
+import { BoardInfo } from '@/lib/types';
+import BoardCard from './BoardCard';
 
 interface BoardGridProps {
-  boards: {
-    id: string;
-    name: string;
-    teamId: string | null;
-    currentStep: number;
-  }[];
+  boards: BoardInfo[];
   buttonColor: string;
+  teamId: string | null;
 }
 
-export default function BoardGrid({ boards, buttonColor }: BoardGridProps) {
+export default function BoardGrid({
+  boards = [],
+  buttonColor,
+  teamId,
+}: BoardGridProps) {
   const getBoardUrl = (boardName: string) => {
     return `/board/${boardName.toLowerCase().replace(/ /g, '-')}`;
   };
@@ -30,7 +32,7 @@ export default function BoardGrid({ boards, buttonColor }: BoardGridProps) {
     if (isThrottled) return;
     setIsThrottled(true);
 
-    // 클릭한 projectId에 따라 모달 열기/닫기
+    // 클릭한 boardId에 따라 모달 열기/닫기
     if (modalType === 'PROJECT_SETTING' && activeBoardId === boardId) {
       closeModal();
       setActiveBoardId(null);
@@ -44,63 +46,58 @@ export default function BoardGrid({ boards, buttonColor }: BoardGridProps) {
     }, 1000);
   };
 
+  const handleNewBoardClick = () => {
+    openModal('CREATE_BOARD');
+  };
+
   const TOTAL_STEPS = 10;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-y-auto">
-      <div
-        style={{ backgroundColor: buttonColor }}
-        className="rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 aspect-[2/3] flex items-center justify-center flex-col text-white"
-      >
-        <button className="w-3/4 h-3/4 flex items-center justify-center text-white text-6xl rounded-md hover:opacity-90 transition-opacity duration-200">
-          +
-        </button>
-        <p>New board</p>
-      </div>
-      {boards.map((board) => (
-        <div key={board.id}>
-          <div className="bg-white rounded-lg shadow-md transition-all duration-200 aspect-[2/3] p-6 flex flex-col justify-around transform group hover:shadow-lg">
-            <div className="flex justify-end">
-              <Image
-                src={dots}
-                alt="dots"
-                onClick={() => handleBoardClick(board.id)}
-                className="cursor-pointer"
-              />
-              {/* 현재 project.id가 activeProjectId와 동일할 때만 모달 표시 */}
-              {modalType === 'PROJECT_SETTING' &&
-                activeBoardId === board.id && (
-                  <BoardSettingModal onClose={closeModal} />
-                )}
-            </div>
-            <Link
-              href={getBoardUrl(board.name)}
-              className="flex justify-center"
-            >
-              <Image
-                src={testImage}
-                alt="project-icon"
-                className="rounded-full w-36 h-36 transition-all duration-500 group-hover:rounded-lg group-hover:w-40 group-hover:h-40"
-              />
-            </Link>
-            <div className="relative w-full h-1 mt-4 bg-gray-200 rounded">
-              <div
-                className="h-full rounded"
-                style={{
-                  width: `${(board.currentStep / TOTAL_STEPS) * 100}%`,
-                  backgroundColor: board.teamId ? buttonColor : 'gray',
-                }}
-              ></div>
-            </div>
-            <div>
-              <h3 className="font-bold text-xl mb-2">{board.name}</h3>
-              <p className="text-sm text-gray-500">
-                {board.teamId ? '팀 프로젝트' : '개인 프로젝트'}
-              </p>
-            </div>
-          </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 overflow-y-auto ">
+      {teamId ? (
+        <div
+          style={{ backgroundColor: buttonColor }}
+          className="rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 aspect-[2/3] flex items-center justify-center flex-col text-white"
+        >
+          <button
+            onClick={handleNewBoardClick}
+            className="w-3/4 h-3/4 flex items-center justify-center text-white text-6xl rounded-md hover:opacity-90 transition-opacity duration-200"
+          >
+            +
+          </button>
+          <p>New board</p>
         </div>
-      ))}
+      ) : (
+        <div className="col-span-full flex flex-col items-center justify-center h-96 bg-gray-50 rounded-lg shadow-md">
+          <p className="text-lg font-semibold text-gray-700">
+            팀을 생성해서 보드를 만들어 보아요
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            프로젝트를 시작하려면 새로운 팀을 생성하세요.
+          </p>
+        </div>
+      )}
+
+      {boards?.length > 0 ? (
+        boards.map((board) => (
+          <BoardCard
+            key={board._id}
+            board={board}
+            buttonColor={buttonColor}
+            TOTAL_STEPS={TOTAL_STEPS}
+            getBoardUrl={getBoardUrl}
+          />
+        ))
+      ) : (
+        <div></div>
+      )}
+      {modalType === 'CREATE_BOARD' && (
+        <CreateBoardModal
+          isOpen={modalType === 'CREATE_BOARD'}
+          onClose={closeModal}
+          teamId={teamId}
+        />
+      )}
     </div>
   );
 }
