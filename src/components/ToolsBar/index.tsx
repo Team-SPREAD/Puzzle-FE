@@ -36,7 +36,6 @@ export default function ToolsBar({
   onColorChange,
 }: Props) {
   const isToolActive = (mode: CanvasMode, checkLayerType?: LayerType) => {
-    // Selection 도구 체크
     if (mode === CanvasMode.None) {
       return (
         canvasState.mode === CanvasMode.None ||
@@ -47,12 +46,10 @@ export default function ToolsBar({
       );
     }
 
-    // 펜슬 도구 체크
     if (mode === CanvasMode.Pencil) {
       return canvasState.mode === CanvasMode.Pencil;
     }
 
-    // 도형 삽입 도구들 체크
     if (mode === CanvasMode.Inserting && typeof checkLayerType === 'number') {
       return (
         canvasState.mode === mode &&
@@ -197,9 +194,10 @@ function ToolButton({
   children: React.ReactNode;
 }) {
   return (
-    <motion.button
+    <motion.div
       onClick={onClick}
-      className="relative w-full flex items-center justify-center"
+      className="relative w-full flex items-center justify-center cursor-pointer"
+      role="button"
       whileHover={{ scale: 1.1 }}
     >
       <div className="w-7 h-7 flex items-center justify-center">
@@ -217,6 +215,6 @@ function ToolButton({
           {children}
         </div>
       </div>
-    </motion.button>
+    </motion.div>
   );
 }
