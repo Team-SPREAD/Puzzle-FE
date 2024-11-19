@@ -36,7 +36,6 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({ currentStep }) => {
     }
   }, [puzzleColors, setPuzzleColors, TOTAL_USERS]);
 
-
   const handleVote = () => {
     if (!hasVoted) {
       vote();
