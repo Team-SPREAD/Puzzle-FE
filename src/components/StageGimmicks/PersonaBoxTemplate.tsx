@@ -97,7 +97,7 @@ export default function PersonaBoxTemplate({
         width: isCollapsed ? '240px' : '320px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      style={{ position: 'absolute', zIndex: 9999 }}
+      style={{ position: 'absolute', zIndex: 30 }}
     >
       <div
         ref={containerRef}

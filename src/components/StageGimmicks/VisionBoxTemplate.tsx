@@ -99,7 +99,7 @@ export default function VisionBoxTemplate({
         width: isCollapsed ? '180px' : '320px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      style={{ position: 'absolute', zIndex: 9999 }}
+      style={{ position: 'absolute', zIndex: 30 }}
     >
       <div className={`p-4 ${isCollapsed ? 'px-3 py-2' : ''}`}>
         <div className="flex items-center justify-between mb-2">

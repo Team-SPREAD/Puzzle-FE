@@ -149,7 +149,7 @@ export default function UserStoryTemplate({
         width: isCollapsed ? '180px' : '400px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      style={{ position: 'absolute', zIndex: 9999 }}
+      style={{ position: 'absolute', zIndex: 30 }}
     >
       <div className={`p-4 ${isCollapsed ? 'px-3 py-2' : ''}`}>
         <div className="flex flex-col gap-2">

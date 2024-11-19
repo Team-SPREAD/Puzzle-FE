@@ -95,7 +95,7 @@ const InputForNode = ({
         position: 'absolute',
         bottom: '8rem',
         left: '8rem',
-        zIndex: 100,
+        zIndex: 30,
       }}
     >
       <div className={`p-4 ${isCollapsed ? 'px-3 py-2' : ''}`}>
