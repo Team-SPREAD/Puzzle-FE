@@ -11,6 +11,7 @@ type ModalType =
   | 'PROJECT_SETTING' // 여기까지 대시보드 모달
   | 'VOTE_COMPLETE' //투표 모달
   | 'NEXT_STEP' //단계 이동 모달
+  | 'CREATE_BOARD'
   | null;
 
 interface ModalProps {
