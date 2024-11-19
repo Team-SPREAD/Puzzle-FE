@@ -7,8 +7,13 @@ import {
 import { useVoteStore } from '@/store/vote/voteStore';
 import { useProcessStore } from '@/store/vote/processStore';
 import useModalStore from '@/store/useModalStore';
+import { captureAndUpload } from '@/app/api/canvas-axios';
 
-export const useVoteProgress = (boardId: string, currentStep: number) => {
+export const useVoteProgress = (
+  boardId: string,
+  currentStep: number,
+  canvasRef: React.RefObject<HTMLElement>,
+) => {
   const { openModal } = useModalStore(); // 추가
   const broadcastEvent = useBroadcastEvent();
   const self = useSelf();
@@ -62,6 +67,31 @@ export const useVoteProgress = (boardId: string, currentStep: number) => {
             voting.set('votes', {});
             voting.set('isCompleted', false);
             voting.set('currentStep', nextStep);
+          }
+          // 캡처 로직 추가
+          const liveblocksToken = localStorage.getItem('roomToken');
+          if (!canvasRef.current) {
+            console.error('Canvas element is not available.');
+            return;
+          }
+          if (!liveblocksToken) {
+            console.error('Liveblocks token is missing.');
+            return;
+          }
+
+          try {
+            await captureAndUpload(
+              canvasRef.current,
+              boardId,
+              currentStep,
+              liveblocksToken,
+            );
+          } catch (captureError) {
+            console.error(
+              'Failed to capture and upload the canvas:',
+              captureError,
+            );
+            return;
           }
 
           openModal('VOTE_COMPLETE');

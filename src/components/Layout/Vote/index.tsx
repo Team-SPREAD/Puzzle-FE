@@ -11,9 +11,13 @@ import { generateRandomColor } from '@/utils/getRandomColor';
 
 interface VotingSystemProps {
   currentStep: number;
+  canvasRef: React.RefObject<HTMLDivElement>;
 }
 
-export const VotingSystem: React.FC<VotingSystemProps> = ({ currentStep }) => {
+export const VotingSystem: React.FC<VotingSystemProps> = ({
+  currentStep,
+  canvasRef,
+}) => {
   const params = useParams();
   const boardId = Array.isArray(params.boardId)
     ? params.boardId[0]
@@ -26,7 +30,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({ currentStep }) => {
     voteCount,
     isCompleted,
     TOTAL_USERS,
-  } = useVoteProgress(boardId, currentStep);
+  } = useVoteProgress(boardId, currentStep, canvasRef);
   const { showTransform } = useVoteAnimation(isCompleted, TOTAL_USERS);
   const { progressColor, puzzleColors, setPuzzleColors } = useColorStore();
 
