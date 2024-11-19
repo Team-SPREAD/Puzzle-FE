@@ -1,4 +1,4 @@
-import React  from 'react';
+import React from 'react';
 import ProcessBar from './ProcessBar';
 import { Process } from '@/lib/types';
 import { HelpCircle, Plus } from 'lucide-react';
@@ -6,9 +6,8 @@ import Avatar from '@/components/Avatar';
 import Image from 'next/image';
 import { useUpdateMyPresence } from '@/liveblocks.config';
 import puzzleLogo from '~/images/logo/logo.svg';
-import { useProcessStore } from '@/store/vote/processStore'; 
-import { useParams } from 'next/navigation';
-
+import { useProcessStore } from '@/store/vote/processStore';
+import { useParams, useRouter } from 'next/navigation';
 
 interface ProcessNavProps {
   userInfo: {
@@ -29,24 +28,28 @@ const ProcessNav: React.FC<ProcessNavProps> = ({
   const updateMyPresence = useUpdateMyPresence();
   const { isStepAccessible, getCompletedSteps } = useProcessStore();
   const { boardId } = useParams();
-
+  const router = useRouter();
   const updateCurrentProcess = (step: number) => {
     // 이전 단계 이동을 위한 조건 수정
     const completedSteps = boardId ? getCompletedSteps(boardId as string) : [];
-    const canAccess = completedSteps.includes(step) || isStepAccessible(boardId as string, step);
+    const canAccess =
+      completedSteps.includes(step) ||
+      isStepAccessible(boardId as string, step);
 
     if (!canAccess) return;
-    
+
     updateMyPresence({
       currentProcess: step,
     });
   };
 
-
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-10 px-4 py-3">
       <div className="max-w-[1400px] mx-auto flex items-center justify-between">
-        <span className="text-2xl font-bold">
+        <span
+          className="text-2xl font-bold cursor-pointer"
+          onClick={() => router.back()}
+        >
           <Image src={puzzleLogo} alt="Logo" width={100} height={40} />
         </span>
         <ProcessBar
