@@ -15,7 +15,7 @@ export default function DiscussionBoxTemplate({
   const [topic, setTopic] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<DiscussionCategory>('category');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const me = useSelf();
   const userName = me?.info?.name || '익명 사용자';

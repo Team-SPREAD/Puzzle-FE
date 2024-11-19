@@ -11,7 +11,7 @@ export default function PersonaBoxTemplate({
   color,
   position,
 }: PersonaBoxProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [personaData, setPersonaData] = useState({
     name: '',
     age: '',

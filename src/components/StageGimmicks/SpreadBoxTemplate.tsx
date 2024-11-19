@@ -13,7 +13,7 @@ export default function SpreadBoxTemplate({
   position,
 }: SpreadBoxProps) {
   const [centerIdea, setCenterIdea] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const createCenterSpread = useMutation(
     ({ storage }) => {

@@ -57,7 +57,7 @@ export default function SolvingProblemBoxTemplate({
   position,
 }: SolvingProblemBoxProps) {
   const [selectedType, setSelectedType] = useState<BoxType>('define');
-  const [showGuide, setShowGuide] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
   const me = useSelf();
   const layers = useStorage((root) => root.layers);
 

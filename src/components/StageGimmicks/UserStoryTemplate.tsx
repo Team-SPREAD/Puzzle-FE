@@ -16,7 +16,7 @@ export default function UserStoryTemplate({
   const [action, setAction] = useState('');
   const [goal, setGoal] = useState('');
   const [task, setTask] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false); // 박스 접힘 상태 관리
+  const [isCollapsed, setIsCollapsed] = useState(true); // 박스 접힘 상태 관리
 
   // 현재 사용자 정보 가져오기
   const me = useSelf();
