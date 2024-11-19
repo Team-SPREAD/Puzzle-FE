@@ -32,7 +32,7 @@ export default function InviteAcceptPage() {
     setIsAccepting(true);
     try {
       const response = await acceptInvitation(resolvedId);
-      if (response.status === 200) {
+      if (response.status === 201) {
         console.log('Invitation accepted successfully');
         router.push(`/`);
       } else {
