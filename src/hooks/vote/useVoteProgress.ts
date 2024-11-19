@@ -7,42 +7,71 @@ import {
 import { useVoteStore } from '@/store/vote/voteStore';
 import { useProcessStore } from '@/store/vote/processStore';
 import useModalStore from '@/store/useModalStore';
+import { getTeamMembers } from '@/app/api/dashboard-axios';
+import { useState, useEffect } from 'react';
 
 export const useVoteProgress = (boardId: string, currentStep: number) => {
-  const { openModal } = useModalStore(); // 추가
+  const { openModal } = useModalStore();
   const broadcastEvent = useBroadcastEvent();
   const self = useSelf();
   const { host, voting } = useStorage((root) => ({
     host: root.host,
     voting: root.voting,
   }));
+  const [totalUsers, setTotalUsers] = useState(1);
+
+  useEffect(() => {
+    const fetchTeamUsers = async () => {
+      if (!boardId) return; // boardId 체크 추가
+
+      try {
+        const response = await getTeamMembers(
+          boardId,
+          localStorage.getItem('token') || '',
+        );
+        if (response.data && Array.isArray(response.data)) {
+          // 데이터 유효성 검사
+          setTotalUsers(response.data.length);
+          useVoteStore.setState({ totalUsers: response.data.length });
+        }
+      } catch (error) {
+        console.error('Error fetching team users:', error);
+        // 에러 시에도 기존 상태 유지
+      }
+    };
+
+    fetchTeamUsers();
+  }, [boardId]);
 
   const isHost = host?.userId === self.id;
   const votes = voting?.votes || {};
   const voteCount = Object.keys(votes).length;
-  const TOTAL_USERS = 1; // 상수로 정의
-  const hasVoted = !!votes[self.id?.toString() || ''];
-  const isCompleted = voteCount === TOTAL_USERS;
+  const hasVoted = self?.id ? !!votes[self.id] : false; // self.id null 체크
+  const isCompleted = totalUsers > 0 && voteCount >= totalUsers; // 조건 수정
 
-  const vote = useMutation(({ storage, self }) => {
-    if (!self.id) return;
+  const vote = useMutation(
+    ({ storage, self }) => {
+      if (!self?.id) return;
 
-    const voting = storage.get('voting');
-    if (!voting) return;
+      const voting = storage.get('voting');
+      if (!voting) return;
 
-    const currentVotes = voting.get('votes') || {};
-    if (currentVotes[self.id]) return;
+      const currentVotes = voting.get('votes') || {};
+      if (currentVotes[self.id]) return;
 
-    voting.set('votes', {
-      ...currentVotes,
-      [self.id]: { userId: self.id, timestamp: Date.now() },
-    });
+      const newVotes = {
+        ...currentVotes,
+        [self.id]: { userId: self.id, timestamp: Date.now() },
+      };
 
-    const voteCount = Object.keys(currentVotes).length + 1;
-    if (voteCount === useVoteStore.getState().totalUsers) {
-      voting.set('isCompleted', true);
-    }
-  }, []); // 빈 배열 추가
+      voting.set('votes', newVotes);
+
+      if (Object.keys(newVotes).length >= totalUsers) {
+        voting.set('isCompleted', true);
+      }
+    },
+    [totalUsers],
+  );
 
   const saveProgress = useMutation(
     async ({ storage }) => {
@@ -75,7 +104,7 @@ export const useVoteProgress = (boardId: string, currentStep: number) => {
       }
     },
     [boardId, currentStep, isHost],
-  ); // 의존성 배열 추가
+  );
 
   return {
     vote,
@@ -84,6 +113,6 @@ export const useVoteProgress = (boardId: string, currentStep: number) => {
     hasVoted,
     voteCount,
     isCompleted,
-    TOTAL_USERS,
+    totalUsers,
   };
 };
