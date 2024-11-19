@@ -31,10 +31,16 @@ export type TeamsInfo = {
 export type TeamsMember = {};
 
 export type BoardInfo = {
-  name: string;
-  id: string;
+  _id: string;
+  boardName: string;
   description: string;
-  role: string;
+  boardImgUrl: string;
+  currentStep: string;
+  createdDate: string;
+  updatedDate: string;
+  team: string;
+  like: boolean;
+  __v: number;
 };
 
 export type Color = {
