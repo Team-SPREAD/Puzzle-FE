@@ -7,10 +7,10 @@ import Sidebar from '@/components/DashBoard/SideBar';
 import Header from '@/components/DashBoard/Header';
 import TeamMembersBar from '@/components/DashBoard/TeamMembersBar';
 import BoardOverview from '@/components/DashBoard/BoardOverview';
-import CreateTeamModal from '@/components/DashBoard/Modal/CreateTeamModal';
-import InviteTeamModal from '@/components/DashBoard/Modal/InviteTeamModal';
-import EditTeamModal from '@/components/DashBoard/Modal/EditTeamModal';
-import DeleteTeamModal from '@/components/DashBoard/Modal/DeleteTeamModal';
+import CreateTeamModal from '@/components/DashBoard/Modals/CreateTeamModal';
+import InviteTeamModal from '@/components/DashBoard/Modals/InviteTeamModal';
+import EditTeamModal from '@/components/DashBoard/Modals/EditTeamModal';
+import DeleteTeamModal from '@/components/DashBoard/Modals/DeleteTeamModal';
 import { Loading } from '@/components/Loading';
 // 유틸
 import { generateRandomColor } from '@/utils/getRandomColor';
@@ -30,11 +30,17 @@ export default function DashboardPage() {
   const { modalType, closeModal } = useModalStore();
 
   const setTeams = useTeamsStore((state) => state.setTeams);
+  const setCurrentTeam = useTeamsStore((state) => state.setCurrentTeam); // 현재 팀 설정 함수 가져오기
   const teams = useTeamsStore((state) => state.teams);
 
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [buttonColor, setButtonColor] = useState('');
   const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
+  const [searchTerm, setSearchTerm] = useState(''); // 검색 상태 추가
+
+  const [boardView, setBoardView] = useState<'MyBoards' | 'FavoriteBoards'>(
+    'MyBoards',
+  ); //현재 보드들의 상태
 
   // 랜덤 색상 설정
   useEffect(() => {
@@ -97,9 +103,16 @@ export default function DashboardPage() {
     loadUserInfo();
   }, [setUser, setTeams]);
 
+  // selectedTeamId가 변경될 때 currentTeam 업데이트
+  useEffect(() => {
+    if (selectedTeamId) {
+      setCurrentTeam(selectedTeamId);
+    }
+  }, [selectedTeamId, setCurrentTeam]);
+
   const dashboardTitle =
     selectedTeamId === null
-      ? '개인 대시보드'
+      ? 'HOME 대시보드'
       : teams.find((t) => t._id === selectedTeamId)?.teamName || '팀 대시보드';
 
   if (isLoading) {
@@ -118,6 +131,7 @@ export default function DashboardPage() {
           isDashboardPersonal={selectedTeamId === null}
           buttonColor={buttonColor}
           userName={userInfo.name}
+          onSearch={setSearchTerm}
         />
 
         <div className="flex w-full h-[92%]">
@@ -134,11 +148,15 @@ export default function DashboardPage() {
               token: userInfo.token,
             }}
             favoriteProjects={[]}
+            boardView={boardView} // 상태 전달
+            setBoardView={setBoardView} // 상태 업데이트 함수 전달
           />
           <BoardOverview
             dashboardTitle={dashboardTitle}
-            filteredProjects={[]} // 임시
             buttonColor={buttonColor}
+            teamId={selectedTeamId}
+            searchTerm={searchTerm}
+            boardView={boardView} // 상태 전달
           />
         </div>
         {/* 모달 타입에 따른 조건부 렌더링 */}
