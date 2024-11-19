@@ -13,7 +13,7 @@ export default function TopicVoteTemplate({
   position,
 }: TopicBoxProps) {
   const [content, setContent] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const me = useSelf();
   const userName = me?.info?.name || '익명 사용자';
@@ -81,7 +81,7 @@ export default function TopicVoteTemplate({
         width: isCollapsed ? '180px' : '320px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      style={{ position: 'absolute', zIndex: 9999 }}
+      style={{ position: 'absolute', zIndex: 30 }}
     >
       <div className={`p-4 ${isCollapsed ? 'px-3 py-2' : ''}`}>
         <div className="flex items-center justify-between mb-2">

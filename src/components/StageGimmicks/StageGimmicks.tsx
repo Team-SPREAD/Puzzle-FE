@@ -39,9 +39,9 @@ export default function StageGimmicks({ currentStep }: StageGimmicksProps) {
         className="absolute top-[12%] left-[40%]  -translate-x-1/2 text-center pointer-events-none z-50"
       >
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {currentGimmick.title}
+          {/* {currentGimmick.title} */}
         </h2>
-        <p className="text-gray-600">{currentGimmick.description}</p>
+        {/* <p className="text-gray-600">{currentGimmick.description}</p> */}
       </motion.div>
 
       {/* 단계별 기믹 박스들 */}
