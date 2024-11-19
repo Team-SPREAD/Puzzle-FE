@@ -20,7 +20,7 @@ const InputForNode = ({
   addWhatNode: (node: Node) => void;
 }) => {
   const [label, setLabel] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false); // 박스 접힘 상태 관리
+  const [isCollapsed, setIsCollapsed] = useState(true); // 박스 접힘 상태 관리
 
   const onChangeLabel = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLabel(e.target.value);
@@ -84,18 +84,18 @@ const InputForNode = ({
       className="absolute bg-white/90 backdrop-blur-sm rounded-xl shadow-lg"
       animate={{
         height: isCollapsed ? '50px' : 'auto',
-        width: isCollapsed ? '180px' : '487px',
+        width: isCollapsed ? '180px' : '257px',
       }}
       initial={{
         height: isCollapsed ? '50px' : 'auto',
-        width: isCollapsed ? '180px' : '487px',
+        width: isCollapsed ? '180px' : '257px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       style={{
         position: 'absolute',
         bottom: '8rem',
         left: '8rem',
-        zIndex: 100,
+        zIndex: 30,
       }}
     >
       <div className={`p-4 ${isCollapsed ? 'px-3 py-2' : ''}`}>

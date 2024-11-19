@@ -75,7 +75,7 @@ import { useParams } from 'next/navigation';
 import { RoomEvent } from '@/liveblocks.config';
 import useModalStore from '@/store/useModalStore';
 import VotingModal from '../Layout/Vote/Modal/VotingModal';
-import { toPng } from 'html-to-image';
+import GuideModal from '../Layout/Modal/GuildModal';
 
 const MAX_LAYERS = 100;
 
@@ -825,6 +825,7 @@ const Canvas = () => {
           <RightNav />
         </div>
       </div>
+      {modalType === 'GUIDE_MODAL' && <GuideModal />}  {/* 추가 */}
     </div>
   );
 };

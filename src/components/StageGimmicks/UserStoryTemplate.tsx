@@ -16,7 +16,7 @@ export default function UserStoryTemplate({
   const [action, setAction] = useState('');
   const [goal, setGoal] = useState('');
   const [task, setTask] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false); // 박스 접힘 상태 관리
+  const [isCollapsed, setIsCollapsed] = useState(true); // 박스 접힘 상태 관리
 
   // 현재 사용자 정보 가져오기
   const me = useSelf();
@@ -149,7 +149,7 @@ export default function UserStoryTemplate({
         width: isCollapsed ? '180px' : '400px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      style={{ position: 'absolute', zIndex: 9999 }}
+      style={{ position: 'absolute', zIndex: 30 }}
     >
       <div className={`p-4 ${isCollapsed ? 'px-3 py-2' : ''}`}>
         <div className="flex flex-col gap-2">

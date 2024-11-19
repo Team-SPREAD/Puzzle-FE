@@ -57,7 +57,7 @@ export default function SolvingProblemBoxTemplate({
   position,
 }: SolvingProblemBoxProps) {
   const [selectedType, setSelectedType] = useState<BoxType>('define');
-  const [showGuide, setShowGuide] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
   const me = useSelf();
   const layers = useStorage((root) => root.layers);
 
@@ -168,7 +168,7 @@ export default function SolvingProblemBoxTemplate({
         width: showGuide ? '500px' : '240px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      style={{ position: 'absolute', zIndex: 9999 }}
+      style={{ position: 'absolute', zIndex: 30 }}
     >
       <div className={cn(
         'p-6 space-y-6',

@@ -13,7 +13,7 @@ export default function SpreadBoxTemplate({
   position,
 }: SpreadBoxProps) {
   const [centerIdea, setCenterIdea] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const createCenterSpread = useMutation(
     ({ storage }) => {
@@ -70,7 +70,7 @@ export default function SpreadBoxTemplate({
         width: isCollapsed ? '180px' : '320px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      style={{ position: 'absolute', zIndex: 9999 }}
+      style={{ position: 'absolute', zIndex: 30 }}
     >
       <div className={`p-4 ${isCollapsed ? 'px-4 py-4' : ''}`}>
         <div className="flex items-center justify-between mb-2">

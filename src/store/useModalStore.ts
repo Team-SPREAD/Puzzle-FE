@@ -12,6 +12,7 @@ type ModalType =
   | 'VOTE_COMPLETE' //투표 모달
   | 'NEXT_STEP' //단계 이동 모달
   | 'CREATE_BOARD'
+  | 'GUIDE_MODAL' // 안내 모달
   | null;
 
 interface ModalProps {
