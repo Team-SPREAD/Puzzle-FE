@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { setCookie } from 'nookies';
 import Image from 'next/image';
 import { Trash2, Star, Edit3, RotateCcw } from 'lucide-react';
 import Lottie from 'lottie-react';
@@ -61,8 +62,14 @@ const BoardCard: React.FC<BoardCardProps> = ({
       if (response.status === 201 && response.data?.token) {
         const { token } = response.data;
 
-        // 로컬 스토리지에 토큰 저장
+        // 로컬 스토리지에 룸 토큰 저장
         localStorage.setItem('roomToken', token);
+
+        //쿠키에 룸 토큰 저장
+        setCookie(null, 'roomToken', token, {
+          maxAge: 3600, //1시간
+          path: '/',
+        });
 
         // 방 URL로 리다이렉트
         const roomUrl = getBoardUrl(board._id);
