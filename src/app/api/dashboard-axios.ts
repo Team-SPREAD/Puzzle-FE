@@ -64,3 +64,48 @@ export const updateTeam = async (teamId: string, teamName: string) => {
     teamName,
   });
 };
+
+//보드를 생성하는 함수
+export const createBoard = async (formData: FormData) => {
+  return axiosInstance.post('/api/board', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+//보드를 불러오는 함수
+export const getBoard = async (teamId: string) => {
+  return axiosInstance.get(`/api/board/${teamId}`);
+};
+
+//보드를 수정하는 함수
+export const updateBoard = async (boardId: string, formData: FormData) => {
+  return axiosInstance.patch(`/api/board/${boardId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+//보드를 삭제하는 함수
+export const deleteBoard = async (boardId: string) => {
+  return axiosInstance.delete(`/api/board/${boardId}`);
+};
+
+//보드를 즐겨찾기 함수
+export const likeBoard = async (boardId: string) => {
+  return axiosInstance.patch(`/api/board/like/${boardId}`);
+};
+
+//즐겨찾기 항목 모두 가져오기 함수
+export const likeAllBoard = async () => {
+  return axiosInstance.get('/api/board/like/all');
+};
+
+//룸 토큰 발급하는 함수
+export const getRoomToken = async (roomId: string) => {
+  return axiosInstance.post(`/api/board/token`, {
+    roomId,
+  });
+};
