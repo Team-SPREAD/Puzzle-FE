@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation';
 import useModalStore from '@/store/useModalStore';
 import { motion } from 'framer-motion';
 import { useStorage } from '@/liveblocks.config';
-import Lottie from 'lottie-react';
+import Lottie from 'react-lottie-player';
 import think from '~/lotties/think.json'; //이건 나중에 변경
 import { useProcessStore } from '@/store/vote/processStore';
 import { useColorStore } from '@/store/vote/colorStore';
@@ -43,7 +43,12 @@ const VotingModal = () => {
 
         {/* Lottie 애니메이션 */}
         <div className="relative -mt-10 -mb-10 z-0">
-          {/* <Lottie animationData={think} loop={false} style={{ height: 200 }} />  //버그가 심해서 주석 처리*/}
+          <Lottie
+            animationData={think}
+            loop={false}
+            style={{ height: 200 }}
+            play
+          />
         </div>
 
         <div className="relative z-20">
