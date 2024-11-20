@@ -1,48 +1,169 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-import { UserInfo } from '@/lib/types';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import useModalStore from '@/store/useModalStore';
+import { Settings, LogOut, Moon, Sun } from 'lucide-react';
+import { create } from 'zustand';
+
+// Image imports
 import dots from '~/images/dots.svg';
 import star from '~/images/star.svg';
 import projects from '~/images/projects.svg';
 import arrowBottom from '~/images/arrow-bottom.svg';
-import UserSelectModal from './Modals/UserSelectModal';
-import defaultIcon from '~/images/testUserIcon.jpeg';
-import { generateRandomColor } from '@/utils/getRandomColor';
 import house from '~/images/house.svg';
+import defaultIcon from '~/images/testUserIcon.jpeg';
+
+// Component imports
+import UserSelectModal from './Modals/UserSelectModal';
+import { generateRandomColor } from '@/utils/getRandomColor';
+
+interface DarkModeStore {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+const useDarkMode = create<DarkModeStore>((set: any) => ({
+  isDarkMode: false,
+  toggleDarkMode: () =>
+    set((state: { isDarkMode: boolean }) => ({
+      isDarkMode: !state.isDarkMode,
+    })),
+}));
+
+interface UserInfo {
+  _id: string;
+  name: string;
+  email: string;
+  avatar: string | null;
+  token: string;
+}
+
+interface NavItemProps {
+  isExpanded: boolean;
+  icon: string | React.ComponentType<any> | any;
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  isDarkMode: boolean;
+  showChildren?: boolean;
+  closeOnClick?: boolean;
+  setIsExpanded?: (value: boolean) => void;
+}
+
+const NavItem: React.FC<NavItemProps> = ({
+  isExpanded,
+  icon: Icon,
+  label,
+  isActive,
+  onClick,
+  isDarkMode,
+  showChildren,
+  closeOnClick,
+  setIsExpanded,
+}) => {
+  const handleClick = () => {
+    // Teams 아이콘 클릭시 사이드바 열기
+    if (
+      (label === 'Teams' || label === 'Settings') &&
+      !isExpanded &&
+      setIsExpanded
+    ) {
+      setIsExpanded(true);
+    }
+    onClick();
+    if (closeOnClick && setIsExpanded) {
+      setIsExpanded(false);
+    }
+  };
+
+  return (
+    <motion.div
+      whileHover={{ x: 10 }}
+      className={`p-3 rounded-lg cursor-pointer flex items-center ${
+        isActive
+          ? isDarkMode
+            ? 'bg-gray-700 text-white'
+            : 'bg-blue-50 text-blue-600'
+          : isDarkMode
+            ? 'text-gray-300 hover:bg-gray-700'
+            : 'text-gray-600 hover:bg-gray-100'
+      }`}
+      onClick={handleClick}
+    >
+      <div
+        className={`w-10 h-10 rounded-lg ${
+          isActive
+            ? isDarkMode
+              ? 'bg-gray-600'
+              : 'bg-blue-100'
+            : 'bg-gray-100'
+        } flex items-center justify-center`}
+      >
+        {typeof Icon === 'object' && Icon.src ? (
+          <Image
+            src={Icon.src}
+            width={20}
+            height={20}
+            alt={label.toLowerCase()}
+          />
+        ) : (
+          Icon && typeof Icon === 'function' && <Icon size={20} />
+        )}
+      </div>
+      {isExpanded && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="ml-3 flex-1 flex items-center justify-between"
+        >
+          <span>{label}</span>
+          {showChildren && (
+            <motion.div
+              animate={{ rotate: showChildren ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Image src={arrowBottom} width={12} height={12} alt="expand" />
+            </motion.div>
+          )}
+        </motion.div>
+      )}
+    </motion.div>
+  );
+};
 
 interface SidebarProps {
   selectedTeamId: string | null;
   setSelectedTeamId: (teamId: string | null) => void;
   buttonColor: string;
-  favoriteProjects: { id: string; name: string; isFavorite: boolean }[];
   teams: { _id: string; teamName: string }[];
   userInfo: UserInfo;
-  boardView: 'MyBoards' | 'FavoriteBoards'; // 현재 보드 상태
-  setBoardView: (view: 'MyBoards' | 'FavoriteBoards') => void; // 상태 변경 함수
+  boardView: 'MyBoards' | 'FavoriteBoards';
+  setBoardView: (view: 'MyBoards' | 'FavoriteBoards') => void;
+  favoriteProjects: { id: string; name: string; isFavorite: boolean }[];
 }
 
 export default function Sidebar({
   selectedTeamId,
   setSelectedTeamId,
   buttonColor,
-  favoriteProjects,
   teams,
   userInfo,
   boardView,
   setBoardView,
+  favoriteProjects,
 }: SidebarProps) {
-  const { openModal, closeModal, modalType } = useModalStore();
-  const [isUserSelectThrottled, setIsUserSelectThrottled] = useState(false); // 딜레이 상태 추가
-
-  // 팀의 첫 글자와 랜덤 색상 저장 상태
+  const [isExpanded, setIsExpanded] = useState(false);
   const [teamInitialColors, setTeamInitialColors] = useState<{
     [key: string]: string;
   }>({});
+  const [showSettings, setShowSettings] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
+  const { openModal, closeModal, modalType } = useModalStore();
 
   useEffect(() => {
-    // 팀 리스트를 기반으로 각 팀의 첫 글자에 대한 랜덤 색상 생성
     const colors = teams.reduce(
       (acc, team) => {
         acc[team._id] = generateRandomColor();
@@ -53,175 +174,239 @@ export default function Sidebar({
     setTeamInitialColors(colors);
   }, [teams]);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  };
+
   const handleTeamSelect = (teamId: string | null) => {
     setSelectedTeamId(teamId);
+    setBoardView('MyBoards');
     closeModal();
-  };
-
-  const handleUserSelectClick = () => {
-    if (isUserSelectThrottled) return; // 딜레이 중일 경우 클릭 무시
-
-    setIsUserSelectThrottled(true); // 딜레이 상태 활성화
-    if (modalType === 'USER_SELECT') {
-      closeModal();
-    } else {
-      openModal('USER_SELECT');
-    }
-
-    setTimeout(() => {
-      setIsUserSelectThrottled(false); // 일정 시간 후 딜레이 해제
-    }, 1000); // 1초 딜레이 설정
-  };
-
-  const toggleFavorite = (projectId: string) => {
-    console.log(`Toggle favorite for project ${projectId}`);
+    setIsExpanded(false);
   };
 
   return (
-    <div className="w-[16%] p-3 bg-white shadow-md flex flex-col">
-      <div className="h-full flex flex-col justify-between">
-        <div className="">
-          <div className="mt-3 mb-10">
-            <button
-              onClick={() =>
+    <div className="relative">
+      <motion.div
+        initial={{ width: '64px' }}
+        animate={{ width: isExpanded ? '280px' : '80px' }}
+        className={`fixed left-0 h-screen shadow-lg z-40 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} overflow-hidden`}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      >
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="fixed left-[58px] top-6 w-6 h-6 rounded-full text-white flex items-center justify-center z-50"
+          animate={{ left: isExpanded ? '268px' : '70px' }}
+          style={{ backgroundColor: buttonColor }}
+        >
+          {isExpanded ? '←' : '→'}
+        </motion.button>
+
+        <nav className="mt-16 px-4 space-y-2 h-[calc(100vh-180px)] overflow-y-auto">
+          <NavItem
+            isExpanded={isExpanded}
+            icon={projects}
+            label="Home"
+            isActive={boardView === 'MyBoards'}
+            onClick={() => {
+              setBoardView('MyBoards');
+              setSelectedTeamId(null);
+            }}
+            isDarkMode={isDarkMode}
+            closeOnClick={true}
+            setIsExpanded={setIsExpanded}
+          />
+
+          <NavItem
+            isExpanded={isExpanded}
+            icon={star}
+            label="Favorites"
+            isActive={boardView === 'FavoriteBoards'}
+            onClick={() => {
+              setBoardView('FavoriteBoards');
+              setSelectedTeamId(null);
+            }}
+            isDarkMode={isDarkMode}
+            closeOnClick={true}
+            setIsExpanded={setIsExpanded}
+          />
+
+          <div>
+            <NavItem
+              isExpanded={isExpanded}
+              icon={house}
+              label="Teams"
+              isActive={modalType === 'DROPDOWN_TEAM_SELECT'}
+              onClick={() => {
+                if (!isExpanded) {
+                  setIsExpanded(true);
+                }
                 modalType === 'DROPDOWN_TEAM_SELECT'
                   ? closeModal()
-                  : openModal('DROPDOWN_TEAM_SELECT')
-              }
-              className="w-full h-[48px] text-left px-3 py-2 border rounded-md flex justify-between items-center"
-            >
-              <div className="flex items-center">
-                {selectedTeamId ? (
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
-                    style={{
-                      backgroundColor: teamInitialColors[selectedTeamId],
-                    }}
-                  >
-                    {teams
-                      .find((t) => t._id === selectedTeamId)
-                      ?.teamName[0].toUpperCase()}
-                  </div>
-                ) : (
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
-                    style={{ backgroundColor: buttonColor }}
-                  >
-                    <Image src={house} width={16} height={16} alt="home" />
-                  </div>
-                )}
-                {selectedTeamId
-                  ? teams.find((t) => t._id === selectedTeamId)?.teamName
-                  : 'Home'}
-              </div>
-              <Image
-                src={arrowBottom}
-                width={12}
-                height={7}
-                alt={'arrowBottom'}
-              />
-            </button>
+                  : openModal('DROPDOWN_TEAM_SELECT');
+              }}
+              isDarkMode={isDarkMode}
+              showChildren={modalType === 'DROPDOWN_TEAM_SELECT'}
+              closeOnClick={false}
+              setIsExpanded={setIsExpanded}
+            />
             {modalType === 'DROPDOWN_TEAM_SELECT' && (
-              <div className="mt-2 bg-white rounded-md shadow-lg absolute z-50 w-[14%]">
-                <button
-                  onClick={() => handleTeamSelect(null)}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center"
+              <AnimatePresence>
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: 'auto' }}
+                  exit={{ height: 0 }}
+                  className="ml-4 mt-2 space-y-1"
                 >
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
-                    style={{ backgroundColor: buttonColor }}
-                  >
-                    <Image src={house} width={16} height={16} alt="home" />
-                  </div>
-                  Home
-                </button>
-                {teams.map((team) => (
-                  <button
-                    key={team._id}
-                    onClick={() => handleTeamSelect(team._id)}
-                    className="w-full text-left px-3 py-2 hover:bg-gray-100 flex items-center"
-                  >
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-white mr-2"
-                      style={{ backgroundColor: teamInitialColors[team._id] }}
+                  {teams.map((team) => (
+                    <motion.button
+                      key={team._id}
+                      whileHover={{ x: 10 }}
+                      onClick={() => handleTeamSelect(team._id)}
+                      className={`w-full p-2 rounded-lg flex items-center space-x-2 ${
+                        selectedTeamId === team._id
+                          ? isDarkMode
+                            ? 'bg-gray-700 text-white'
+                            : 'bg-blue-50 text-blue-600'
+                          : isDarkMode
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-600 hover:bg-gray-100'
+                      }`}
                     >
-                      {team.teamName[0].toUpperCase()}
-                    </div>
-                    {team.teamName}
-                  </button>
-                ))}
-                <button
-                  onClick={() => openModal('CREATE_TEAM')}
-                  className="w-full text-left px-4 py-2 text-[#878787] hover:bg-gray-100"
-                >
-                  + Create Team
-                </button>
-              </div>
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
+                        style={{ backgroundColor: teamInitialColors[team._id] }}
+                      >
+                        {team.teamName[0].toUpperCase()}
+                      </div>
+                      <span>{team.teamName}</span>
+                    </motion.button>
+                  ))}
+                  <motion.button
+                    whileHover={{ x: 10 }}
+                    onClick={() => openModal('CREATE_TEAM')}
+                    className={`w-full p-2 text-left rounded-lg ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    } hover:bg-gray-100`}
+                  >
+                    + Create Team
+                  </motion.button>
+                </motion.div>
+              </AnimatePresence>
             )}
           </div>
 
-          {/* My boards 버튼 */}
-          <div className="mb-3">
-            <button
-              onClick={() => setBoardView('MyBoards')}
-              className={`w-full h-[48px] text-left px-4 py-2 border rounded-md flex items-center ${
-                boardView === 'MyBoards' ? 'bg-gray-200' : ''
-              }`}
-            >
-              <Image
-                src={projects}
-                width={18}
-                height={18}
-                alt="projects_icon"
-                style={{ marginRight: 10 }}
-              />
-              <span>My boards</span>
-            </button>
-          </div>
-
-          {/* Favorite boards 버튼 */}
           <div>
-            <button
-              onClick={() => setBoardView('FavoriteBoards')}
-              className={`w-full h-[48px] text-left px-4 py-2 border rounded-md flex items-center ${
-                boardView === 'FavoriteBoards' ? 'bg-gray-200' : ''
-              }`}
-            >
-              <Image
-                src={star}
-                width={18}
-                height={18}
-                alt="star_icon"
-                style={{ marginRight: 10 }}
-              />
-              <span>Favorite boards</span>
-            </button>
+            <NavItem
+              isExpanded={isExpanded}
+              icon={Settings}
+              label="Settings"
+              isActive={modalType === 'SETTINGS'}
+              onClick={() => {
+                if (!isExpanded) {
+                  setIsExpanded(true);
+                }
+                modalType === 'SETTINGS' ? closeModal() : openModal('SETTINGS');
+              }}
+              isDarkMode={isDarkMode}
+              showChildren={modalType === 'SETTINGS'}
+              closeOnClick={false}
+              setIsExpanded={setIsExpanded}
+            />
+            {modalType === 'SETTINGS' && (
+              <AnimatePresence>
+                <motion.div
+                  initial={{ height: 0 }}
+                  animate={{ height: 'auto' }}
+                  exit={{ height: 0 }}
+                  className="ml-4 mt-2 space-y-1"
+                >
+                  <motion.button
+                    whileHover={{ x: 10 }}
+                    onClick={() => {
+                      toggleDarkMode();
+                      closeModal();
+                      setIsExpanded(false);
+                    }}
+                    className={`w-full p-2 rounded-lg flex items-center space-x-2 ${
+                      isDarkMode
+                        ? 'text-gray-300 hover:bg-gray-700'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                      {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
+                    </div>
+                    <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+                  </motion.button>
+                </motion.div>
+              </AnimatePresence>
+            )}
           </div>
-        </div>
-        <div className="">
-          {modalType === 'USER_SELECT' && (
-            <UserSelectModal email={userInfo.email} />
-          )}
-          <div
-            onClick={handleUserSelectClick}
-            className="w-full h-[48px] px-2 py-2 rounded-md border flex justify-between items-center"
+        </nav>
+
+        <div className="absolute bottom-4 w-full px-4">
+          <motion.div
+            whileHover={{ x: 10 }}
+            onClick={() => setShowLogout(!showLogout)}
+            className={`flex items-center space-x-3 cursor-pointer rounded-lg p-3 ${
+              isDarkMode
+                ? 'hover:bg-gray-700 text-white'
+                : 'hover:bg-gray-100 text-gray-600'
+            }`}
           >
-            <div className="flex justify-between items-center space-x-2">
-              <Image
-                src={userInfo.avatar || defaultIcon}
-                alt="user avatar"
-                width={35}
-                height={35}
-                className="rounded-full"
-              />
-              <p>{userInfo.name}</p>
-            </div>
-            <div>
-              <Image src={dots} alt="dots" width={20} height={10} />
-            </div>
-          </div>
+            <Image
+              src={userInfo.avatar || defaultIcon}
+              alt="profile"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            {isExpanded && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-1 items-center justify-between"
+              >
+                <span className="truncate font-medium">{userInfo.name}</span>
+                <LogOut size={18} />
+              </motion.div>
+            )}
+          </motion.div>
+
+          <AnimatePresence>
+            {showLogout && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className={`absolute bottom-full left-0 w-full p-2 mb-1 ${
+                  isDarkMode ? 'bg-gray-700' : 'bg-white'
+                } shadow-lg rounded-lg`}
+              >
+                <button
+                  onClick={handleLogout}
+                  className={`w-full p-3 text-left rounded-lg flex items-center space-x-2 ${
+                    isDarkMode
+                      ? 'hover:bg-gray-600 text-white'
+                      : 'hover:bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  <LogOut size={18} />
+                  <span className="font-medium">Logout</span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </div>
+
+        {modalType === 'USER_SELECT' && (
+          <UserSelectModal email={userInfo.email} />
+        )}
+      </motion.div>
     </div>
   );
 }
