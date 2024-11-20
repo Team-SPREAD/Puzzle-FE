@@ -3,11 +3,14 @@ import {
   useMutation,
   useSelf,
   useStorage,
+  useOthers,
 } from '@/liveblocks.config';
 import { useVoteStore } from '@/store/vote/voteStore';
 import { useProcessStore } from '@/store/vote/processStore';
 import useModalStore from '@/store/useModalStore';
 import { captureAndUpload } from '@/app/api/canvas-axios';
+import { useEffect, useState } from 'react';
+import { getTeamMembers } from '@/app/api/dashboard-axios';
 
 export const useVoteProgress = (
   boardId: string,
@@ -17,37 +20,48 @@ export const useVoteProgress = (
   const { openModal } = useModalStore(); // 추가
   const broadcastEvent = useBroadcastEvent();
   const self = useSelf();
+  const others = useOthers(); // 다른 사용자들 가져오기
+
   const { host, voting } = useStorage((root) => ({
     host: root.host,
     voting: root.voting,
   }));
+  const totalUsers = others.length + 1;
+
+  useEffect(() => {
+    useVoteStore.setState({ totalUsers });
+  }, [totalUsers]); //방 인원수에 맞게 투표 수 변경
+
 
   const isHost = host?.userId === self.id;
   const votes = voting?.votes || {};
   const voteCount = Object.keys(votes).length;
-  const TOTAL_USERS = 1; // 상수로 정의
-  const hasVoted = !!votes[self.id?.toString() || ''];
-  const isCompleted = voteCount === TOTAL_USERS;
+  const hasVoted = self?.id ? !!votes[self.id] : false; // self.id null 체크
+  const isCompleted = totalUsers > 0 && voteCount >= totalUsers; // 조건 수정
 
-  const vote = useMutation(({ storage, self }) => {
-    if (!self.id) return;
+  const vote = useMutation(
+    ({ storage, self }) => {
+      if (!self?.id) return;
 
-    const voting = storage.get('voting');
-    if (!voting) return;
+      const voting = storage.get('voting');
+      if (!voting) return;
 
-    const currentVotes = voting.get('votes') || {};
-    if (currentVotes[self.id]) return;
+      const currentVotes = voting.get('votes') || {};
+      if (currentVotes[self.id]) return;
 
-    voting.set('votes', {
-      ...currentVotes,
-      [self.id]: { userId: self.id, timestamp: Date.now() },
-    });
+      const newVotes = {
+        ...currentVotes,
+        [self.id]: { userId: self.id, timestamp: Date.now() },
+      };
 
-    const voteCount = Object.keys(currentVotes).length + 1;
-    if (voteCount === useVoteStore.getState().totalUsers) {
-      voting.set('isCompleted', true);
-    }
-  }, []); // 빈 배열 추가
+      voting.set('votes', newVotes);
+
+      if (Object.keys(newVotes).length >= totalUsers) {
+        voting.set('isCompleted', true);
+      }
+    },
+    [totalUsers],
+  );
 
   const saveProgress = useMutation(
     async ({ storage }) => {
@@ -105,7 +119,7 @@ export const useVoteProgress = (
       }
     },
     [boardId, currentStep, isHost],
-  ); // 의존성 배열 추가
+  );
 
   return {
     vote,
@@ -114,6 +128,6 @@ export const useVoteProgress = (
     hasVoted,
     voteCount,
     isCompleted,
-    TOTAL_USERS,
+    totalUsers,
   };
 };

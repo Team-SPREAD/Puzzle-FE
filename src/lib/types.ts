@@ -142,10 +142,16 @@ export type VisionLayer = {
   width: number;
   height: number;
   fill: Color;
-  borderColor: Color; // 비전 박스 테두리 색상
-  value: string; // 비전 텍스트
-  fontStyle: string; // 폰트 스타일
-  iconUrl?: string; // 아이콘 URL (옵션)
+  borderColor: Color;
+  value: string;
+  fontStyle: string;
+  iconUrl?: string;
+  author?: string;
+  creator?: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
 };
 
 // TopicVote 레이어 타입

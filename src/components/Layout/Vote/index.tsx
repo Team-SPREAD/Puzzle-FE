@@ -7,7 +7,6 @@ import { PuzzlePiece } from './components/PuzzlePiece';
 import { SaveButton } from './components/SaveButton';
 import { PuzzleText } from './components/PuzzleText';
 import { useVoteProgress } from '@/hooks/vote/useVoteProgress';
-import { generateRandomColor } from '@/utils/getRandomColor';
 
 interface VotingSystemProps {
   currentStep: number;
@@ -29,16 +28,16 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
     hasVoted,
     voteCount,
     isCompleted,
-    TOTAL_USERS,
+    totalUsers,
   } = useVoteProgress(boardId, currentStep, canvasRef);
-  const { showTransform } = useVoteAnimation(isCompleted, TOTAL_USERS);
+  const { showTransform } = useVoteAnimation(isCompleted, totalUsers);
   const { progressColor, puzzleColors, setPuzzleColors } = useColorStore();
 
   useEffect(() => {
     if (!puzzleColors || puzzleColors.length === 0) {
-      setPuzzleColors(TOTAL_USERS);
+      setPuzzleColors(totalUsers);
     }
-  }, [puzzleColors, setPuzzleColors, TOTAL_USERS]);
+  }, [puzzleColors, setPuzzleColors, totalUsers]);
 
   const handleVote = () => {
     if (!hasVoted) {
@@ -62,12 +61,12 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
         <div className="relative flex items-center justify-center w-[180px] h-[40px]">
           <AnimatePresence>
             {(!isCompleted || !showTransform) &&
-              Array.from({ length: TOTAL_USERS }).map((_, index) => (
+              Array.from({ length: totalUsers }).map((_, index) => (
                 <motion.div
                   key={index}
                   layout
                   className="relative mx-[4px]"
-                  style={{ zIndex: TOTAL_USERS - index }}
+                  style={{ zIndex: totalUsers - index }}
                 >
                   <PuzzlePiece
                     isVoted={index < voteCount}
@@ -76,7 +75,7 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({
                     disabled={hasVoted}
                     shouldMerge={isCompleted}
                     index={index}
-                    totalUsers={TOTAL_USERS}
+                    totalUsers={totalUsers}
                   />
                 </motion.div>
               ))}
