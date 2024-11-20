@@ -6,15 +6,25 @@ import useModalStore from '@/store/useModalStore';
 import useBoardStore from '@/store/useBoardStore';
 import arrowBottom from '~/images/arrow-bottom.svg';
 import TeamSettingModal from '@/components/DashBoard/Modals/TeamSettingsModal';
-import { getBoard } from '@/app/api/dashboard-axios';
+import { getBoard, getTeamMembers } from '@/app/api/dashboard-axios';
 import { likeAllBoard } from '@/app/api/dashboard-axios';
+
 interface BoardOverviewProps {
   dashboardTitle: string;
   buttonColor: string;
-  teamId: string | null; // 팀 ID가 없는 경우 null
+  teamId: string | null;
   searchTerm: string;
   boardView: 'MyBoards' | 'FavoriteBoards';
+  token: string;
 }
+interface TeamMember {
+  _id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatar?: string | null;
+}
+
 
 export default function BoardOverview({
   dashboardTitle,
@@ -22,25 +32,41 @@ export default function BoardOverview({
   teamId,
   searchTerm,
   boardView,
+  token
 }: BoardOverviewProps) {
   const { modalType, openModal, closeModal } = useModalStore();
   const setBoardsInfo = useBoardStore((state) => state.setBoardsInfo);
   const boards = useBoardStore((state) => state.Boards);
-
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [isThrottled, setIsThrottled] = useState(false);
+
+  // 팀 멤버 정보 로드
+  useEffect(() => {
+    if (teamId) {
+      const fetchTeamMembers = async () => {
+        try {
+          const response = await getTeamMembers(teamId, token);
+          if (response.status === 200) {
+            setTeamMembers(response.data);
+          }
+        } catch (error) {
+          console.error('Error fetching team members:', error);
+          setTeamMembers([]);
+        }
+      };
+      fetchTeamMembers();
+    } else {
+      setTeamMembers([]);
+    }
+  }, [teamId, token]);
 
   const handleArrowClick = () => {
     if (isThrottled) return;
     setIsThrottled(true);
-
     modalType === 'TEAM_SETTING' ? closeModal() : openModal('TEAM_SETTING');
-
-    setTimeout(() => {
-      setIsThrottled(false);
-    }, 1000);
+    setTimeout(() => setIsThrottled(false), 1000);
   };
 
-  // 팀 ID 또는 boardView 변경에 따라 보드 데이터 로드
   useEffect(() => {
     const fetchBoards = async () => {
       if (boardView === 'MyBoards') {
@@ -49,65 +75,84 @@ export default function BoardOverview({
             const response = await getBoard(teamId);
             if (response.status === 200) {
               setBoardsInfo(response.data);
-              console.log('MyBoards:', response.data);
-            } else {
-              console.error('Failed to fetch boards');
             }
           } catch (error) {
             console.error('Error fetching boards:', error);
           }
         } else {
-          setBoardsInfo([]); // 팀 ID가 없는 경우 보드 상태 초기화
+          setBoardsInfo([]);
         }
       } else if (boardView === 'FavoriteBoards') {
         try {
           const response = await likeAllBoard();
           if (response.status === 200) {
             setBoardsInfo(response.data);
-            console.log('FavoriteBoards:', response.data);
-          } else {
-            console.error('Failed to fetch favorite boards');
           }
         } catch (error) {
           console.error('Error fetching favorite boards:', error);
         }
       }
     };
-
     fetchBoards();
   }, [teamId, boardView, setBoardsInfo]);
 
-  // 검색어가 있는 경우에만 필터링
   const filteredBoards = searchTerm
     ? boards.filter((board) =>
-        board.boardName.toLowerCase().includes(searchTerm.toLowerCase()),
+        board.boardName.toLowerCase().includes(searchTerm.toLowerCase())
       )
-    : boards; // 검색어가 없으면 전체 보드 사용
+    : boards;
+
   return (
     <div className="flex flex-grow flex-col p-5">
       <div className="flex items-center mb-5 relative">
-        <h1 className="text-[32px] font-bold">{dashboardTitle}</h1>
-
-        {dashboardTitle !== '개인 대시보드' && (
-          <div className="ml-5 relative">
-            <div
-              className="w-[20px] h-[20px] rounded-full bg-[#EDEDED] flex justify-center items-center cursor-pointer"
-              onClick={handleArrowClick}
-            >
-              <Image
-                src={arrowBottom}
-                width={12}
-                height={7}
-                alt="arrowBottom"
-              />
+        <div className="flex items-center gap-2">
+          <h1 className="text-[32px] font-bold">{dashboardTitle}</h1>
+          
+          {teamId && (
+            <div className="flex -space-x-2 ml-4">
+              {teamMembers.slice(0, 4).map((member, index) => (
+                <div
+                  key={member._id}
+                  className="relative"
+                  style={{ zIndex: teamMembers.length - index }}
+                >
+                  {member.avatar && member.avatar !== 'null' ? (
+                    <Image
+                      src={member.avatar}
+                      width={32}
+                      height={32}
+                      alt={`${member.firstName} ${member.lastName}`}
+                      className="rounded-full border-2 border-white"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-sm font-medium text-gray-600">
+                      {member.firstName[0]}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {teamMembers.length > 4 && (
+                <div className="w-8 h-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-sm font-medium text-gray-600 relative z-0">
+                  +{teamMembers.length - 4}
+                </div>
+              )}
             </div>
+          )}
 
-            {/* 팀 세팅 모달창 */}
-            {modalType === 'TEAM_SETTING' && (
-              <TeamSettingModal onClose={closeModal} />
-            )}
-          </div>
-        )}
+          {dashboardTitle !== '개인 대시보드' && (
+            <div className="ml-3">
+              <button
+                className="w-6 h-6 rounded-full bg-[#EDEDED] flex justify-center items-center cursor-pointer hover:bg-gray-200 transition-colors"
+                onClick={handleArrowClick}
+              >
+                <Image src={arrowBottom} width={12} height={7} alt="arrowBottom" />
+              </button>
+              {modalType === 'TEAM_SETTING' && (
+                <TeamSettingModal onClose={closeModal} />
+              )}
+            </div>
+          )}
+        </div>
       </div>
       <BoardGrid
         boards={filteredBoards}
