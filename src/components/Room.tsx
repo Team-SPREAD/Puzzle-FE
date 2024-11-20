@@ -1,8 +1,7 @@
 'use client';
 
-import { ReactNode, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { RoomProvider, VotingState } from '@/liveblocks.config';
+import { ReactNode, useEffect, useState } from 'react';
+import { RoomProvider } from '@/liveblocks.config';
 import { ClientSideSuspense } from '@liveblocks/react';
 import { LiveList, LiveMap, LiveObject } from '@liveblocks/client';
 import { Layer } from '@/lib/types';
@@ -10,10 +9,25 @@ import { Loading } from '@/components/Loading';
 import Canvas from '@/components/Canvas/Canvas';
 import { steps } from '@/lib/process-data';
 import { SerializableNode } from '@/lib/types';
+
 interface RoomProps {
   roomId: string;
 }
+
 const Room = ({ roomId }: RoomProps) => {
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
+
+  if (!token) {
+    return <Loading />;
+  }
+
   return (
     <RoomProvider
       id={roomId}
@@ -35,8 +49,8 @@ const Room = ({ roomId }: RoomProps) => {
         layerIds: new LiveList([]),
         person: new LiveObject({ name: 'Marie', age: 30 }),
         nodes: new LiveMap<string, LiveObject<SerializableNode>>(),
-        edges: [], //이거 중요함 수정 x
-        host: new LiveObject({ userId: '' }), // 호스트 정보
+        edges: [],
+        host: new LiveObject({ userId: '' }),
         voting: new LiveObject({
           votes: {},
           currentStep: 1,
