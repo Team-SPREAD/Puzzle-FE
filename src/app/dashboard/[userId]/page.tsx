@@ -121,80 +121,73 @@ export default function DashboardPage() {
 
   return (
     <div className="flex w-screen h-screen">
-      <TeamMembersBar
-        teamId={selectedTeamId!}
+      <Sidebar
+        selectedTeamId={selectedTeamId}
+        setSelectedTeamId={setSelectedTeamId}
         buttonColor={buttonColor}
-        token={userInfo.token}
+        teams={teams}
+        userInfo={{
+          _id: userInfo._id,
+          name: userInfo.name,
+          avatar: userInfo.avatar,
+          email: userInfo.email,
+          token: userInfo.token,
+        }}
+        favoriteProjects={[]}
+        boardView={boardView}
+        setBoardView={setBoardView}
       />
-      <div className="w-[96%] h-full">
+      <div className="flex-1 flex flex-col ml-[80px] transition-all duration-300">
         <Header
           isDashboardPersonal={selectedTeamId === null}
           buttonColor={buttonColor}
           userName={userInfo.name}
           onSearch={setSearchTerm}
         />
-
-        <div className="flex w-full h-[92%]">
-          <Sidebar
-            selectedTeamId={selectedTeamId}
-            setSelectedTeamId={setSelectedTeamId}
-            buttonColor={buttonColor}
-            teams={teams}
-            userInfo={{
-              _id: userInfo._id,
-              name: userInfo.name,
-              avatar: userInfo.avatar,
-              email: userInfo.email,
-              token: userInfo.token,
-            }}
-            favoriteProjects={[]}
-            boardView={boardView} // 상태 전달
-            setBoardView={setBoardView} // 상태 업데이트 함수 전달
-          />
-          <BoardOverview
-            dashboardTitle={dashboardTitle}
-            buttonColor={buttonColor}
-            teamId={selectedTeamId}
-            searchTerm={searchTerm}
-            boardView={boardView} // 상태 전달
-          />
-        </div>
-        {/* 모달 타입에 따른 조건부 렌더링 */}
-        {modalType === 'CREATE_TEAM' && (
-          <CreateTeamModal
-            isOpen={true}
-            onClose={closeModal}
-            userId={Number(userInfo._id)}
-            token={userInfo.token}
-          />
-        )}
-        {modalType === 'INVITE_TEAM' && (
-          <InviteTeamModal
-            isOpen={true}
-            onClose={closeModal}
-            token={userInfo.token}
-            teamId={selectedTeamId!}
-            sender={userInfo.name}
-          />
-        )}
-        {modalType === 'EDIT_TEAM' && (
-          <EditTeamModal
-            isOpen={true}
-            onClose={closeModal}
-            teamId={selectedTeamId!}
-            currentTeamName={dashboardTitle}
-          />
-        )}
-        {modalType === 'DELETE_TEAM' && (
-          <DeleteTeamModal
-            isOpen={true}
-            onClose={closeModal}
-            teamId={selectedTeamId!}
-            currentTeamName={dashboardTitle}
-            teamName={dashboardTitle}
-          />
-        )}
+        <BoardOverview
+          dashboardTitle={dashboardTitle}
+          buttonColor={buttonColor}
+          teamId={selectedTeamId}
+          searchTerm={searchTerm}
+          boardView={boardView}
+          token={userInfo.token}
+        />
       </div>
+      {/* 모달 타입에 따른 조건부 렌더링 */}
+      {modalType === 'CREATE_TEAM' && (
+        <CreateTeamModal
+          isOpen={true}
+          onClose={closeModal}
+          userId={Number(userInfo._id)}
+          token={userInfo.token}
+        />
+      )}
+      {modalType === 'INVITE_TEAM' && (
+        <InviteTeamModal
+          isOpen={true}
+          onClose={closeModal}
+          token={userInfo.token}
+          teamId={selectedTeamId!}
+          sender={userInfo.name}
+        />
+      )}
+      {modalType === 'EDIT_TEAM' && (
+        <EditTeamModal
+          isOpen={true}
+          onClose={closeModal}
+          teamId={selectedTeamId!}
+          currentTeamName={dashboardTitle}
+        />
+      )}
+      {modalType === 'DELETE_TEAM' && (
+        <DeleteTeamModal
+          isOpen={true}
+          onClose={closeModal}
+          teamId={selectedTeamId!}
+          currentTeamName={dashboardTitle}
+          teamName={dashboardTitle}
+        />
+      )}
     </div>
   );
 }
