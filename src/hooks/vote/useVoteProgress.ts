@@ -3,6 +3,7 @@ import {
   useMutation,
   useSelf,
   useStorage,
+  useOthers,
 } from '@/liveblocks.config';
 import { useVoteStore } from '@/store/vote/voteStore';
 import { useProcessStore } from '@/store/vote/processStore';
@@ -19,34 +20,18 @@ export const useVoteProgress = (
   const { openModal } = useModalStore(); // 추가
   const broadcastEvent = useBroadcastEvent();
   const self = useSelf();
+  const others = useOthers(); // 다른 사용자들 가져오기
+
   const { host, voting } = useStorage((root) => ({
     host: root.host,
     voting: root.voting,
   }));
-  const [totalUsers, setTotalUsers] = useState(1);
+  const totalUsers = others.length + 1;
 
   useEffect(() => {
-    const fetchTeamUsers = async () => {
-      if (!boardId) return; // boardId 체크 추가
+    useVoteStore.setState({ totalUsers });
+  }, [totalUsers]); //방 인원수에 맞게 투표 수 변경
 
-      try {
-        const response = await getTeamMembers(
-          boardId,
-          localStorage.getItem('token') || '',
-        );
-        if (response.data && Array.isArray(response.data)) {
-          // 데이터 유효성 검사
-          setTotalUsers(response.data.length);
-          useVoteStore.setState({ totalUsers: response.data.length });
-        }
-      } catch (error) {
-        console.error('Error fetching team users:', error);
-        // 에러 시에도 기존 상태 유지
-      }
-    };
-
-    fetchTeamUsers();
-  }, [boardId]);
 
   const isHost = host?.userId === self.id;
   const votes = voting?.votes || {};
