@@ -10,9 +10,13 @@ import { useVoteProgress } from '@/hooks/vote/useVoteProgress';
 
 interface VotingSystemProps {
   currentStep: number;
+  canvasRef: React.RefObject<HTMLDivElement>;
 }
 
-export const VotingSystem: React.FC<VotingSystemProps> = ({ currentStep }) => {
+export const VotingSystem: React.FC<VotingSystemProps> = ({
+  currentStep,
+  canvasRef,
+}) => {
   const params = useParams();
   const boardId = Array.isArray(params.boardId)
     ? params.boardId[0]
@@ -24,8 +28,8 @@ export const VotingSystem: React.FC<VotingSystemProps> = ({ currentStep }) => {
     hasVoted,
     voteCount,
     isCompleted,
-    totalUsers
-  } = useVoteProgress(boardId, currentStep);
+    totalUsers,
+  } = useVoteProgress(boardId, currentStep, canvasRef);
   const { showTransform } = useVoteAnimation(isCompleted, totalUsers);
   const { progressColor, puzzleColors, setPuzzleColors } = useColorStore();
 

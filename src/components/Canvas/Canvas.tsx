@@ -66,17 +66,7 @@ import {
   Result,
 } from '../Templates';
 import { StageGimmicks } from '@/components/StageGimmicks';
-
-import {
-  Connection,
-  EdgeChange,
-  NodeChange,
-  addEdge,
-  applyEdgeChanges,
-  applyNodeChanges,
-} from 'reactflow';
 import ReactFlowCanvas from '../ReactFlowCanvas';
-
 import { VotingSystem } from '@/components/Layout/Vote';
 import useUserStore from '@/store/useUserStore';
 import useTeamsStore from '@/store/useTeamsStore';
@@ -723,9 +713,11 @@ const Canvas = () => {
     }),
     [penSize],
   );
-
   return (
-    <div className="w-full h-screen flex flex-col relative bg-surface-canvas touch-none overflow-hidden">
+    <div
+      id={'canvas-element'}
+      className="w-full h-screen flex flex-col relative bg-surface-canvas touch-none overflow-hidden"
+    >
       <ProcessNav
         userInfo={userInfo}
         setCamera={handleSetCamera}
@@ -735,6 +727,7 @@ const Canvas = () => {
 
       <div className="flex-1 relative">
         {/* 현재 단계의 템플릿 렌더링 */}
+
         <StageGimmicks currentStep={currentStep} />
         {renderStageTemplate()}
         {[9].includes(currentStep) && (
@@ -809,7 +802,7 @@ const Canvas = () => {
         </div>
 
         <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30">
-          <VotingSystem currentStep={currentStep} />
+          <VotingSystem currentStep={currentStep} canvasRef={cursorPanel} />
         </div>
         {/* 모달 컴포넌트 */}
         {modalType === 'VOTE_COMPLETE' && <VotingModal />}
