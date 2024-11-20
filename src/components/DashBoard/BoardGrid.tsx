@@ -86,6 +86,7 @@ export default function BoardGrid({
             buttonColor={buttonColor}
             TOTAL_STEPS={TOTAL_STEPS}
             getBoardUrl={getBoardUrl}
+           
           />
         ))
       ) : (
