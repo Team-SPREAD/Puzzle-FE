@@ -8,10 +8,31 @@ import { createRoomContext } from '@liveblocks/react';
 import { Color, Layer, Point, UserInfo, Process } from '@/lib/types';
 
 const client = createClient({
-  authEndpoint: '/api/liveblocks-auth',
+  authEndpoint: async (room) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const response = await fetch('/api/liveblocks-auth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ room }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.details || 'Auth failed');
+    }
+
+    return response.json();
+  },
   throttle: 16,
 });
-
 // Presence represents the properties that will exist on every User in the Room
 type Presence = {
   selection: string[];
