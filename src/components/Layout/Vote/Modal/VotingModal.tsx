@@ -43,7 +43,7 @@ const VotingModal = () => {
 
         {/* Lottie 애니메이션 */}
         <div className="relative -mt-10 -mb-10 z-0">
-          <Lottie animationData={think} loop={false} style={{ height: 200 }} />
+          {/* <Lottie animationData={think} loop={false} style={{ height: 200 }} />  //버그가 심해서 주석 처리*/}
         </div>
 
         <div className="relative z-20">
