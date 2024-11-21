@@ -1,164 +1,144 @@
 'use client';
-import BoardGrid from '@/components/DashBoard/BoardGrid';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import useModalStore from '@/store/useModalStore';
-import useBoardStore from '@/store/useBoardStore';
-import arrowBottom from '~/images/arrow-bottom.svg';
-import TeamSettingModal from '@/components/DashBoard/Modals/TeamSettingsModal';
-import { getBoard, getTeamMembers } from '@/app/api/dashboard-axios';
-import { likeAllBoard } from '@/app/api/dashboard-axios';
 
-interface BoardOverviewProps {
-  dashboardTitle: string;
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, Info } from 'lucide-react';
+import { useDarkMode } from '@/store/useDarkModeStore';
+import useModalStore from '@/store/useModalStore';
+import { BoardInfo } from '@/lib/types';
+import BoardCard from './BoardCard';
+import CreateBoardModal from './Modals/CreateBoardModal';
+
+interface BoardGridProps {
+  boards: BoardInfo[];
   buttonColor: string;
   teamId: string | null;
-  searchTerm: string;
-  boardView: 'MyBoards' | 'FavoriteBoards';
-  token: string;
-}
-interface TeamMember {
-  _id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  avatar?: string | null;
 }
 
-
-export default function BoardOverview({
-  dashboardTitle,
+export default function BoardGrid({
+  boards = [],
   buttonColor,
   teamId,
-  searchTerm,
-  boardView,
-  token
-}: BoardOverviewProps) {
+}: BoardGridProps) {
   const { modalType, openModal, closeModal } = useModalStore();
-  const setBoardsInfo = useBoardStore((state) => state.setBoardsInfo);
-  const boards = useBoardStore((state) => state.Boards);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [isThrottled, setIsThrottled] = useState(false);
+  const { isDarkMode } = useDarkMode();
 
-  // 팀 멤버 정보 로드
-  useEffect(() => {
-    if (teamId) {
-      const fetchTeamMembers = async () => {
-        try {
-          const response = await getTeamMembers(teamId, token);
-          if (response.status === 200) {
-            setTeamMembers(response.data);
-          }
-        } catch (error) {
-          console.error('Error fetching team members:', error);
-          setTeamMembers([]);
-        }
-      };
-      fetchTeamMembers();
-    } else {
-      setTeamMembers([]);
-    }
-  }, [teamId, token]);
-
-  const handleArrowClick = () => {
-    if (isThrottled) return;
-    setIsThrottled(true);
-    modalType === 'TEAM_SETTING' ? closeModal() : openModal('TEAM_SETTING');
-    setTimeout(() => setIsThrottled(false), 1000);
+  const getBoardUrl = (boardName: string) => {
+    return `/board/${boardName.toLowerCase().replace(/ /g, '-')}`;
   };
 
-  useEffect(() => {
-    const fetchBoards = async () => {
-      if (boardView === 'MyBoards') {
-        if (teamId) {
-          try {
-            const response = await getBoard(teamId);
-            if (response.status === 200) {
-              setBoardsInfo(response.data);
-            }
-          } catch (error) {
-            console.error('Error fetching boards:', error);
-          }
-        } else {
-          setBoardsInfo([]);
-        }
-      } else if (boardView === 'FavoriteBoards') {
-        try {
-          const response = await likeAllBoard();
-          if (response.status === 200) {
-            setBoardsInfo(response.data);
-          }
-        } catch (error) {
-          console.error('Error fetching favorite boards:', error);
-        }
-      }
-    };
-    fetchBoards();
-  }, [teamId, boardView, setBoardsInfo]);
+  const handleNewBoardClick = () => {
+    openModal('CREATE_BOARD');
+  };
 
-  const filteredBoards = searchTerm
-    ? boards.filter((board) =>
-        board.boardName.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : boards;
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 }
+  };
 
   return (
-    <div className="flex flex-grow flex-col p-5">
-      <div className="flex items-center mb-5 relative">
-        <div className="flex items-center gap-2">
-          <h1 className="text-[32px] font-bold">{dashboardTitle}</h1>
-          
-          {teamId && (
-            <div className="flex -space-x-2 ml-4">
-              {teamMembers.slice(0, 4).map((member, index) => (
-                <div
-                  key={member._id}
-                  className="relative"
-                  style={{ zIndex: teamMembers.length - index }}
-                >
-                  {member.avatar && member.avatar !== 'null' ? (
-                    <Image
-                      src={member.avatar}
-                      width={32}
-                      height={32}
-                      alt={`${member.firstName} ${member.lastName}`}
-                      className="rounded-full border-2 border-white"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-sm font-medium text-gray-600">
-                      {member.firstName[0]}
-                    </div>
-                  )}
-                </div>
-              ))}
-              {teamMembers.length > 4 && (
-                <div className="w-8 h-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-sm font-medium text-gray-600 relative z-0">
-                  +{teamMembers.length - 4}
-                </div>
-              )}
-            </div>
-          )}
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 p-6 ${
+        isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+      }`}
+    >
+      {teamId && (
+        <motion.div
+          variants={itemVariants}
+          className="relative aspect-[3/4]"
+        >
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleNewBoardClick}
+            className={`w-full h-full rounded-xl overflow-hidden flex flex-col items-center justify-center p-6 ${
+              isDarkMode 
+                ? 'bg-gradient-to-br from-blue-600/80 to-purple-700/80'
+                : 'bg-gradient-to-br from-blue-500 to-purple-600'
+            } text-white group`}
+          >
+            <motion.div
+              whileHover={{ rotate: 90 }}
+              transition={{ duration: 0.3 }}
+              className="mb-4 p-3 rounded-full bg-white/10"
+            >
+              <Plus size={32} />
+            </motion.div>
+            <h3 className="text-xl font-semibold">새 보드 만들기</h3>
+            <p className="text-sm mt-2 opacity-80 text-center">
+              새로운 프로젝트를 시작해보세요
+            </p>
+          </motion.button>
+        </motion.div>
+      )}
 
-          {dashboardTitle !== '개인 대시보드' && (
-            <div className="ml-3">
-              <button
-                className="w-6 h-6 rounded-full bg-[#EDEDED] flex justify-center items-center cursor-pointer hover:bg-gray-200 transition-colors"
-                onClick={handleArrowClick}
-              >
-                <Image src={arrowBottom} width={12} height={7} alt="arrowBottom" />
-              </button>
-              {modalType === 'TEAM_SETTING' && (
-                <TeamSettingModal onClose={closeModal} />
-              )}
+      {!teamId && boards.length === 0 && (
+        <motion.div
+          variants={itemVariants} 
+          className="col-span-full"
+        >
+          <div className={`rounded-xl ${
+            isDarkMode ? 'bg-gray-800' : 'bg-white'
+          } p-8 text-center shadow-lg border ${
+            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+          }`}>
+            <div className="flex flex-col items-center gap-4">
+              <div className={`p-4 rounded-full ${
+                isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+              }`}>
+                <Info size={32} className={isDarkMode ? 'text-gray-400' : 'text-gray-500'} />
+              </div>
+              <h3 className={`text-xl font-semibold ${
+                isDarkMode ? 'text-gray-200' : 'text-gray-700'
+              }`}>
+                아직 생성된 보드가 없습니다
+              </h3>
+              <p className={`max-w-md ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                새로운 팀을 만들고 첫 프로젝트를 시작해보세요!
+              </p>
             </div>
-          )}
-        </div>
-      </div>
-      <BoardGrid
-        boards={filteredBoards}
-        buttonColor={buttonColor}
-        teamId={teamId}
-      />
-    </div>
+          </div>
+        </motion.div>
+      )}
+
+      {boards.map((board) => (
+        <motion.div
+          key={board._id}
+          variants={itemVariants}
+        >
+          <BoardCard
+            board={board}
+            buttonColor={buttonColor}
+            TOTAL_STEPS={10}
+            getBoardUrl={getBoardUrl}
+          />
+        </motion.div>
+      ))}
+
+      <AnimatePresence>
+        {modalType === 'CREATE_BOARD' && (
+          <CreateBoardModal
+            isOpen={true}
+            onClose={closeModal}
+            teamId={teamId}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
