@@ -1,14 +1,48 @@
+'use client';
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { Camera, UserInfo } from '@/lib/types';
+import { useBroadcastEvent, useEventListener } from '@/liveblocks.config';
+import MarkdownEditor from '../MarkdownEditor';
+import '@/styles/markdown.css';
+import { stepResult } from '@/app/api/canvas-axios';
 
 interface ResultProps {
   camera: Camera;
- 
+  boardId: string;
 }
 
-export default function Result({ camera }: ResultProps) {
+export default function Result({ camera, boardId }: ResultProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const broadcast = useBroadcastEvent();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [markdown, setMarkdown] = useState<string>('# 요구사항 명세서');
+
+  // Liveblocks 이벤트 수신
+  useEventListener(({ event }) => {
+    if (event.type === 'FINAL_MODAL') {
+      setIsModalOpen(true); // FINAL_MODAL 이벤트로 모달 열기
+    }
+  });
+
+  // 컴포넌트 마운트 시 결과를 가져옴
+  useEffect(() => {
+    const fetchResult = async () => {
+      try {
+        const liveblocksToken = localStorage.getItem('roomToken'); // Liveblocks 토큰 가져오기
+
+        const resultResponse = await stepResult(boardId, liveblocksToken);
+
+        if (resultResponse) {
+          setMarkdown(resultResponse.data.result); // 결과 데이터를 MarkdownEditor에 설정
+        }
+      } catch (error) {
+        console.error('Failed to fetch result:', error);
+      }
+    };
+    fetchResult();
+  }, [boardId]);
 
   return (
     <>
@@ -39,35 +73,37 @@ export default function Result({ camera }: ResultProps) {
                     <h2 className="font-semibold text-white">결과 마무리</h2>
                   </div>
                   <p className="text-xs text-gray-400">
-                    프로젝트 마무리를 위해 요구사항 명세성과 확인 작업을 진행하세요
+                    프로젝트 마무리를 위해 요구사항 명세성과 확인 작업을
+                    진행하세요
                   </p>
                 </div>
 
                 {/* 카드 그리드 */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer">
+                  <div
+                    className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer"
+                    onClick={() => {
+                      broadcast({ type: 'FINAL_MODAL' });
+                      setIsModalOpen(true);
+                      setIsCollapsed(true);
+                    }}
+                  >
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">
                       <span>📝</span> 요구사항 명세서
                     </h3>
-                    <p className="text-xs text-gray-400">
-                      요구사항 확인하기
-                    </p>
+                    <p className="text-xs text-gray-400">요구사항 확인하기</p>
                   </div>
                   <div className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer">
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">
                       <span>🔍</span> 마무리 검토
                     </h3>
-                    <p className="text-xs text-gray-400">
-                      결과물을 점검하세요
-                    </p>
+                    <p className="text-xs text-gray-400">결과물을 점검하세요</p>
                   </div>
                   <div className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer">
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">
                       <span>✅</span> 최종 확인
                     </h3>
-                    <p className="text-xs text-gray-400">
-                       완료되었는지 확인
-                    </p>
+                    <p className="text-xs text-gray-400">완료되었는지 확인</p>
                   </div>
                 </div>
               </motion.div>
@@ -146,6 +182,59 @@ export default function Result({ camera }: ResultProps) {
           )}
         </motion.div>
       </motion.div>
+      {/* 모달 */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white w-full max-w-5xl rounded-xl shadow-2xl overflow-hidden relative"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-4 right-4 z-10 text-gray-500 hover:text-gray-800 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+
+              {/* Modal Content */}
+              <div className="p-6 pt-12">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                  요구사항 명세서
+                </h2>
+                <MarkdownEditor
+                  value={markdown}
+                  onChange={(value) => setMarkdown(value || '')}
+                  height={500}
+                  placeholder="요구사항을 입력하세요..."
+                  className="markdown-editor"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
