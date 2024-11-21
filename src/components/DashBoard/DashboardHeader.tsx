@@ -160,7 +160,7 @@ export default function DashboardHeader({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="absolute right-8 -mt-6 z-50 transform-gpu"
+                  className="absolute right-16 -mt-[83px] z-30 transform-gpu"
                   style={{ minWidth: '200px' }} 
                 >
                   <TeamSettingModal onClose={closeModal} />

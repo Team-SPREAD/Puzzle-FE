@@ -206,9 +206,10 @@ export default function DashboardPage() {
             {' '}
             {/* overflow-auto로 스크롤 허용 */}
             <BoardGrid
-              boards={filteredBoards}
-              buttonColor={buttonColor}
-              teamId={selectedTeamId}
+              boards={filteredBoards} // 필터링된 보드 데이터를 전달
+              buttonColor={buttonColor} // 버튼 색상
+              teamId={selectedTeamId} // 선택된 팀 ID
+              token={userInfo.token} // 사용자 토큰
             />
           </div>
         </div>
