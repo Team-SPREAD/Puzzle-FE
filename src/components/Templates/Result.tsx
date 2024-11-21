@@ -7,6 +7,8 @@ import { useBroadcastEvent, useEventListener } from '@/liveblocks.config';
 import MarkdownEditor from '../MarkdownEditor';
 import '@/styles/markdown.css';
 import { stepResult } from '@/app/api/canvas-axios';
+// import jsPDF from 'jspdf';
+// import { marked } from 'marked';
 
 interface ResultProps {
   camera: Camera;
@@ -18,6 +20,7 @@ export default function Result({ camera, boardId }: ResultProps) {
   const broadcast = useBroadcastEvent();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [markdown, setMarkdown] = useState<string>('# 요구사항 명세서');
+  const [copied, setCopied] = useState(false);
 
   // Liveblocks 이벤트 수신
   useEventListener(({ event }) => {
@@ -27,22 +30,67 @@ export default function Result({ camera, boardId }: ResultProps) {
   });
 
   // 컴포넌트 마운트 시 결과를 가져옴
-  useEffect(() => {
-    const fetchResult = async () => {
-      try {
-        const liveblocksToken = localStorage.getItem('roomToken'); // Liveblocks 토큰 가져오기
+  const fetchResult = async () => {
+    try {
+      const liveblocksToken = localStorage.getItem('roomToken'); // Liveblocks 토큰 가져오기
 
-        const resultResponse = await stepResult(boardId, liveblocksToken);
+      const resultResponse = await stepResult(boardId, liveblocksToken);
 
-        if (resultResponse) {
-          setMarkdown(resultResponse.data.result); // 결과 데이터를 MarkdownEditor에 설정
-        }
-      } catch (error) {
-        console.error('Failed to fetch result:', error);
+      if (resultResponse) {
+        setMarkdown(resultResponse.data.result); // 결과 데이터를 MarkdownEditor에 설정
+        console.log('결과 데이터 가져오기 성공');
       }
-    };
-    fetchResult();
-  }, [boardId]);
+    } catch (error) {
+      console.error('Failed to fetch result:', error);
+    }
+  };
+
+  // 클립보드 복사 함수
+  const handleCopyMarkdown = () => {
+    navigator.clipboard.writeText(markdown).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  // PDF 내보내기 함수
+  // const handleExportPDF = () => {
+  //   // HTML로 변환
+  //   const htmlContent = `
+  //   <style>
+  //   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+  //     body { font-family: 'Noto Sans KR', sans-serif; }
+  //     h1, h2, h3 { font-weight: bold; color: #333; }
+  //     ul { padding-left: 20px; }
+  //     li { margin-bottom: 8px; }
+  //     img { max-width: 100%; height: auto; display: block; margin-bottom: 8px; }
+  //     pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+  //   </style>
+  //   ${marked.parse(markdown)}
+  // `;
+
+  //   // PDF 생성
+  //   const doc = new jsPDF({
+  //     orientation: 'p',
+  //     unit: 'mm',
+  //     format: 'a4',
+  //   });
+
+  //   // // 폰트 설정 (기본 폰트)
+  //   doc.setFont('helvetica');
+
+  //   // HTML을 PDF로 변환 (마진 설정)
+  //   doc.html(htmlContent, {
+  //     callback: function (doc) {
+  //       console.log(doc);
+  //       doc.save('puzzle_result.pdf');
+  //     },
+  //     x: 10,
+  //     y: 10,
+  //     width: 190, // A4 페이지 폭에 맞춤
+  //     windowWidth: 190,
+  //   });
+  // };
 
   return (
     <>
@@ -86,6 +134,7 @@ export default function Result({ camera, boardId }: ResultProps) {
                       broadcast({ type: 'FINAL_MODAL' });
                       setIsModalOpen(true);
                       setIsCollapsed(true);
+                      (() => fetchResult())();
                     }}
                   >
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">
@@ -221,8 +270,87 @@ export default function Result({ camera, boardId }: ResultProps) {
               {/* Modal Content */}
               <div className="p-6 pt-12">
                 <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  요구사항 명세서
+                  단계 결과
                 </h2>
+                {/* 버튼들 */}
+                <div className="flex gap-2 mb-2">
+                  {/* PDF 내보내기 버튼 */}
+                  {/* <button
+                    onClick={handleExportPDF}
+                    className="bg-[#E20001] text-white px-3 py-1 rounded-md text-sm hover:bg-[#BD0000] transition-colors flex items-center gap-1"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    PDF
+                  </button> */}
+
+                  {/* 클립보드 복사 버튼 */}
+                  <button
+                    onClick={handleCopyMarkdown}
+                    className={`text-white px-3 py-1 rounded-md text-sm transition-colors flex items-center gap-1 ${
+                      copied
+                        ? 'bg-green-500 hover:bg-green-600'
+                        : 'bg-blue-500 hover:bg-blue-600'
+                    }`}
+                  >
+                    {copied ? (
+                      <>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        복사됨
+                      </>
+                    ) : (
+                      <>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect
+                            x="9"
+                            y="9"
+                            width="13"
+                            height="13"
+                            rx="2"
+                            ry="2"
+                          />
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                        </svg>
+                        복사
+                      </>
+                    )}
+                  </button>
+                </div>
                 <MarkdownEditor
                   value={markdown}
                   onChange={(value) => setMarkdown(value || '')}
