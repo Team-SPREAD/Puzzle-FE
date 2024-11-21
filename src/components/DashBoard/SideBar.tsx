@@ -175,206 +175,217 @@ export default function Sidebar({
     setIsExpanded(false);
   };
 
+  const handleSidebarToggle = () => {
+    if (isExpanded) {
+      // 사이드바가 닫힐 때 모든 드롭다운 닫기
+      closeModal();
+    }
+    setIsExpanded(!isExpanded);
+  };
   return (
-    <div className="relative">
+    <div className="relative h-screen">
       <motion.div
         initial={{ width: '64px' }}
         animate={{ width: isExpanded ? '280px' : '80px' }}
-        className={`fixed left-0 h-screen shadow-lg z-40 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} overflow-hidden`}
+        className={`fixed left-0 h-screen shadow-lg z-40 ${
+          isDarkMode ? 'bg-gray-800' : 'bg-white'
+        }`}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={handleSidebarToggle}
           className="fixed left-[58px] top-6 w-6 h-6 rounded-full text-white flex items-center justify-center z-50"
           animate={{ left: isExpanded ? '268px' : '70px' }}
           style={{ backgroundColor: buttonColor }}
         >
           {isExpanded ? '←' : '→'}
         </motion.button>
-
-        <nav className="mt-16 px-4 space-y-2 flex flex-col h-[calc(100vh-100px)]">
-          {/* Main Navigation */}
-          <div className="flex-1 space-y-2">
-            <NavItem
-              isExpanded={isExpanded}
-              icon={projects}
-              label="Home"
-              isActive={boardView === 'MyBoards'}
-              onClick={() => {
-                setBoardView('MyBoards');
-                setSelectedTeamId(null);
-              }}
-              isDarkMode={isDarkMode}
-              closeOnClick={true}
-              setIsExpanded={setIsExpanded}
-            />
-
-            <NavItem
-              isExpanded={isExpanded}
-              icon={star}
-              label="Favorites"
-              isActive={boardView === 'FavoriteBoards'}
-              onClick={() => {
-                setBoardView('FavoriteBoards');
-                setSelectedTeamId(null);
-              }}
-              isDarkMode={isDarkMode}
-              closeOnClick={true}
-              setIsExpanded={setIsExpanded}
-            />
-
-            <div>
+  
+        <div className="h-full pt-16 flex flex-col">
+          <nav className={`px-4 flex-1 flex flex-col ${
+            isExpanded ? 'overflow-y-auto' : 'overflow-visible'
+          }`}>
+            {/* Main Navigation */}
+            <div className="flex-1 space-y-2">
               <NavItem
                 isExpanded={isExpanded}
-                icon={house}
-                label="Teams"
-                isActive={modalType === 'DROPDOWN_TEAM_SELECT'}
+                icon={projects}
+                label="Home"
+                isActive={boardView === 'MyBoards'}
                 onClick={() => {
-                  if (!isExpanded) {
-                    setIsExpanded(true);
-                  }
-                  modalType === 'DROPDOWN_TEAM_SELECT'
-                    ? closeModal()
-                    : openModal('DROPDOWN_TEAM_SELECT');
+                  setBoardView('MyBoards');
+                  setSelectedTeamId(null);
                 }}
                 isDarkMode={isDarkMode}
-                showChildren={modalType === 'DROPDOWN_TEAM_SELECT'}
-                closeOnClick={false}
+                closeOnClick={true}
                 setIsExpanded={setIsExpanded}
               />
-              {modalType === 'DROPDOWN_TEAM_SELECT' && (
-                <AnimatePresence>
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: 'auto' }}
-                    exit={{ height: 0 }}
-                    className="ml-4 mt-2 space-y-1"
-                  >
-                    {teams.map((team) => (
+  
+              <NavItem
+                isExpanded={isExpanded}
+                icon={star}
+                label="Favorites"
+                isActive={boardView === 'FavoriteBoards'}
+                onClick={() => {
+                  setBoardView('FavoriteBoards');
+                  setSelectedTeamId(null);
+                }}
+                isDarkMode={isDarkMode}
+                closeOnClick={true}
+                setIsExpanded={setIsExpanded}
+              />
+  
+              <div>
+                <NavItem
+                  isExpanded={isExpanded}
+                  icon={house}
+                  label="Teams"
+                  isActive={modalType === 'DROPDOWN_TEAM_SELECT'}
+                  onClick={() => {
+                    if (!isExpanded) {
+                      setIsExpanded(true);
+                    }
+                    modalType === 'DROPDOWN_TEAM_SELECT'
+                      ? closeModal()
+                      : openModal('DROPDOWN_TEAM_SELECT');
+                  }}
+                  isDarkMode={isDarkMode}
+                  showChildren={modalType === 'DROPDOWN_TEAM_SELECT'}
+                  closeOnClick={false}
+                  setIsExpanded={setIsExpanded}
+                />
+                {modalType === 'DROPDOWN_TEAM_SELECT' && (
+                  <AnimatePresence>
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: 'auto' }}
+                      exit={{ height: 0 }}
+                      className="ml-4 mt-2 space-y-1"
+                    >
+                      {teams.map((team) => (
+                        <motion.button
+                          key={team._id}
+                          whileHover={{ x: 10 }}
+                          onClick={() => handleTeamSelect(team._id)}
+                          className={`w-full p-2 rounded-lg flex items-center space-x-2 ${
+                            selectedTeamId === team._id
+                              ? isDarkMode
+                                ? 'bg-gray-700 text-white'
+                                : 'bg-blue-50 text-blue-600'
+                              : isDarkMode
+                                ? 'text-gray-300 hover:bg-gray-700'
+                                : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
+                            style={{ backgroundColor: teamInitialColors[team._id] }}
+                          >
+                            {team.teamName[0].toUpperCase()}
+                          </div>
+                          <span>{team.teamName}</span>
+                        </motion.button>
+                      ))}
                       <motion.button
-                        key={team._id}
                         whileHover={{ x: 10 }}
-                        onClick={() => handleTeamSelect(team._id)}
+                        onClick={() => openModal('CREATE_TEAM')}
+                        className={`w-full p-2 text-left rounded-lg ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        } hover:bg-gray-100`}
+                      >
+                        + Create Team
+                      </motion.button>
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+              </div>
+  
+              <div>
+                <NavItem
+                  isExpanded={isExpanded}
+                  icon={Settings}
+                  label="Settings"
+                  isActive={modalType === 'SETTINGS'}
+                  onClick={() => {
+                    if (!isExpanded) {
+                      setIsExpanded(true);
+                    }
+                    modalType === 'SETTINGS' ? closeModal() : openModal('SETTINGS');
+                  }}
+                  isDarkMode={isDarkMode}
+                  showChildren={modalType === 'SETTINGS'}
+                  closeOnClick={false}
+                  setIsExpanded={setIsExpanded}
+                />
+                {modalType === 'SETTINGS' && (
+                  <AnimatePresence>
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: 'auto' }}
+                      exit={{ height: 0 }}
+                      className="ml-4 mt-2 space-y-1"
+                    >
+                      <motion.button
+                        whileHover={{ x: 10 }}
+                        onClick={() => {
+                          toggleDarkMode();
+                          closeModal();
+                          setIsExpanded(false);
+                        }}
                         className={`w-full p-2 rounded-lg flex items-center space-x-2 ${
-                          selectedTeamId === team._id
-                            ? isDarkMode
-                              ? 'bg-gray-700 text-white'
-                              : 'bg-blue-50 text-blue-600'
-                            : isDarkMode
-                              ? 'text-gray-300 hover:bg-gray-700'
-                              : 'text-gray-600 hover:bg-gray-100'
+                          isDarkMode
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-600 hover:bg-gray-100'
                         }`}
                       >
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
-                          style={{ backgroundColor: teamInitialColors[team._id] }}
-                        >
-                          {team.teamName[0].toUpperCase()}
+                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                          {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
                         </div>
-                        <span>{team.teamName}</span>
+                        <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
                       </motion.button>
-                    ))}
-                    <motion.button
-                      whileHover={{ x: 10 }}
-                      onClick={() => openModal('CREATE_TEAM')}
-                      className={`w-full p-2 text-left rounded-lg ${
-                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                      } hover:bg-gray-100`}
-                    >
-                      + Create Team
-                    </motion.button>
-                  </motion.div>
-                </AnimatePresence>
-              )}
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+              </div>
             </div>
-
-            <div>
+  
+            {/* Bottom Navigation */}
+            <div className="pt-2 pb-4 space-y-2 border-t mt-auto">
               <NavItem
                 isExpanded={isExpanded}
-                icon={Settings}
-                label="Settings"
-                isActive={modalType === 'SETTINGS'}
-                onClick={() => {
-                  if (!isExpanded) {
-                    setIsExpanded(true);
-                  }
-                  modalType === 'SETTINGS' ? closeModal() : openModal('SETTINGS');
-                }}
+                icon={FileText}
+                label="Notion"
+                isActive={false}
+                onClick={() => {}}
                 isDarkMode={isDarkMode}
-                showChildren={modalType === 'SETTINGS'}
-                closeOnClick={false}
-                setIsExpanded={setIsExpanded}
+                href="https://www.notion.so"
               />
-              {modalType === 'SETTINGS' && (
-                <AnimatePresence>
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: 'auto' }}
-                    exit={{ height: 0 }}
-                    className="ml-4 mt-2 space-y-1"
-                  >
-                    <motion.button
-                      whileHover={{ x: 10 }}
-                      onClick={() => {
-                        toggleDarkMode();
-                        closeModal();
-                        setIsExpanded(false);
-                      }}
-                      className={`w-full p-2 rounded-lg flex items-center space-x-2 ${
-                        isDarkMode
-                          ? 'text-gray-300 hover:bg-gray-700'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                        {isDarkMode ? <Moon size={16} /> : <Sun size={16} />}
-                      </div>
-                      <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-                    </motion.button>
-                  </motion.div>
-                </AnimatePresence>
-              )}
+  
+              <NavItem
+                isExpanded={isExpanded}
+                icon={HardDrive}
+                label="Google Drive"
+                isActive={false}
+                onClick={() => {}}
+                isDarkMode={isDarkMode}
+                href="https://drive.google.com"
+              />
+  
+              <NavItem
+                isExpanded={isExpanded}
+                icon={LogOut}
+                label="Logout"
+                isActive={false}
+                onClick={handleLogout}
+                isDarkMode={isDarkMode}
+              />
             </div>
-          </div>
-
-          {/* Bottom Navigation */}
-          <div className="space-y-2 pb-4">
-            <NavItem
-              isExpanded={isExpanded}
-              icon={FileText}
-              label="Notion"
-              isActive={false}
-              onClick={() => {}}
-              isDarkMode={isDarkMode}
-              href="https://www.notion.so"
-            />
-            
-            <NavItem
-              isExpanded={isExpanded}
-              icon={HardDrive}
-              label="Google Drive"
-              isActive={false}
-              onClick={() => {}}
-              isDarkMode={isDarkMode}
-              href="https://drive.google.com"
-            />
-            
-            <NavItem
-              isExpanded={isExpanded}
-              icon={LogOut}
-              label="Logout"
-              isActive={false}
-              onClick={handleLogout}
-              isDarkMode={isDarkMode}
-            />
-          </div>
-        </nav>
-
-        {modalType === 'USER_SELECT' && (
-          <UserSelectModal email={userInfo.email} />
-        )}
+          </nav>
+        </div>
+  
+        {modalType === 'USER_SELECT' && <UserSelectModal email={userInfo.email} />}
       </motion.div>
     </div>
   );
