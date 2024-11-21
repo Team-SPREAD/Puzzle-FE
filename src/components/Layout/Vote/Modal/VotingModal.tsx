@@ -43,6 +43,7 @@ const VotingModal = () => {
 
         {/* Lottie 애니메이션 */}
         <div className="relative -mt-10 -mb-10 z-0">
+
           <Lottie
             animationData={think}
             loop={false}

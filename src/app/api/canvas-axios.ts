@@ -1,6 +1,7 @@
 import { toPng } from 'html-to-image';
 import axiosInstance from '@/app/api/axiosInstance';
 
+
 //Canvas 이미지화 및 서버로 업로드
 export const captureAndUpload = async (
   element: HTMLElement,
@@ -91,3 +92,4 @@ export const stepResult = async (
     return null;
   }
 };
+
