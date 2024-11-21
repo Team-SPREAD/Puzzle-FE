@@ -16,7 +16,6 @@ import ReactFlow, {
   Edge,
 } from 'reactflow';
 
-import { toPng } from 'html-to-image';
 import { useMutation, useStorage } from '@/liveblocks.config';
 import FloatingEdge from './FloatingEdge';
 import StakeholderConnectionLine from './StakeholderConnectionLine';
@@ -64,10 +63,6 @@ const Flow = () => {
   const edges = useStorage((root) => root.edges);
   const [nodeColor, setNodeColor] = useState('#121417');
   const reactFlow = useReactFlow();
-
-  // reactFlowWrapper는 전체 컴포넌트를 감싸고, reactFlowContainer는 ReactFlow 컴포넌트만을 캡처하기 위한 것
-  const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-  const reactFlowContainer = useRef<HTMLDivElement | null>(null);
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance>();
 
@@ -210,29 +205,9 @@ const Flow = () => {
     [edges],
   );
 
-  // React Flow 컴포넌트만 캡처하는 기능
-  const handleCaptureClick = useCallback(() => {
-    if (!reactFlowContainer.current) {
-      console.error('React Flow container element not found');
-      return;
-    }
-
-    toPng(reactFlowContainer.current, { backgroundColor: '#ffffff' })
-      .then((dataUrl) => {
-        const link = document.createElement('a');
-        link.download = 'reactflow-capture.png';
-        link.href = dataUrl;
-        link.click();
-      })
-      .catch((error) => {
-        console.error('Failed to capture React Flow:', error);
-      });
-  }, []);
-
   return (
-    <div className="h-full w-full grow" ref={reactFlowWrapper}>
-      <div ref={reactFlowContainer} style={{ width: '100%', height: '100%' }}>
-        {/* React Flow Container를 감싸는 div */}
+    <div className="h-full w-full grow">
+      <div style={{ width: '100%', height: '100%' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -257,12 +232,6 @@ const Flow = () => {
         </ReactFlow>
       </div>
       <InputForNode addWhatNode={addNode} />
-      <button
-        onClick={handleCaptureClick}
-        className="capture-button absolute bottom-[8rem] "
-      >
-        캡처하기
-      </button>
     </div>
   );
 };

@@ -89,6 +89,7 @@ const Canvas = () => {
   const nodes = useStorage((root) => root.nodes);
   const edges = useStorage((root) => root.edges);
   const cursorPanel = useRef(null);
+  const reactFlowCanvas = useRef(null); //테스트
   const { setCurrentStep: setBoardStep, getCurrentStep } = useProcessStore();
   const { setCurrentStep: setGlobalCurrentStep } = useProcessStore();
 
@@ -227,7 +228,7 @@ const Canvas = () => {
       case 9:
         return <RoleAssignment camera={camera} />;
       case 10:
-        return <Result camera={camera} />;
+        return <Result camera={camera} boardId={boardId} />;
       default:
         return null;
     }
@@ -724,21 +725,21 @@ const Canvas = () => {
         currentStep={currentStep}
         processes={steps}
       />
-
       <div className="flex-1 relative">
         {/* 현재 단계의 템플릿 렌더링 */}
 
         <StageGimmicks currentStep={currentStep} />
         {renderStageTemplate()}
-        {[9].includes(currentStep) && (
-          <div className="relative h-screen w-screen bg-white">
-            <ReactFlowCanvas />
-          </div>
-        )}
         <div
           className="w-full h-full relative bg-surface-canvas touch-none"
           ref={cursorPanel}
         >
+          {[9].includes(currentStep) && (
+            <div className="relative h-screen w-screen bg-white">
+              <ReactFlowCanvas />
+            </div>
+          )}
+
           <Cursors cursorPanel={cursorPanel} />
           <SelectionTools
             isAnimated={
@@ -806,26 +807,27 @@ const Canvas = () => {
         </div>
         {/* 모달 컴포넌트 */}
         {modalType === 'VOTE_COMPLETE' && <VotingModal />}
-
-        <div className="absolute bottom-4 left-4 z-30">
-          <ToolsBar
-            canvasState={canvasState}
-            setCanvasState={setState}
-            undo={history.undo}
-            redo={history.redo}
-            canUndo={canUndo}
-            canRedo={canRedo}
-            penSize={penSize}
-            setPenSize={setPenSize}
-            currentColor={lastUsedColor} // 추가
-            onColorChange={setLastUsedColor}
-          />
-        </div>
+        {![9].includes(currentStep) && (
+          <div className="absolute bottom-4 left-4 z-30">
+            <ToolsBar
+              canvasState={canvasState}
+              setCanvasState={setState}
+              undo={history.undo}
+              redo={history.redo}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              penSize={penSize}
+              setPenSize={setPenSize}
+              currentColor={lastUsedColor} // 추가
+              onColorChange={setLastUsedColor}
+            />
+          </div>
+        )}
         <div className="absolute bottom-0 right-0 z-30">
           <RightNav />
         </div>
       </div>
-      {modalType === 'GUIDE_MODAL' && <GuideModal />}  {/* 추가 */}
+      {modalType === 'GUIDE_MODAL' && <GuideModal />} {/* 추가 */}
     </div>
   );
 };

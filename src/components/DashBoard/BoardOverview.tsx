@@ -88,7 +88,7 @@ export default function BoardOverview({
       <div className="flex items-center mb-5 relative">
         <h1 className="text-[32px] font-bold">{dashboardTitle}</h1>
 
-        {dashboardTitle !== '개인 대시보드' && (
+        {dashboardTitle !== 'HOME 대시보드' && (
           <div className="ml-5 relative">
             <div
               className="w-[20px] h-[20px] rounded-full bg-[#EDEDED] flex justify-center items-center cursor-pointer"

@@ -114,7 +114,9 @@ export type RoomEvent =
   | { type: 'NEXT_STEP'; nextStep: number }
   | { type: 'RESET_VOTES' }
   | { type: 'SHOW_COMPLETION_MODAL' }
-  | { type: 'OPEN_MODAL' };
+  | { type: 'OPEN_MODAL' }
+  //결과 도출 모달
+  | { type: 'FINAL_MODAL' };
 
 export interface RoomEventMessage {
   event: any;
