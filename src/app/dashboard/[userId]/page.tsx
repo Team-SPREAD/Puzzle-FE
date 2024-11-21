@@ -2,45 +2,63 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+
 // 컴포넌트
 import Sidebar from '@/components/DashBoard/SideBar';
 import Header from '@/components/DashBoard/Header';
-import TeamMembersBar from '@/components/DashBoard/TeamMembersBar';
-import BoardOverview from '@/components/DashBoard/BoardOverview';
+import BoardGrid from '@/components/DashBoard/BoardGrid';
+import DashboardHeader from '@/components/DashBoard/DashboardHeader';
 import CreateTeamModal from '@/components/DashBoard/Modals/CreateTeamModal';
 import InviteTeamModal from '@/components/DashBoard/Modals/InviteTeamModal';
 import EditTeamModal from '@/components/DashBoard/Modals/EditTeamModal';
 import DeleteTeamModal from '@/components/DashBoard/Modals/DeleteTeamModal';
 import { Loading } from '@/components/Loading';
+
 // 유틸
 import { generateRandomColor } from '@/utils/getRandomColor';
+
 // 상태 관리
 import useUserStore from '@/store/useUserStore';
 import useTeamsStore from '@/store/useTeamsStore';
 import useModalStore from '@/store/useModalStore';
-// Axios API 호출 함수
-import { getUserInfo, getMyTeams } from '@/app/api/dashboard-axios';
+import { useDarkMode } from '@/store/useDarkModeStore';
+import { BoardInfo } from '@/lib/types';
+
+// API
+import {
+  getUserInfo,
+  getMyTeams,
+  getBoard,
+  likeAllBoard,
+} from '@/app/api/dashboard-axios';
+
+const pageVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
 
 export default function DashboardPage() {
   const { userId } = useParams();
   const router = useRouter();
+  const { isDarkMode } = useDarkMode();
 
+  // Store hooks
   const userInfo = useUserStore((state) => state.userInfo);
   const setUser = useUserStore((state) => state.setUserInfo);
   const { modalType, closeModal } = useModalStore();
+  const { setTeams, setCurrentTeam, teams } = useTeamsStore();
 
-  const setTeams = useTeamsStore((state) => state.setTeams);
-  const setCurrentTeam = useTeamsStore((state) => state.setCurrentTeam); // 현재 팀 설정 함수 가져오기
-  const teams = useTeamsStore((state) => state.teams);
-
+  // Local state
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [buttonColor, setButtonColor] = useState('');
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태 추가
-  const [searchTerm, setSearchTerm] = useState(''); // 검색 상태 추가
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [boardView, setBoardView] = useState<'MyBoards' | 'FavoriteBoards'>(
     'MyBoards',
-  ); //현재 보드들의 상태
+  );
+  const [boards, setBoards] = useState<BoardInfo[]>([]);
 
   // 랜덤 색상 설정
   useEffect(() => {
@@ -51,59 +69,81 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadUserInfo = async () => {
       const token = localStorage.getItem('token');
-
-      if (token) {
-        try {
-          // 사용자 정보 API 요청
-          const response = await getUserInfo(token);
-
-          if (response.status === 200) {
-            const userData = response.data;
-
-            // 상태 저장
-            setUser({
-              _id: userData.userId,
-              name: `${userData.firstName}${userData.lastName}`,
-              email: userData.email,
-              avatar: userData.avatar,
-              token: token,
-            });
-
-            // 팀 정보 가져오기
-            const teamsResponse = await getMyTeams(token);
-
-            if (teamsResponse.status === 200) {
-              const teamsData = teamsResponse.data;
-              setTeams(
-                teamsData.map((team: any) => ({
-                  _id: team._id,
-                  teamName: team.teamName,
-                  users: team.users,
-                  createdDate: team.createdDate,
-                  updatedDate: team.updateDate,
-                })),
-              );
-            } else {
-              console.error('Failed to fetch teams');
-            }
-          } else {
-            console.error('Failed to fetch user information');
-          }
-        } catch (error) {
-          console.error('API 요청 실패:', error);
-        } finally {
-          setIsLoading(false); // 로딩 상태 해제
-        }
-      } else {
+      if (!token) {
         console.error('로컬스토리지에 토큰이 없습니다.');
-        setIsLoading(false); // 로딩 상태 해제
+        router.push('/login');
+        return;
+      }
+
+      try {
+        const [userResponse, teamsResponse] = await Promise.all([
+          getUserInfo(token),
+          getMyTeams(token),
+        ]);
+
+        if (userResponse.status === 200) {
+          const userData = userResponse.data;
+          setUser({
+            _id: userData.userId,
+            name: `${userData.firstName}${userData.lastName}`,
+            email: userData.email,
+            avatar: userData.avatar,
+            token: token,
+          });
+        }
+
+        if (teamsResponse.status === 200) {
+          const teamsData = teamsResponse.data.map((team: any) => ({
+            _id: team._id,
+            teamName: team.teamName,
+            users: team.users,
+            createdDate: team.createdDate,
+            updatedDate: team.updateDate,
+          }));
+          setTeams(teamsData);
+        }
+      } catch (error) {
+        console.error('API 요청 실패:', error);
+        router.push('/login');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     loadUserInfo();
-  }, [setUser, setTeams]);
+  }, [setUser, setTeams, router]);
 
-  // selectedTeamId가 변경될 때 currentTeam 업데이트
+  // boards 데이터 가져오기
+  useEffect(() => {
+    const fetchBoards = async () => {
+      if (boardView === 'MyBoards') {
+        if (selectedTeamId) {
+          try {
+            const response = await getBoard(selectedTeamId);
+            if (response.status === 200) {
+              setBoards(response.data);
+            }
+          } catch (error) {
+            console.error('Error fetching boards:', error);
+          }
+        } else {
+          setBoards([]);
+        }
+      } else if (boardView === 'FavoriteBoards') {
+        try {
+          const response = await likeAllBoard();
+          if (response.status === 200) {
+            setBoards(response.data);
+          }
+        } catch (error) {
+          console.error('Error fetching favorite boards:', error);
+        }
+      }
+    };
+    fetchBoards();
+  }, [selectedTeamId, boardView]);
+
+  // currentTeam 업데이트
   useEffect(() => {
     if (selectedTeamId) {
       setCurrentTeam(selectedTeamId);
@@ -115,51 +155,67 @@ export default function DashboardPage() {
       ? 'HOME 대시보드'
       : teams.find((t) => t._id === selectedTeamId)?.teamName || '팀 대시보드';
 
+  // 검색어로 보드 필터링
+  const filteredBoards = searchTerm
+    ? boards.filter((board) =>
+        board.boardName.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
+    : boards;
+
   if (isLoading) {
-    return <Loading />; // 로딩 중일 때 로딩 컴포넌트 표시
+    return <Loading />;
   }
 
   return (
-    <div className="flex w-screen h-screen">
-      <TeamMembersBar
-        teamId={selectedTeamId!}
+    <motion.div
+      className={`flex w-screen h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
+      <Sidebar
+        selectedTeamId={selectedTeamId}
+        setSelectedTeamId={setSelectedTeamId}
         buttonColor={buttonColor}
-        token={userInfo.token}
+        teams={teams}
+        userInfo={userInfo}
+        favoriteProjects={[]}
+        boardView={boardView}
+        setBoardView={setBoardView}
       />
-      <div className="w-[96%] h-full">
+
+      <div className="flex-1 flex flex-col ml-[80px] transition-all duration-300">
         <Header
           isDashboardPersonal={selectedTeamId === null}
           buttonColor={buttonColor}
-          userName={userInfo.name}
+          userInfo={userInfo}
           onSearch={setSearchTerm}
         />
 
-        <div className="flex w-full h-[92%]">
-          <Sidebar
-            selectedTeamId={selectedTeamId}
-            setSelectedTeamId={setSelectedTeamId}
-            buttonColor={buttonColor}
-            teams={teams}
-            userInfo={{
-              _id: userInfo._id,
-              name: userInfo.name,
-              avatar: userInfo.avatar,
-              email: userInfo.email,
-              token: userInfo.token,
-            }}
-            favoriteProjects={[]}
-            boardView={boardView} // 상태 전달
-            setBoardView={setBoardView} // 상태 업데이트 함수 전달
-          />
-          <BoardOverview
-            dashboardTitle={dashboardTitle}
-            buttonColor={buttonColor}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {' '}
+          {/* flex-col과 overflow-hidden 추가 */}
+          <DashboardHeader
+            title={dashboardTitle}
             teamId={selectedTeamId}
-            searchTerm={searchTerm}
-            boardView={boardView} // 상태 전달
+            buttonColor={buttonColor}
+            token={userInfo.token}
           />
+          <div className="flex-1 overflow-auto">
+            {' '}
+            {/* overflow-auto로 스크롤 허용 */}
+            <BoardGrid
+              boards={filteredBoards} // 필터링된 보드 데이터를 전달
+              buttonColor={buttonColor} // 버튼 색상
+              teamId={selectedTeamId} // 선택된 팀 ID
+              token={userInfo.token} // 사용자 토큰
+            />
+          </div>
         </div>
-        {/* 모달 타입에 따른 조건부 렌더링 */}
+      </div>
+
+      <AnimatePresence>
         {modalType === 'CREATE_TEAM' && (
           <CreateTeamModal
             isOpen={true}
@@ -168,33 +224,36 @@ export default function DashboardPage() {
             token={userInfo.token}
           />
         )}
-        {modalType === 'INVITE_TEAM' && (
+
+        {modalType === 'INVITE_TEAM' && selectedTeamId && (
           <InviteTeamModal
             isOpen={true}
             onClose={closeModal}
             token={userInfo.token}
-            teamId={selectedTeamId!}
+            teamId={selectedTeamId}
             sender={userInfo.name}
           />
         )}
-        {modalType === 'EDIT_TEAM' && (
+
+        {modalType === 'EDIT_TEAM' && selectedTeamId && (
           <EditTeamModal
             isOpen={true}
             onClose={closeModal}
-            teamId={selectedTeamId!}
+            teamId={selectedTeamId}
             currentTeamName={dashboardTitle}
           />
         )}
-        {modalType === 'DELETE_TEAM' && (
+
+        {modalType === 'DELETE_TEAM' && selectedTeamId && (
           <DeleteTeamModal
             isOpen={true}
             onClose={closeModal}
-            teamId={selectedTeamId!}
+            teamId={selectedTeamId}
             currentTeamName={dashboardTitle}
             teamName={dashboardTitle}
           />
         )}
-      </div>
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 }

@@ -1,16 +1,17 @@
+'use client';
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { setCookie } from 'nookies';
 import Image from 'next/image';
-import { Trash2, Star, Edit3, RotateCcw } from 'lucide-react';
+import { Trash2, Star, Edit3, Info, ChevronLeft } from 'lucide-react';
 import Lottie from 'lottie-react';
 import starAnimation from '~/lotties/star.json';
-import dots from '~/images/dots.svg';
 import { BoardInfo } from '@/lib/types';
-import TestImage from '~/images/testUserIcon.jpeg';
 import { likeBoard, getRoomToken } from '@/app/api/dashboard-axios';
 import EditBoardModal from './Modals/EditBoardModal';
 import DeleteBoardModal from './Modals/DeleteBoardModal';
+import { useDarkMode } from '@/store/useDarkModeStore';
 
 interface BoardCardProps {
   board: BoardInfo;
@@ -26,54 +27,58 @@ const BoardCard: React.FC<BoardCardProps> = ({
   getBoardUrl,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false); // 즐겨찾기 애니메이션 상태
-  const [isLiked, setIsLiked] = useState(board.like); // 즐겨찾기 상태
-  const [isEntering, setIsEntering] = useState(false); // 방 입장 상태
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // EditModal 상태
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // DeleteModal 상태
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [isLiked, setIsLiked] = useState(board.like);
+  const [isEntering, setIsEntering] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { isDarkMode } = useDarkMode();
 
-  const handleFlip = () => {
-    setIsFlipped(!isFlipped);
+  const cardVariants = {
+    initial: { scale: 0.95, opacity: 0 },
+    enter: { scale: 1, opacity: 1, transition: { duration: 0.3 } },
+    exit: { scale: 0.95, opacity: 0, transition: { duration: 0.3 } },
+  };
+
+  const flipVariants = {
+    front: {
+      rotateY: 0,
+      transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] },
+    },
+    back: {
+      rotateY: 180,
+      transition: { duration: 0.4, ease: [0.23, 1, 0.32, 1] },
+    },
   };
 
   const handleLikeBoard = async () => {
-    setIsAnimating(true); // 애니메이션 시작
+    setIsAnimating(true);
     try {
       const response = await likeBoard(board._id);
       if (response.status === 200) {
-        setIsLiked(!isLiked); // 즐겨찾기 상태 토글
-      } else {
-        console.error('Failed to update like status');
+        setIsLiked(!isLiked);
       }
     } catch (error) {
       console.error('Error updating like status:', error);
     } finally {
-      setTimeout(() => setIsAnimating(false), 1000); // 애니메이션 종료
+      setTimeout(() => setIsAnimating(false), 1000);
     }
   };
 
   const handleEnterRoom = async () => {
-    if (isEntering) return; // 중복 클릭 방지
+    if (isEntering || isFlipped) return;
     setIsEntering(true);
 
     try {
       const response = await getRoomToken(board._id);
-
       if (response.status === 201 && response.data?.token) {
         const { token } = response.data;
-
-        // 로컬 스토리지에 룸 토큰 저장
         localStorage.setItem('roomToken', token);
-
-        //쿠키에 룸 토큰 저장
         setCookie(null, 'roomToken', token, {
-          maxAge: 3600, //1시간
+          maxAge: 3600,
           path: '/',
         });
-
-        // 방 URL로 리다이렉트
-        const roomUrl = getBoardUrl(board._id);
-        window.location.href = roomUrl;
+        window.location.href = getBoardUrl(board._id);
       } else {
         alert('토큰 발급에 실패했습니다.');
       }
@@ -81,192 +86,209 @@ const BoardCard: React.FC<BoardCardProps> = ({
       console.error('Error entering the room:', error);
       alert('방에 들어가는 중 오류가 발생했습니다.');
     } finally {
-      setIsEntering(false); // 상태 해제
+      setIsEntering(false);
     }
   };
 
+  const cardBackground = isDarkMode ? 'bg-gray-800' : 'bg-white';
+  const cardText = isDarkMode ? 'text-gray-200' : 'text-gray-800';
+  const cardTextSecondary = isDarkMode ? 'text-gray-400' : 'text-gray-500';
+  const cardHover = isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
+
   return (
-    <>
-      {/* 보드 카드 */}
-      <div className="relative w-full aspect-[2/3] perspective-1000 hover:shadow-2xl duration-500 mb-4">
+    <motion.div
+      variants={cardVariants}
+      initial="initial"
+      animate="enter"
+      exit="exit"
+      className="relative aspect-[3/4] perspective-1000"
+    >
+      <motion.div
+        className="w-full h-full relative preserve-3d cursor-pointer"
+        animate={isFlipped ? 'back' : 'front'}
+        variants={flipVariants}
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {/* Front */}
         <motion.div
-          className="w-full h-full relative preserve-3d"
-          animate={{ rotateY: isFlipped ? 180 : 0 }}
-          transition={{ duration: 0.6 }}
-          style={{ transformStyle: 'preserve-3d' }}
+          className={`absolute w-full h-full backface-hidden ${cardBackground} rounded-xl shadow-lg overflow-hidden border ${
+            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+          }`}
+          style={{ backfaceVisibility: 'hidden' }}
         >
-          {/* Front of card */}
-          <motion.div
-            className="w-full h-full absolute backface-hidden"
-            style={{ backfaceVisibility: 'hidden' }}
-          >
-            <div className="bg-white rounded-lg shadow-md h-full flex flex-col relative">
-              <AnimatePresence>
-                {isAnimating && (
+          <div className="h-full flex flex-col">
+            {/* Header */}
+            <div className="p-4 flex justify-between items-center">
+              <h3 className={`font-semibold text-lg truncate ${cardText}`}>
+                {board.boardName}
+              </h3>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsFlipped(true)}
+                className={`p-2 rounded-full ${cardHover}`}
+              >
+                <Info className={cardTextSecondary} size={20} />
+              </motion.button>
+            </div>
+
+            {/* Image Section */}
+            <div
+              className="flex-1 relative group cursor-pointer"
+              onClick={handleEnterRoom}
+            >
+              <div
+                className="w-full h-full bg-cover bg-center transition-transform duration-300 group-hover:scale-105"
+                style={{
+                  backgroundImage: board.boardImgUrl
+                    ? `url(${board.boardImgUrl})`
+                    : `url('/images/testUserIcon.jpeg')`,
+                }}
+              />
+              <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity" />
+              {isEntering && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-white border-t-transparent" />
+                </div>
+              )}
+            </div>
+
+            {/* Progress Section */}
+            <div className="p-4">
+              <div className="mb-3">
+                <div className="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.5 }}
-                    transition={{
-                      duration: 0.5,
-                      ease: 'easeOut',
+                    className="absolute top-0 left-0 h-full rounded-full"
+                    style={{ backgroundColor: buttonColor }}
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${(Number(board.currentStep) / TOTAL_STEPS) * 100}%`,
                     }}
-                    className="absolute inset-0 z-20 flex items-center justify-center"
-                  >
-                    {/* White overlay */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.7 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute inset-0 bg-white"
-                    />
-                    {/* Lottie Animation */}
-                    <div className="relative z-30 w-1/2 max-w-[200px]">
-                      <Lottie
-                        animationData={starAnimation}
-                        loop={false}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                        }}
-                      />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              {/* Header */}
-              <div className="h-[10%] flex justify-end items-center px-6">
-                <Image
-                  src={dots}
-                  alt="dots"
-                  width={21}
-                  height={16}
-                  onClick={handleFlip}
-                  className="cursor-pointer"
-                />
-              </div>
-
-              {/* Image Section */}
-              <div className="h-[60%] flex justify-center items-center px-6">
-                <button
-                  onClick={handleEnterRoom} // 방 입장 버튼
-                  className={`w-full h-full relative flex items-center justify-center border-2 border-gray-200 rounded-lg hover:bg-gray-50`}
-                  style={{
-                    backgroundImage: `url(${board.boardImgUrl || TestImage.src})`,
-                    backgroundSize: 'cover', // 이미지 크기 조정
-                    backgroundPosition: 'center', // 이미지 위치 조정
-                  }}
-                  disabled={isEntering} // 로딩 중 비활성화
-                >
-                  {isEntering && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50">
-                      <span className="text-gray-500">로딩 중...</span>
-                    </div>
-                  )}
-                </button>
-              </div>
-
-              {/* Progress and Info Section */}
-              <div className="h-[30%] px-6 flex flex-col justify-evenly">
-                <div className="relative w-full h-1 bg-gray-200 rounded">
-                  <div
-                    className="h-full rounded"
-                    style={{
-                      width: `${
-                        (Number(board.currentStep) / TOTAL_STEPS) * 100
-                      }%`,
-                      backgroundColor: board.team ? buttonColor : 'gray',
-                    }}
-                  ></div>
-                </div>
-
-                <div className="flex flex-col justify-center">
-                  <h3 className="font-bold text-xl mb-2 line-clamp-1">
-                    {board.boardName}
-                  </h3>
-                  <p className="text-sm text-gray-500">{board.description}</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Back of card */}
-          <motion.div
-            className="w-full h-full absolute backface-hidden"
-            style={{
-              backfaceVisibility: 'hidden',
-              transform: 'rotateY(180deg)',
-            }}
-          >
-            <div className="bg-white rounded-lg shadow-md h-full flex flex-col">
-              <div className="h-[10%] flex justify-end items-center px-6">
-                <button onClick={handleFlip}>
-                  <RotateCcw className="w-6 h-6 text-gray-500 hover:text-gray-700" />
-                </button>
-              </div>
-
-              <div className="flex-1 flex flex-col justify-center gap-4 px-6">
-                <button
-                  className="w-full flex items-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors relative"
-                  onClick={handleLikeBoard}
-                >
-                  <Star
-                    className={`w-5 h-5 ${
-                      isLiked ? 'text-yellow-500 fill-current' : 'text-black'
-                    }`}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
                   />
-                  <span
-                    className={`${isLiked ? 'text-yellow-500' : 'text-black'}`}
-                  >
-                    {isLiked ? '즐겨찾기 제거' : '즐겨찾기 추가'}
-                  </span>
-                </button>
-
-                <button
-                  className="w-full flex items-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors"
-                  onClick={() => setIsEditModalOpen(true)}
-                >
-                  <Edit3 className="w-5 h-5" />
-                  <span>보드 수정</span>
-                </button>
-
-                <button
-                  className="w-full flex items-center gap-2 p-4 rounded-lg hover:bg-gray-100 transition-colors text-red-500"
-                  onClick={() => setIsDeleteModalOpen(true)}
-                >
-                  <Trash2 className="w-5 h-5" />
-                  <span>보드 삭제</span>
-                </button>
+                </div>
+                <p className={`text-sm mt-1 ${cardTextSecondary}`}>
+                  진행률:{' '}
+                  {Math.round((Number(board.currentStep) / TOTAL_STEPS) * 100)}%
+                </p>
               </div>
 
-              <div className="h-[10%]" />
+              <p className={`text-sm ${cardTextSecondary} line-clamp-2`}>
+                {board.description}
+              </p>
             </div>
-          </motion.div>
+          </div>
         </motion.div>
-      </div>
 
-      {/* EditBoardModal 로컬 상태로 관리 */}
-      {isEditModalOpen && (
-        <EditBoardModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          boardId={board._id}
-          currentBoardName={board.boardName}
-          currentDescription={board.description}
-        />
-      )}
+        {/* Back */}
+        <motion.div
+          className={`absolute w-full h-full backface-hidden ${cardBackground} rounded-xl shadow-lg overflow-hidden border ${
+            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+          }`}
+          style={{
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+          }}
+        >
+          <div className="h-full flex flex-col p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className={`font-semibold text-lg truncate ${cardText}`}>
+                {board.boardName}
+              </h3>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsFlipped(false)}
+                className={`p-2 rounded-full ${cardHover}`}
+              >
+                <ChevronLeft className={cardTextSecondary} size={20} />
+              </motion.button>
+            </div>
 
-      {/* DeleteBoardModal 로컬 상태로 관리 */}
-      {isDeleteModalOpen && (
-        <DeleteBoardModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          boardId={board._id}
-          currentBoardName={board.boardName}
-          boardName={board.boardName}
-        />
-      )}
-    </>
+            <div className="flex-1 space-y-4">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`w-full p-4 rounded-lg flex items-center gap-3 ${
+                  isLiked
+                    ? isDarkMode
+                      ? 'bg-yellow-500/20 text-yellow-400'
+                      : 'bg-yellow-50 text-yellow-600'
+                    : cardHover
+                }`}
+                onClick={handleLikeBoard}
+              >
+                <Star className={isLiked ? 'fill-current' : ''} size={20} />
+                <span>{isLiked ? '즐겨찾기 해제' : '즐겨찾기 추가'}</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`w-full p-4 rounded-lg flex items-center gap-3 ${cardHover}`}
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                <Edit3 size={20} />
+                <span>보드 수정</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`w-full p-4 rounded-lg flex items-center gap-3 ${
+                  isDarkMode
+                    ? 'text-red-400 hover:bg-red-500/20'
+                    : 'text-red-600 hover:bg-red-50'
+                }`}
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
+                <Trash2 size={20} />
+                <span>보드 삭제</span>
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Star Animation Overlay */}
+        <AnimatePresence>
+          {isAnimating && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 flex items-center justify-center"
+            >
+              <div className="relative w-1/2 max-w-[200px]">
+                <Lottie animationData={starAnimation} loop={false} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Modals */}
+      <AnimatePresence>
+        {isEditModalOpen && (
+          <EditBoardModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            boardId={board._id}
+            currentBoardName={board.boardName}
+            currentDescription={board.description}
+          />
+        )}
+
+        {isDeleteModalOpen && (
+          <DeleteBoardModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            boardId={board._id}
+            currentBoardName={board.boardName}
+            boardName={board.boardName}
+          />
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
