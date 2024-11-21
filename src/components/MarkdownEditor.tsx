@@ -1,7 +1,6 @@
 import React, { FC, useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { cn } from '@/lib/utils';
-import { ICommand } from '@uiw/react-md-editor';
 
 // Dynamic import for client-side rendering
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
