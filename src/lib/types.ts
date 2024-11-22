@@ -147,6 +147,7 @@ export type VisionLayer = {
   fontStyle: string;
   iconUrl?: string;
   author?: string;
+  lastEditedBy?: string;
   creator?: {
     id: string;
     name: string;
