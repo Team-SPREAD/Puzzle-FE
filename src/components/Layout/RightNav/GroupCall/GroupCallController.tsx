@@ -3,22 +3,22 @@
 import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@liveblocks/react/suspense';
 import { ActiveUserInfo } from '@/liveblocks.config';
-import phoneIcon from '~/images/phone.svg';
-import phoneSlash from '~/images/phone-slash.svg';
-import headPhone from '~/images/headPhone.svg';
-import microPhone from '~/images/microphone.svg';
-import Image from 'next/image';
-import testUserIcon from '~/images/testUserIcon.jpeg';
+import { Phone, PhoneOff, Mic, MicOff } from 'lucide-react';
 import useUserStore from '@/store/useUserStore';
 import SendBirdCall, { Room } from 'sendbird-calls';
 import { useSendBirdInit } from '@/hooks/useSendBirdCalls';
 import { LiveObject, LiveList } from '@liveblocks/client';
 import { addActiveUser, removeActiveUser } from '@/utils/activeUserUtils';
 
-export default function GroupCallController() {
+interface TypeGroupCallId {
+  roomId: string;
+}
+
+export default function GroupCallController(groupCallId: TypeGroupCallId) {
   const userInfo = useUserStore((state) => state.userInfo);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isCalling, setIsCalling] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   const roomParams = {
     roomType: SendBirdCall.RoomType.LARGE_ROOM_FOR_AUDIO_ONLY,
@@ -30,8 +30,7 @@ export default function GroupCallController() {
   };
 
   //sendbird 초기화 및 유저 인증 과정
-  const authToken = localStorage.getItem('authToken');
-  const authOption = { userId: userInfo._id, accessToken: authToken! };
+  const authOption = { userId: userInfo._id, accessToken: userInfo.token };
   useSendBirdInit(authOption);
 
   //필요시 사용
@@ -181,6 +180,33 @@ export default function GroupCallController() {
     [exitFromActiveUsers],
   );
 
+  const toggleMute = () => {
+    const room = SendBirdCall.getCachedRoomById(groupCallId.roomId) as
+      | Room
+      | undefined;
+
+    if (!room) {
+      console.error('방 정보를 찾을 수 없습니다.');
+      return;
+    }
+
+    if (isMuted) {
+      try {
+        room.localParticipant.unmuteMicrophone();
+        setIsMuted(false);
+      } catch (error) {
+        console.error('오디오 활성화 실패: ', error);
+      }
+    } else {
+      try {
+        room.localParticipant.muteMicrophone();
+        setIsMuted(true);
+      } catch (error) {
+        console.error('오디오 비활성화 실패: ', error);
+      }
+    }
+  };
+
   // 브라우저가 닫히거나 페이지가 떠날 때 유저를 ActiveUser에서 제거
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -196,39 +222,38 @@ export default function GroupCallController() {
   }, [exitFromActiveUsers]);
 
   return (
-    <div className="flex w-full h-8 items-center justify-center px-1 rounded-[4px] border border-[#E9E9E9]">
+    <div className="flex items-center justify-center w-full">
       <audio ref={audioRef} autoPlay />
-      <div className="flex w-full justify-between">
-        <div className="flex">
-          <Image
-            src={userInfo.avatar}
-            width={16}
-            height={16}
-            alt="userIcon"
-            className="w-6 h-6 bg-gray-300 rounded-full mr-1"
-          />
-          <div className="">{userInfo.name}</div>
-        </div>
-        {isCalling ? (
-          <div className="flex ">
-            <div className="flex mr-3">
-              <button className="mx-1">
-                <Image src={microPhone} alt="phoneIcon" />
-              </button>
-              <button className="mx-1">
-                <Image src={headPhone} alt="headPhone" />
-              </button>
-            </div>
-            <button onClick={GroupCallOut}>
-              <Image src={phoneSlash} alt="phoneSlash" />
-            </button>
-          </div>
-        ) : (
-          <button onClick={GroupCallIn}>
-            <Image src={phoneIcon} alt="phoneIcon" />
-          </button>
-        )}
-      </div>
+      {isCalling && (
+        <button
+          onClick={toggleMute}
+          className={`
+            w-1/2 h-10 flex items-center justify-center 
+            rounded-lg transition-all duration-300 mr-3
+            ${
+              isMuted
+                ? 'bg-gray-500 hover:bg-gray-600 text-white'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }
+          `}
+        >
+          {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
+        </button>
+      )}
+      <button
+        onClick={isCalling ? GroupCallOut : GroupCallIn}
+        className={`
+          w-full h-10 flex items-center justify-center 
+          rounded-lg transition-all duration-300 
+          ${
+            isCalling
+              ? 'bg-red-500 hover:bg-red-600 text-white'
+              : 'bg-purple-500 hover:bg-purple-600 text-white'
+          }
+        `}
+      >
+        {isCalling ? <PhoneOff size={20} /> : <Phone size={20} />}
+      </button>
     </div>
   );
 }

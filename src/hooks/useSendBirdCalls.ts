@@ -27,6 +27,4 @@ const useSendBirdInit = async ({ userId, accessToken }: AuthOption) => {
   }
 };
 
-//useSendBirdInit({userId:'test1', accessToken : 'mock_token_test1'});
-
 export { useSendBirdInit };
