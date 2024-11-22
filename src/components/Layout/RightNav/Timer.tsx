@@ -1,26 +1,19 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import {
   useBroadcastEvent,
   useEventListener,
   useStorage,
   useMutation,
 } from '@/liveblocks.config';
-import playIcon from '~/images/play.svg';
-import stopIcon from '~/images/stop.svg';
+import { Play, Pause, RotateCcw } from 'lucide-react';
 
 export default function Timer() {
-  const [isRunning, setIsRunning] = useState(false); // 타이머 상태
+  const [isRunning, setIsRunning] = useState(false);
   const broadcast = useBroadcastEvent();
-
-  // 오디오 태그를 참조할 ref 생성
   const audioRef = useRef<HTMLAudioElement>(null);
-
-  // 타이머 시간을 Storage에서 가져옴
   const time = useStorage((root) => root.time ?? { time: 300 }).time;
 
-  // 타이머 시간을 업데이트하는 Mutation
   const setTime = useMutation(({ storage }, newTime) => {
     const timeObject = storage.get('time');
     if (timeObject) {
@@ -28,7 +21,6 @@ export default function Timer() {
     }
   }, []);
 
-  // 타이머 시작 및 중지 핸들러
   const toggleTimer = () => {
     if (isRunning) {
       stopTimer();
@@ -37,26 +29,22 @@ export default function Timer() {
     }
   };
 
-  // 타이머 시작
   const startTimer = () => {
     setIsRunning(true);
     broadcast({ type: 'START_TIMER', time });
   };
 
-  // 타이머 중지
   const stopTimer = () => {
     setIsRunning(false);
     broadcast({ type: 'STOP_TIMER' });
   };
 
-  // 시간 추가
   const addTime = () => {
-    setTime(time + 60); // 1분 추가
+    setTime(time + 60);
   };
 
-  // 시간 감소
   const subtractTime = () => {
-    setTime(Math.max(0, time - 60)); // 1분 감소, 최소 0초
+    setTime(Math.max(0, time - 60));
   };
 
   const resetTime = () => {
@@ -64,7 +52,6 @@ export default function Timer() {
     setTime(300);
   };
 
-  // 다른 클라이언트의 타이머 상태를 수신
   useEventListener(({ event }) => {
     if (event.type === 'START_TIMER') {
       setTime(event.time);
@@ -74,7 +61,6 @@ export default function Timer() {
     }
   });
 
-  // 로컬 타이머 업데이트
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isRunning) {
@@ -82,65 +68,85 @@ export default function Timer() {
         if (time > 0) {
           setTime(time - 1);
         } else if (time === 0) {
-          // 시간이 0이 되면 종료 소리 재생 및 타이머 초기화
           if (audioRef.current) {
             audioRef.current.play();
           }
-          setTime(300); // 5분으로 초기화
-          setIsRunning(false); // 타이머 멈추기
+          setTime(300);
+          setIsRunning(false);
         }
       }, 1000);
     }
     return () => clearInterval(interval);
   }, [isRunning, time, setTime]);
 
-  // 분과 초로 변환
   const minutes = Math.floor(time / 60);
   const seconds = time % 60;
 
+  // Determine background color based on remaining time
+  const getTimerBackgroundColor = () => {
+    const totalTime = 300; // Initial 5 minutes
+    const percentRemaining = (time / totalTime) * 100;
+
+    if (percentRemaining > 50) {
+      return 'bg-white'; // Normal state
+    } else if (percentRemaining > 25) {
+      return 'bg-orange-100'; // Warning state
+    } else {
+      return 'bg-red-100'; // Critical state
+    }
+  };
+
   return (
-    <div className="flex flex-col border-b border-[#E9E9E9]">
-      <h1 className="text-3xl text-[#FF2323] text-center my-1">
-        {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
-      </h1>
-      <div className="w-full flex justify-between items-center my-1 ">
-        <div className="flex">
+    <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100">
+      <div className="flex flex-col items-center">
+        <div
+          className={`${getTimerBackgroundColor()} rounded-full px-6 py-3 mb-4 shadow-inner`}
+        >
+          <h1 className="text-4xl font-bold text-purple-600 tracking-wider">
+            {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+          </h1>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <div className="flex space-x-2">
+            <button
+              onClick={subtractTime}
+              className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full 
+                         flex items-center justify-center hover:bg-purple-200 
+                         transition-colors font-bold"
+            >
+              -
+            </button>
+            <button
+              onClick={addTime}
+              className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full 
+                         flex items-center justify-center hover:bg-purple-200 
+                         transition-colors font-bold"
+            >
+              +
+            </button>
+          </div>
+
           <button
-            onClick={addTime}
-            className="w-[24px] h-[24px] mr-2 bg-white text-[#FF2323] border border-[#FF2323] rounded-full flex justify-center items-center"
+            onClick={resetTime}
+            className="w-8 h-8 text-purple-600 hover:bg-purple-100 
+                       rounded-full flex items-center justify-center 
+                       transition-colors"
           >
-            +
+            <RotateCcw size={16} />
           </button>
+
           <button
-            onClick={subtractTime}
-            className="w-[24px] h-[24px] bg-white text-[#FF2323] border border-[#FF2323] rounded-full flex justify-center items-center"
+            onClick={toggleTimer}
+            className={`w-12 h-8 rounded-full flex items-center justify-center 
+                        ${isRunning ? 'bg-red-500' : 'bg-green-500'} 
+                        text-white transition-colors`}
           >
-            -
+            {isRunning ? <Pause size={16} /> : <Play size={16} />}
           </button>
         </div>
-        {/* 리셋 버튼 */}
-        <button
-          onClick={resetTime}
-          className="w-[50px] h-[24px] text-[8px] text-[#FF2323] border border-[#FF2323] rounded-xl"
-        >
-          Reset
-        </button>
-        {/* 시작/중지 토글 버튼 */}
-        <button
-          onClick={toggleTimer}
-          className={
-            'w-[64px] h-[24px] bg-[#FF2323] rounded-xl flex justify-center items-center'
-          }
-        >
-          {isRunning ? (
-            <Image src={stopIcon} alt="stopIcon" />
-          ) : (
-            <Image src={playIcon} alt="playIcon" />
-          )}
-        </button>
       </div>
 
-      {/* 종료 소리 재생을 위한 audio 태그 */}
       <audio
         ref={audioRef}
         src="https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/alarm.mp3"
