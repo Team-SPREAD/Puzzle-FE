@@ -7,6 +7,7 @@ const useSendBirdInit = async ({ userId, accessToken }: AuthOption) => {
 
   try {
     const authOption = { userId, accessToken };
+    console.log(authOption);
     await SendBirdCall.authenticate(authOption, (result, error) => {
       if (error) {
         console.error('샌드버드 인증 실패', error.message);
