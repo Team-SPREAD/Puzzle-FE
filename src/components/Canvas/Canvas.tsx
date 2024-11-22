@@ -77,12 +77,12 @@ import useModalStore from '@/store/useModalStore';
 import VotingModal from '../Layout/Vote/Modal/VotingModal';
 import GuideModal from '../Layout/Modal/GuildModal';
 
-const MAX_LAYERS = 100;
+const MAX_LAYERS = 500;
 
 const Canvas = () => {
   const userInfoReal = useUserStore((state) => state.userInfo);
   const teams = useTeamsStore((state) => state.teams);
-
+  const groupCall = useStorage((root) => root.groupCall);
   const userInfo = useUserInfoStore(); //이거 목데이터라 수정해야함
   const [showVoteModal, setShowVoteModal] = useState(false); //투표 모달
   const layerIds = useStorage((root) => root.layerIds);
@@ -823,9 +823,7 @@ const Canvas = () => {
             />
           </div>
         )}
-        <div className="absolute bottom-0 right-0 z-30">
-          <RightNav />
-        </div>
+        <RightNav roomId={groupCall.roomId} />
       </div>
       {modalType === 'GUIDE_MODAL' && <GuideModal />} {/* 추가 */}
     </div>
