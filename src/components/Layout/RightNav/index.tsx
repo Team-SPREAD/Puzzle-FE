@@ -1,60 +1,139 @@
-import { SoundData } from '@/lib/sound-data';
-import SoundBox from './SoundBox';
 import AudioPlayer from './AudioPlayer';
 import Timer from './Timer';
 import GroupCall from './GroupCall';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-export default function RightNav() {
-  const [isClosed, setIsClosed] = useState(false);
+import { memo } from 'react';
+import LiveAvatars from './LiveAvatars';
+import { SoundBlocks } from './SoundBlocks';
+
+type GroupCallProps = {
+  roomId: string;
+};
+
+const RightNav = memo(({ roomId }: GroupCallProps) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
-    <div>
+    <>
       <motion.div
-        animate={{
-          x: isClosed ? -50 : -300,
-          y: 0,
-          scale: 1,
-          rotate: 0,
-        }}
-        className="flex items-center top-40 fixed transform -translate-y-1/2"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="absolute right-5 top-40 z-30"
       >
-        <div className="w-4 h-6 border-[1px] border-[#F0F0F0] bg-white flex justify-center items-center">
-          <p onClick={() => setIsClosed(!isClosed)} className="cursor-pointer">
-            {isClosed ? 'o' : 'x'}
-          </p>
-        </div>
-        <div className="  py-2 shadow-xl rounded-[4px] border-[1px] border-[#F0F0F0] bg-white">
-          {/* 타이머 */}
-          <div className="py-4 px-5">
-            <Timer />
-          </div>
-          {/* 오디오 플레이어 */}
-          <div className="py-2 px-5 ">
-            <AudioPlayer />
-          </div>
-          {/* 사운드 블록 */}
-          <div className="py-4 px-5 ">
-            <div className="text-[12px]">
-              <p className="mb-2">사운드 블록</p>
-            </div>
-            <div className="w-[200px] flex flex-wrap gap-1">
-              {SoundData.map((sound) => (
-                <SoundBox
-                  key={sound.id}
-                  id={sound.id}
-                  name={sound.name}
-                  imgUrl={sound.imgUrl}
-                  url={sound.url}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="py-2 px-3">
-            {/* 룸아이디 임시 */}
-            <GroupCall />
-          </div>
-        </div>
+        <motion.div
+          animate={{ width: isCollapsed ? '80px' : '300px' }}
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+          className="relative bg-white/90 backdrop-blur-sm rounded-xl shadow-lg pointer-events-auto overflow-hidden"
+        >
+          <AnimatePresence mode="wait">
+            {!isCollapsed ? (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="p-4 pl-8"
+              >
+                {/* LiveAvatars */}
+                <div className="mb-4">
+                  <LiveAvatars />
+                </div>
+                {/* Timer */}
+                <div className="mb-4">
+                  <Timer />
+                </div>
+
+                {/* Audio Player */}
+                <div className="mb-4">
+                  <AudioPlayer />
+                </div>
+
+                {/* Sound Blocks */}
+                <div className="mb-4">
+                  <SoundBlocks />
+                </div>
+
+                {/* Group Call */}
+                <div className="mb-2">
+                  <GroupCall roomId={roomId} />
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-full flex items-center justify-center py-3"
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-purple-500">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m-8-9h8m8 0-8 8m8-8L4 7" />
+                    </svg>
+                  </span>
+                  <span className="text-xs font-medium text-purple-600">
+                    Collaborate
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Collapse/Expand Button */}
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsCollapsed(true)}
+                className="absolute left-0 top-0 h-full w-8 hover:bg-gray-100/50 transition-colors flex items-center justify-center"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.2 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="text-purple-500"
+                  >
+                    <path
+                      d="M6 4L12 10L6 16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </motion.div>
+              </motion.button>
+            )}
+          </AnimatePresence>
+
+          {isCollapsed && (
+            <motion.button
+              onClick={() => setIsCollapsed(false)}
+              className="absolute inset-0 w-full h-full"
+            />
+          )}
+        </motion.div>
       </motion.div>
-    </div>
+    </>
   );
-}
+});
+
+export default RightNav;
+RightNav.displayName = 'RightNav';
