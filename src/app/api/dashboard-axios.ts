@@ -74,6 +74,15 @@ export const createBoard = async (formData: FormData) => {
   });
 };
 
+//전체 보드를 불러오는 함수
+export const getAllBoard = async (token: string) => {
+  return axiosInstance.get('/api/board', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 //보드를 불러오는 함수
 export const getBoard = async (teamId: string) => {
   return axiosInstance.get(`/api/board/${teamId}`);
