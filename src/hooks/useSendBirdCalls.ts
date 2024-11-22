@@ -7,6 +7,7 @@ const useSendBirdInit = async ({ userId, accessToken }: AuthOption) => {
 
   try {
     const authOption = { userId, accessToken };
+    console.log(authOption);
     await SendBirdCall.authenticate(authOption, (result, error) => {
       if (error) {
         console.error('샌드버드 인증 실패', error.message);
@@ -26,7 +27,5 @@ const useSendBirdInit = async ({ userId, accessToken }: AuthOption) => {
     console.error('샌드버드 인증 실패', error);
   }
 };
-
-//useSendBirdInit({userId:'test1', accessToken : 'mock_token_test1'});
 
 export { useSendBirdInit };

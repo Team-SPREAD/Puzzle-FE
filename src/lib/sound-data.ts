@@ -3,7 +3,7 @@ import { SoundType } from './types';
 export const SoundData: SoundType[] = [
   {
     id: 1,
-    name: 'Duck Sound',
+    name: 'Duck',
     imgUrl: 'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/duck.svg',
     url: 'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/duck.mp3',
   },
