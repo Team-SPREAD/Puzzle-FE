@@ -62,7 +62,7 @@ export default function DashboardPage() {
 
             // 상태 저장
             setUser({
-              _id: userData.userId,
+              _id: userData._id,
               name: `${userData.firstName}${userData.lastName}`,
               email: userData.email,
               avatar: userData.avatar,

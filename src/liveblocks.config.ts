@@ -9,8 +9,9 @@ import { Color, Layer, Point, UserInfo, Process } from '@/lib/types';
 
 const client = createClient({
   authEndpoint: async (room) => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    
+    const token =
+      typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
     if (!token) {
       throw new Error('No token found');
     }
@@ -19,7 +20,7 @@ const client = createClient({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ room }),
     });
