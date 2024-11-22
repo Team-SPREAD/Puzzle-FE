@@ -5,35 +5,50 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Info } from 'lucide-react';
 import { useDarkMode } from '@/store/useDarkModeStore';
 import useModalStore from '@/store/useModalStore';
-import { getAllBoard } from '@/app/api/dashboard-axios'; // API 가져오기
+import { getAllBoard, getBoard, likeAllBoard } from '@/app/api/dashboard-axios';
 import { BoardInfo } from '@/lib/types';
 import BoardCard from './BoardCard';
 import CreateBoardModal from './Modals/CreateBoardModal';
 
 interface BoardGridProps {
-  boards: BoardInfo[]; // boards 속성 추가
   buttonColor: string;
   teamId: string | null;
-  token: string; // 토큰 속성 유지
+  token: string;
+  searchTerm: string;
+  boardView: 'MyBoards' | 'FavoriteBoards';
 }
 
 export default function BoardGrid({
   buttonColor,
   teamId,
   token,
+  searchTerm,
+  boardView,
 }: BoardGridProps) {
   const { isDarkMode } = useDarkMode();
   const { modalType, openModal, closeModal } = useModalStore();
-  const [boards, setBoards] = useState<BoardInfo[]>([]); // 상태 추가
-  const [loading, setLoading] = useState(true); // 로딩 상태
-  const [error, setError] = useState<string | null>(null); // 오류 상태
+  const [boards, setBoards] = useState<BoardInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBoards = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await getAllBoard(token);
+        let response;
+
+        if (boardView === 'FavoriteBoards') {
+          response = await likeAllBoard();
+        } else {
+          // MyBoards view
+          if (!teamId) {
+            response = await getAllBoard(token);
+          } else {
+            response = await getBoard(teamId);
+          }
+        }
+
         if (response.status === 200) {
           setBoards(response.data);
         } else {
@@ -47,11 +62,8 @@ export default function BoardGrid({
       }
     };
 
-    // 팀 ID가 없으면 전체 보드 불러오기
-    if (!teamId) {
-      fetchBoards();
-    }
-  }, [teamId, token]);
+    fetchBoards();
+  }, [teamId, token, boardView]);
 
   const getBoardUrl = (boardId: string) => {
     return `/board/${boardId}`;
@@ -61,6 +73,13 @@ export default function BoardGrid({
     openModal('CREATE_BOARD');
   };
 
+  // 검색어로 보드 필터링
+  const filteredBoards = searchTerm
+    ? boards.filter((board) =>
+        board.boardName.toLowerCase().includes(searchTerm.toLowerCase()),
+      )
+    : boards;
+
   return (
     <div className="h-full overflow-y-auto">
       <div
@@ -69,7 +88,12 @@ export default function BoardGrid({
         }`}
       >
         {teamId && (
-          <div className="relative aspect-[3/4]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="relative aspect-[3/4]"
+          >
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -92,28 +116,57 @@ export default function BoardGrid({
                 New board
               </p>
             </motion.button>
-          </div>
+          </motion.div>
         )}
 
-        {/* 로딩 상태 처리 */}
+        {/* 로딩 상태 */}
         {loading && (
           <div className="col-span-full flex justify-center items-center h-96">
-            <p className="text-lg font-semibold text-gray-700">
-              보드를 불러오는 중입니다...
-            </p>
+            <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent" />
           </div>
         )}
 
-        {/* 오류 처리 */}
+        {/* 에러 상태 */}
         {error && (
           <div className="col-span-full flex justify-center items-center h-96">
             <p className="text-lg font-semibold text-red-500">{error}</p>
           </div>
         )}
 
-        {/* 보드 표시 */}
-        {!loading && !error && boards?.length > 0 ? (
-          boards.map((board) => (
+        {/* 보드가 없는 상태 */}
+        {!loading && !error && filteredBoards.length === 0 && (
+          <div className="col-span-full flex flex-col items-center justify-center h-96">
+            <Info
+              size={48}
+              className={isDarkMode ? 'text-gray-600' : 'text-gray-400'}
+            />
+            <p
+              className={`text-lg font-semibold mt-4 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}
+            >
+              {teamId
+                ? '이 팀에는 아직 보드가 없습니다.'
+                : boardView === 'FavoriteBoards'
+                  ? '즐겨찾기한 보드가 없습니다.'
+                  : '생성된 보드가 없습니다.'}
+            </p>
+            {teamId && (
+              <p
+                className={`text-sm mt-2 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}
+              >
+                새 보드를 만들어 프로젝트를 시작해보세요!
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* 보드 목록 */}
+        {!loading &&
+          !error &&
+          filteredBoards.map((board) => (
             <motion.div
               key={board._id}
               initial={{ opacity: 0, y: 20 }}
@@ -128,33 +181,19 @@ export default function BoardGrid({
                 getBoardUrl={getBoardUrl}
               />
             </motion.div>
-          ))
-        ) : (
-          // 보드가 없을 때
-          !loading &&
-          !error && (
-            <div className="col-span-full flex flex-col items-center justify-center h-96 bg-gray-50 rounded-lg shadow-md">
-              <p className="text-lg font-semibold text-gray-700">
-                팀을 생성해서 보드를 만들어 보아요
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                프로젝트를 시작하려면 새로운 팀을 생성하세요.
-              </p>
-            </div>
-          )
-        )}
-
-        {/* 모달 */}
-        <AnimatePresence>
-          {modalType === 'CREATE_BOARD' && (
-            <CreateBoardModal
-              isOpen={modalType === 'CREATE_BOARD'}
-              onClose={closeModal}
-              teamId={teamId}
-            />
-          )}
-        </AnimatePresence>
+          ))}
       </div>
+
+      {/* 모달 */}
+      <AnimatePresence>
+        {modalType === 'CREATE_BOARD' && (
+          <CreateBoardModal
+            isOpen={true}
+            onClose={closeModal}
+            teamId={teamId}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
