@@ -23,15 +23,9 @@ import useUserStore from '@/store/useUserStore';
 import useTeamsStore from '@/store/useTeamsStore';
 import useModalStore from '@/store/useModalStore';
 import { useDarkMode } from '@/store/useDarkModeStore';
-import { BoardInfo } from '@/lib/types';
 
 // API
-import {
-  getUserInfo,
-  getMyTeams,
-  getBoard,
-  likeAllBoard,
-} from '@/app/api/dashboard-axios';
+import { getUserInfo, getMyTeams } from '@/app/api/dashboard-axios';
 
 const pageVariants = {
   initial: { opacity: 0 },
@@ -58,7 +52,6 @@ export default function DashboardPage() {
   const [boardView, setBoardView] = useState<'MyBoards' | 'FavoriteBoards'>(
     'MyBoards',
   );
-  const [boards, setBoards] = useState<BoardInfo[]>([]);
 
   // 랜덤 색상 설정
   useEffect(() => {
@@ -113,36 +106,6 @@ export default function DashboardPage() {
     loadUserInfo();
   }, [setUser, setTeams, router]);
 
-  // boards 데이터 가져오기
-  useEffect(() => {
-    const fetchBoards = async () => {
-      if (boardView === 'MyBoards') {
-        if (selectedTeamId) {
-          try {
-            const response = await getBoard(selectedTeamId);
-            if (response.status === 200) {
-              setBoards(response.data);
-            }
-          } catch (error) {
-            console.error('Error fetching boards:', error);
-          }
-        } else {
-          setBoards([]);
-        }
-      } else if (boardView === 'FavoriteBoards') {
-        try {
-          const response = await likeAllBoard();
-          if (response.status === 200) {
-            setBoards(response.data);
-          }
-        } catch (error) {
-          console.error('Error fetching favorite boards:', error);
-        }
-      }
-    };
-    fetchBoards();
-  }, [selectedTeamId, boardView]);
-
   // currentTeam 업데이트
   useEffect(() => {
     if (selectedTeamId) {
@@ -154,13 +117,6 @@ export default function DashboardPage() {
     selectedTeamId === null
       ? 'HOME 대시보드'
       : teams.find((t) => t._id === selectedTeamId)?.teamName || '팀 대시보드';
-
-  // 검색어로 보드 필터링
-  const filteredBoards = searchTerm
-    ? boards.filter((board) =>
-        board.boardName.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
-    : boards;
 
   if (isLoading) {
     return <Loading />;
@@ -194,22 +150,20 @@ export default function DashboardPage() {
         />
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          {' '}
-          {/* flex-col과 overflow-hidden 추가 */}
           <DashboardHeader
             title={dashboardTitle}
             teamId={selectedTeamId}
             buttonColor={buttonColor}
             token={userInfo.token}
           />
+
           <div className="flex-1 overflow-auto">
-            {' '}
-            {/* overflow-auto로 스크롤 허용 */}
             <BoardGrid
-              boards={filteredBoards} // 필터링된 보드 데이터를 전달
-              buttonColor={buttonColor} // 버튼 색상
-              teamId={selectedTeamId} // 선택된 팀 ID
-              token={userInfo.token} // 사용자 토큰
+              buttonColor={buttonColor}
+              teamId={selectedTeamId}
+              token={userInfo.token}
+              searchTerm={searchTerm}
+              boardView={boardView}
             />
           </div>
         </div>
