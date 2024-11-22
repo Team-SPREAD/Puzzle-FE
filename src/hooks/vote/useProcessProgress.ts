@@ -1,9 +1,17 @@
 import { useProcessStore } from '@/store/vote/processStore';
 import { BoardProgress } from '@/store/vote/types';
 import axiosInstance from '@/app/api/axiosInstance';
-
 export const useProcessProgress = (boardId: string) => {
   const { boardProgress, setBoardProgress } = useProcessStore();
+
+  const getHeaders = () => {
+    const liveblocksToken = localStorage.getItem('roomToken');
+    return {
+      headers: {
+        'Liveblocks-Token': liveblocksToken,
+      },
+    };
+  };
 
   const initializeBoardProgress = (
     initialStep: number = 1,
@@ -30,10 +38,8 @@ export const useProcessProgress = (boardId: string) => {
 
   const isStepAccessible = (step: number) => {
     const boardState = boardProgress[boardId];
-
     if (!boardState) return step === 1;
     if (boardState.isLocked) return false;
-
     const maxCompletedStep = Math.max(...(boardState.completedSteps || [1]));
     return step <= maxCompletedStep + 1;
   };
@@ -42,9 +48,8 @@ export const useProcessProgress = (boardId: string) => {
     try {
       const response = await axiosInstance.patch(
         `/api/board/currentStep/${boardId}`,
-        {
-          currentStep: step,
-        },
+        { currentStep: step },
+        getHeaders(),
       );
 
       if (response.status === 200) {
@@ -76,9 +81,8 @@ export const useProcessProgress = (boardId: string) => {
     try {
       const response = await axiosInstance.patch(
         `/api/board/currentStep/${boardId}`,
-        {
-          currentStep: step,
-        },
+        { currentStep: step },
+        getHeaders(),
       );
 
       if (response.status === 200) {
@@ -115,7 +119,6 @@ export const useProcessProgress = (boardId: string) => {
   };
 
   const getCompletedSteps = () => boardProgress[boardId]?.completedSteps || [1];
-
   const getCurrentStep = () => boardProgress[boardId]?.currentStep || 1;
 
   const resetBoardProgress = () => {
