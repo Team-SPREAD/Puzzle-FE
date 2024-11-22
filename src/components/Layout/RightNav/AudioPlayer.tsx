@@ -2,33 +2,36 @@
 import { useEffect, useRef, useState } from 'react';
 import { useBroadcastEvent } from '@liveblocks/react/suspense';
 import { useEventListener } from '@/liveblocks.config';
-import Image from 'next/image';
 import WaveSurfer from 'wavesurfer.js';
-import playIcon from '~/images/play_red.svg';
-import stopIcon from '~/images/stop_red.svg';
+import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 
 export default function AudioPlayer() {
   const broadcast = useBroadcastEvent();
   const waveformRef = useRef<HTMLDivElement | null>(null);
   const wavesurferRef = useRef<WaveSurfer | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.5);
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
     if (waveformRef.current && !wavesurferRef.current) {
-      wavesurferRef.current = WaveSurfer.create({
+      const wavesurfer = WaveSurfer.create({
         container: waveformRef.current,
-        waveColor: '#ABABAB',
-        progressColor: '#FF2323',
+        waveColor: '#E0E0E0',
+        progressColor: '#FF4D4D',
         url: 'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/yourname_ost.mp3',
         dragToSeek: true,
-        height: 30,
+        height: 40,
         hideScrollbar: true,
         normalize: true,
-        barGap: 1,
-        barHeight: 20,
-        barRadius: 20,
-        barWidth: 4,
+        barGap: 2,
+        barHeight: 25,
+        barRadius: 10,
+        barWidth: 3,
       });
+
+      wavesurferRef.current = wavesurfer;
+      wavesurfer.setVolume(volume);
     }
 
     return () => {
@@ -39,53 +42,91 @@ export default function AudioPlayer() {
     };
   }, []);
 
-  // Play/Pause 버튼이 눌렸을 때 동작
+  useEffect(() => {
+    if (wavesurferRef.current) {
+      const newVolume = isMuted ? 0 : volume;
+      wavesurferRef.current.setVolume(newVolume);
+    }
+  }, [volume, isMuted]);
+
   const handlePlayPause = () => {
     if (wavesurferRef.current) {
       if (wavesurferRef.current.isPlaying()) {
-        wavesurferRef.current.pause(); // 재생 중이면 일시정지
-        setIsPlaying(false); // 재생 상태 업데이트
-        broadcast({ type: 'AUDIO_PAUSE' }); // 이벤트 브로드캐스트 (정지)
+        wavesurferRef.current.pause();
+        setIsPlaying(false);
+        broadcast({ type: 'AUDIO_PAUSE' });
       } else {
-        wavesurferRef.current.play(); // 일시정지 중이면 재생
-        setIsPlaying(true); // 재생 상태 업데이트
-        broadcast({ type: 'AUDIO_PLAY' }); // 이벤트 브로드캐스트 (재생)
+        wavesurferRef.current.play();
+        setIsPlaying(true);
+        broadcast({ type: 'AUDIO_PLAY' });
       }
     }
   };
 
-  // 다른 사용자가 Play/Pause 이벤트를 발생시켰을 때 동작
+  const handleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
   useEventListener(({ event }) => {
     if (event.type === 'AUDIO_PLAY') {
-      wavesurferRef.current?.play(); // 다른 사용자가 재생하면 재생
+      wavesurferRef.current?.play();
       setIsPlaying(true);
     } else if (event.type === 'AUDIO_PAUSE') {
-      wavesurferRef.current?.pause(); // 다른 사용자가 정지하면 정지
+      wavesurferRef.current?.pause();
       setIsPlaying(false);
     }
   });
 
   return (
-    <div className="border-b border-[#E9E9E9]">
-      <div className="flex mt-6 items-center">
-        <button
-          onClick={handlePlayPause}
-          className="w-[24px] h-[24px] bg-white text-[#FF2323] border border-[#FF2323] rounded-full flex justify-center items-center mr-3 "
-        >
-          {isPlaying ? (
-            <Image src={stopIcon} alt="stopIcon" />
-          ) : (
-            <Image src={playIcon} alt="playIcon" />
-          )}
-        </button>
-        <div>
-          <h2 className="text-xs">{'너의 이름은 (君の名は) OST'}</h2>
-          <p className="text-[8px]">
-            {'이토모리 고등학교 | 피아노 커버 Piano cover'}
+    <div className="bg-white rounded-xl shadow-md p-4 max-w-md mx-auto">
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="flex-grow">
+          <h2 className="text-sm font-semibold text-gray-800">
+            너의 이름은 (君の名は) OST
+          </h2>
+          <p className="text-xs text-gray-500 mt-1">
+            이토모리 고등학교 | Piano cover
           </p>
         </div>
       </div>
-      <div ref={waveformRef} className="my-4 " />
+
+      <div className="flex items-center space-x-3">
+        <button
+          onClick={handlePlayPause}
+          className="bg-red-50 text-red-500 p-2.5 rounded-full hover:bg-red-100 transition-colors"
+        >
+          {isPlaying ? <Pause size={18} /> : <Play size={18} />}
+        </button>
+
+        <div className="flex items-center space-x-2 flex-grow">
+          <button
+            onClick={handleMute}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={isMuted ? 0 : volume}
+            onChange={(e) => setVolume(parseFloat(e.target.value))}
+            className="flex-grow h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer 
+              [&::-webkit-slider-thumb]:appearance-none 
+              [&::-webkit-slider-thumb]:w-4 
+              [&::-webkit-slider-thumb]:h-4 
+              [&::-webkit-slider-thumb]:bg-red-500 
+              [&::-webkit-slider-thumb]:rounded-full 
+              [&::-webkit-slider-thumb]:shadow-md"
+          />
+        </div>
+      </div>
+
+      <div
+        ref={waveformRef}
+        className="w-full h-10 rounded-lg overflow-hidden mt-4"
+      />
     </div>
   );
 }
