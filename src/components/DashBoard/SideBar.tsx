@@ -165,6 +165,7 @@ export default function Sidebar({
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('roomToken');
     window.location.href = '/';
   };
 
@@ -202,11 +203,13 @@ export default function Sidebar({
         >
           {isExpanded ? '←' : '→'}
         </motion.button>
-  
+
         <div className="h-full pt-16 flex flex-col">
-          <nav className={`px-4 flex-1 flex flex-col ${
-            isExpanded ? 'overflow-y-auto' : 'overflow-visible'
-          }`}>
+          <nav
+            className={`px-4 flex-1 flex flex-col ${
+              isExpanded ? 'overflow-y-auto' : 'overflow-visible'
+            }`}
+          >
             {/* Main Navigation */}
             <div className="flex-1 space-y-2">
               <NavItem
@@ -222,7 +225,7 @@ export default function Sidebar({
                 closeOnClick={true}
                 setIsExpanded={setIsExpanded}
               />
-  
+
               <NavItem
                 isExpanded={isExpanded}
                 icon={star}
@@ -236,7 +239,7 @@ export default function Sidebar({
                 closeOnClick={true}
                 setIsExpanded={setIsExpanded}
               />
-  
+
               <div>
                 <NavItem
                   isExpanded={isExpanded}
@@ -281,7 +284,9 @@ export default function Sidebar({
                         >
                           <div
                             className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
-                            style={{ backgroundColor: teamInitialColors[team._id] }}
+                            style={{
+                              backgroundColor: teamInitialColors[team._id],
+                            }}
                           >
                             {team.teamName[0].toUpperCase()}
                           </div>
@@ -301,7 +306,7 @@ export default function Sidebar({
                   </AnimatePresence>
                 )}
               </div>
-  
+
               <div>
                 <NavItem
                   isExpanded={isExpanded}
@@ -312,7 +317,9 @@ export default function Sidebar({
                     if (!isExpanded) {
                       setIsExpanded(true);
                     }
-                    modalType === 'SETTINGS' ? closeModal() : openModal('SETTINGS');
+                    modalType === 'SETTINGS'
+                      ? closeModal()
+                      : openModal('SETTINGS');
                   }}
                   isDarkMode={isDarkMode}
                   showChildren={modalType === 'SETTINGS'}
@@ -350,7 +357,7 @@ export default function Sidebar({
                 )}
               </div>
             </div>
-  
+
             {/* Bottom Navigation */}
             <div className="pt-2 pb-4 space-y-2 border-t mt-auto">
               <NavItem
@@ -362,7 +369,7 @@ export default function Sidebar({
                 isDarkMode={isDarkMode}
                 href="https://www.notion.so"
               />
-  
+
               <NavItem
                 isExpanded={isExpanded}
                 icon={HardDrive}
@@ -372,7 +379,7 @@ export default function Sidebar({
                 isDarkMode={isDarkMode}
                 href="https://drive.google.com"
               />
-  
+
               <NavItem
                 isExpanded={isExpanded}
                 icon={LogOut}
@@ -384,8 +391,10 @@ export default function Sidebar({
             </div>
           </nav>
         </div>
-  
-        {modalType === 'USER_SELECT' && <UserSelectModal email={userInfo.email} />}
+
+        {modalType === 'USER_SELECT' && (
+          <UserSelectModal email={userInfo.email} />
+        )}
       </motion.div>
     </div>
   );
