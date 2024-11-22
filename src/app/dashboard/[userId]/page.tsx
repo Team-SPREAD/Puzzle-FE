@@ -77,7 +77,7 @@ export default function DashboardPage() {
         if (userResponse.status === 200) {
           const userData = userResponse.data;
           setUser({
-            _id: userData.userId,
+            _id: userData._id,
             name: `${userData.firstName}${userData.lastName}`,
             email: userData.email,
             avatar: userData.avatar,
