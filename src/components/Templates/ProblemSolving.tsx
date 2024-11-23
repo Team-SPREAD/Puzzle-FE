@@ -8,7 +8,6 @@ interface ProblemSolvingProps {
 
 export default function ProblemSolving({ camera }: ProblemSolvingProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
   return (
     <>
       <motion.div
@@ -32,7 +31,7 @@ export default function ProblemSolving({ camera }: ProblemSolvingProps) {
                 {/* 단계 설명 */}
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-amber-100 text-amber-600 text-xs px-2 py-0.5 rounded-full font-medium">
+                    <span className="bg-emerald-100 text-emerald-600 text-xs px-2 py-0.5 rounded-full font-medium">
                       Step 7
                     </span>
                     <h2 className="font-semibold text-gray-800">문제 해결</h2>
@@ -44,23 +43,23 @@ export default function ProblemSolving({ camera }: ProblemSolvingProps) {
 
                 {/* 카드 그리드 */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
+                  <div className="bg-emerald-50 rounded-lg p-3 hover:bg-emerald-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-emerald-800 mb-1 text-sm flex items-center gap-1">
                       <span>⚡</span> 핵심 문제
                     </h3>
-                    <p className="text-xs text-amber-600">문제 정의</p>
+                    <p className="text-xs text-emerald-600">문제 정의</p>
                   </div>
-                  <div className="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
+                  <div className="bg-emerald-50 rounded-lg p-3 hover:bg-emerald-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-emerald-800 mb-1 text-sm flex items-center gap-1">
                       <span>🔍</span> 해결책
                     </h3>
-                    <p className="text-xs text-amber-600">방안 도출</p>
+                    <p className="text-xs text-emerald-600">방안 도출</p>
                   </div>
-                  <div className="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
+                  <div className="bg-emerald-50 rounded-lg p-3 hover:bg-emerald-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-emerald-800 mb-1 text-sm flex items-center gap-1">
                       <span>📊</span> 검증
                     </h3>
-                    <p className="text-xs text-amber-600">효과 분석</p>
+                    <p className="text-xs text-emerald-600">효과 분석</p>
                   </div>
                 </div>
               </motion.div>
@@ -76,7 +75,7 @@ export default function ProblemSolving({ camera }: ProblemSolvingProps) {
                   whileHover={{ scale: 1.2 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                 >
-                  <span className="text-amber-500">
+                  <span className="text-emerald-500">
                     <svg
                       width="24"
                       height="24"
@@ -92,7 +91,7 @@ export default function ProblemSolving({ camera }: ProblemSolvingProps) {
                       <path d="M12 8h.01" />
                     </svg>
                   </span>
-                  <span className="text-xs font-medium text-amber-600">
+                  <span className="text-xs font-medium text-emerald-600">
                     Step 7
                   </span>
                 </motion.div>
@@ -100,7 +99,7 @@ export default function ProblemSolving({ camera }: ProblemSolvingProps) {
             )}
           </AnimatePresence>
 
-          {/* 접기/펼치기 버튼 - 펼쳐진 상태에서만 보임 */}
+          {/* 접기/펼치기 버튼 */}
           <AnimatePresence>
             {!isCollapsed && (
               <motion.button
@@ -108,7 +107,7 @@ export default function ProblemSolving({ camera }: ProblemSolvingProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsCollapsed(true)}
-                className="absolute right-0 top-0 h-full w-12 hover:bg-gray-100/50 transition-colors flex items-center justify-center"
+                className="absolute right-0 top-0 h-full w-12 hover:bg-emerald-50/50 transition-colors flex items-center justify-center"
               >
                 <svg
                   width="20"
@@ -116,7 +115,7 @@ export default function ProblemSolving({ camera }: ProblemSolvingProps) {
                   viewBox="0 0 20 20"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="text-gray-400"
+                  className="text-emerald-400"
                 >
                   <path
                     d="M14 4L8 10L14 16"

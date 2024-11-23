@@ -241,7 +241,7 @@ export default function SolvingProblemBoxTemplate({
             <div className="p-4 bg-violet-50/30 rounded-lg border border-violet-100">
               <h4 className="font-medium mb-2 text-violet-800">사용 방법</h4>
               <ol className="text-sm text-violet-600 space-y-1 list-decimal list-inside">
-                <li>How Bad? 박스를 5개 생성하고 모두 작성해주세요.</li>
+                <li>How Bad? 박스를 3개 생성하고 모두 작성해주세요.</li>
                 <li>모든 How Bad가 완료되면 How Come이 해금됩니다.</li>
                 <li>How Come 3개를 모두 작성하면 How To가 해금됩니다.</li>
                 <li>마지막으로, How To를 작성하여 해결방안을 제시해주세요.</li>
