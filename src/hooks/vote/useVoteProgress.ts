@@ -32,7 +32,6 @@ export const useVoteProgress = (
     useVoteStore.setState({ totalUsers });
   }, [totalUsers]); //방 인원수에 맞게 투표 수 변경
 
-
   const isHost = host?.userId === self.id;
   const votes = voting?.votes || {};
   const voteCount = Object.keys(votes).length;
@@ -69,51 +68,49 @@ export const useVoteProgress = (
 
       try {
         const nextStep = currentStep + 1;
-        const success = await useProcessStore
-          .getState()
-          .addCompletedStep(boardId, nextStep);
+        // 현재 단계를 완료 처리
+        await useProcessStore.getState().addCompletedStep(boardId, currentStep);
+        // 다음 단계로 이동
+        await useProcessStore.getState().setCurrentStep(boardId, nextStep);
 
-        if (success) {
-          useProcessStore.getState().setCurrentStep(boardId, nextStep);
-
-          const voting = storage.get('voting');
-          if (voting) {
-            voting.set('votes', {});
-            voting.set('isCompleted', false);
-            voting.set('currentStep', nextStep);
-          }
-          // 캡처 로직 추가
-          const liveblocksToken = localStorage.getItem('roomToken');
-          if (!canvasRef.current) {
-            console.error('Canvas element is not available.');
-            return;
-          }
-          if (!liveblocksToken) {
-            console.error('Liveblocks token is missing.');
-            return;
-          }
-
-          try {
-            await captureAndUpload(
-              canvasRef.current,
-              boardId,
-              currentStep,
-              liveblocksToken,
-            );
-          } catch (captureError) {
-            console.error(
-              'Failed to capture and upload the canvas:',
-              captureError,
-            );
-            return;
-          }
-
-          openModal('VOTE_COMPLETE');
-          broadcastEvent({
-            type: 'NEXT_STEP',
-            nextStep,
-          });
+        const voting = storage.get('voting');
+        if (voting) {
+          voting.set('votes', {});
+          voting.set('isCompleted', false);
+          voting.set('currentStep', nextStep);
         }
+
+        if (!canvasRef.current) {
+          console.error('Canvas element is not available.');
+          return;
+        }
+
+        const liveblocksToken = localStorage.getItem('roomToken');
+        if (!liveblocksToken) {
+          console.error('Liveblocks token is missing.');
+          return;
+        }
+
+        try {
+          await captureAndUpload(
+            canvasRef.current,
+            boardId,
+            currentStep,
+            liveblocksToken,
+          );
+        } catch (captureError) {
+          console.error(
+            'Failed to capture and upload the canvas:',
+            captureError,
+          );
+          return;
+        }
+
+        openModal('VOTE_COMPLETE');
+        broadcastEvent({
+          type: 'NEXT_STEP',
+          nextStep,
+        });
       } catch (error) {
         console.error('Failed to save progress:', error);
       }
