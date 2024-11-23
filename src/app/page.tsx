@@ -186,7 +186,7 @@ export default function LandingPage() {
               transition={{ delay: 1, duration: 0.8 }}
             >
               <h2 className="text-2xl md:text-3xl text-gray-800 mb-6">
-                프로젝트 개발을 위한 가이드라인 단계 플랫폼
+                실시간으로 폭발적인 기획을 돕는 가이드라인 제공 플랫폼
               </h2>
               <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
                 애자일 방법론으로 체계적인 프로젝트 관리와 팀원들의 창의적인
