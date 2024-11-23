@@ -222,13 +222,13 @@ export default function GroupCallController(groupCallId: TypeGroupCallId) {
   }, [exitFromActiveUsers]);
 
   return (
-    <div className="flex items-center justify-center w-full">
+    <div className="flex gap2">
       <audio ref={audioRef} autoPlay />
       {isCalling && (
         <button
           onClick={toggleMute}
           className={`
-            w-1/2 h-10 flex items-center justify-center 
+            w-1/2 h-8 flex items-center justify-center 
             rounded-lg transition-all duration-300 mr-3
             ${
               isMuted
@@ -237,13 +237,13 @@ export default function GroupCallController(groupCallId: TypeGroupCallId) {
             }
           `}
         >
-          {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
+          {isMuted ? <MicOff size={16} /> : <Mic size={16} />}
         </button>
       )}
       <button
         onClick={isCalling ? GroupCallOut : GroupCallIn}
         className={`
-          w-full h-10 flex items-center justify-center 
+          w-full h-8 flex items-center justify-center 
           rounded-lg transition-all duration-300 
           ${
             isCalling
@@ -252,7 +252,7 @@ export default function GroupCallController(groupCallId: TypeGroupCallId) {
           }
         `}
       >
-        {isCalling ? <PhoneOff size={20} /> : <Phone size={20} />}
+        {isCalling ? <PhoneOff size={16} /> : <Phone size={16} />}
       </button>
     </div>
   );
