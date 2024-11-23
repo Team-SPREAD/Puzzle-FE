@@ -1,5 +1,12 @@
 import React from 'react';
-import { X, Music, MessageCircle, Vote, Palette ,Footprints} from 'lucide-react';
+import {
+  X,
+  Music,
+  MessageCircle,
+  Vote,
+  Palette,
+  Footprints,
+} from 'lucide-react';
 import useModalStore from '@/store/useModalStore';
 
 interface GuideModalProps {
@@ -8,10 +15,8 @@ interface GuideModalProps {
 
 const GuideModal: React.FC<GuideModalProps> = () => {
   const { modalType, closeModal } = useModalStore();
-  console.log('GuideModal rendered, modalType:', modalType);
 
   if (modalType !== 'GUIDE_MODAL') {
-    console.log('Modal not showing - wrong type');
     return null;
   }
   return (
