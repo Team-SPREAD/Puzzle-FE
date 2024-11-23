@@ -19,12 +19,12 @@ const RightNav = memo(({ roomId }: GroupCallProps) => {
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="absolute right-5 top-40 z-30"
+        className="absolute right-3 top-40 z-30" // 위치 조정
       >
         <motion.div
-          animate={{ width: isCollapsed ? '80px' : '300px' }}
+          animate={{ width: isCollapsed ? '80px' : '250px' }} // 너비 감소
           transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-          className="relative bg-white/90 backdrop-blur-sm rounded-xl shadow-lg pointer-events-auto overflow-hidden"
+          className="relative bg-white/90 backdrop-blur-sm rounded-lg shadow-lg pointer-events-auto overflow-hidden" // rounded-xl -> rounded-lg
         >
           <AnimatePresence mode="wait">
             {!isCollapsed ? (
@@ -32,24 +32,32 @@ const RightNav = memo(({ roomId }: GroupCallProps) => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
-                className="p-4 pl-8"
+                className="p-3 pl-6" // 패딩 감소
               >
                 {/* LiveAvatars */}
-                <div className="mb-4">
+                <div className="mb-3">
+                  {' '}
+                  {/* 마진 감소 */}
                   <LiveAvatars />
                 </div>
                 {/* Timer */}
-                <div className="mb-4">
+                <div className="mb-3">
+                  {' '}
+                  {/* 마진 감소 */}
                   <Timer />
                 </div>
 
                 {/* Audio Player */}
-                <div className="mb-4">
+                <div className="mb-3">
+                  {' '}
+                  {/* 마진 감소 */}
                   <AudioPlayer />
                 </div>
 
                 {/* Sound Blocks */}
-                <div className="mb-4">
+                <div className="mb-3">
+                  {' '}
+                  {/* 마진 감소 */}
                   <SoundBlocks />
                 </div>
 
@@ -63,13 +71,13 @@ const RightNav = memo(({ roomId }: GroupCallProps) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="h-full flex items-center justify-center py-3"
+                className="h-full flex items-center justify-center py-2" // 패딩 감소
               >
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-purple-500">
                     <svg
-                      width="24"
-                      height="24"
+                      width="20" // 크기 감소
+                      height="20" // 크기 감소
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -96,15 +104,15 @@ const RightNav = memo(({ roomId }: GroupCallProps) => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsCollapsed(true)}
-                className="absolute left-0 top-0 h-full w-8 hover:bg-gray-100/50 transition-colors flex items-center justify-center"
+                className="absolute left-0 top-0 h-full w-6 hover:bg-gray-100/50 transition-colors flex items-center justify-center" // 너비 감소
               >
                 <motion.div
                   whileHover={{ scale: 1.2 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                 >
                   <svg
-                    width="20"
-                    height="20"
+                    width="16" // 크기 감소
+                    height="16" // 크기 감소
                     viewBox="0 0 20 20"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"

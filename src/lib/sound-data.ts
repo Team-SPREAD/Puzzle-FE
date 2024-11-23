@@ -35,7 +35,7 @@ export const SoundData: SoundType[] = [
   },
   {
     id: 6,
-    name: 'ba dum tss',
+    name: 'ba drum',
     imgUrl:
       'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/bassDrum.svg',
     url: 'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/bassDrum.mp3',
