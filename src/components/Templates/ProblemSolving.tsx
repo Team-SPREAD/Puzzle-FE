@@ -14,7 +14,7 @@ export default function ProblemSolving({ camera }: ProblemSolvingProps) {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="absolute left-5 top-20 z-30"
+        className="absolute left-5 top-[90px] z-30"
       >
         <motion.div
           animate={{ width: isCollapsed ? '48px' : '500px' }}
