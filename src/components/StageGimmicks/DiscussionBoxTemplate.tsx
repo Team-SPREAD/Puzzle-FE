@@ -92,7 +92,7 @@ export default function DiscussionBoxTemplate({
       setDescription('');
       setIsCollapsed(true);
     },
-    [topic, description, category, color, me?.id, userName, avatar]
+    [topic, description, category, color, me?.id, userName, avatar],
   );
 
   return (
@@ -116,12 +116,26 @@ export default function DiscussionBoxTemplate({
       <div className={`p-4 ${isCollapsed ? 'px-4 py-4' : ''}`}>
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-violet-50 flex items-center justify-center">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-violet-500">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <div className="w-7 h-7 rounded-full bg-amber-50 flex items-center justify-center">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                className="text-amber-500"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
               </svg>
             </div>
-            <span className="text-base font-medium text-gray-700">새로운 토론</span>
+            <span className="text-base font-medium text-gray-700">
+              새로운 토론
+            </span>
           </div>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -164,9 +178,9 @@ export default function DiscussionBoxTemplate({
               onChange={(e) => setTopic(e.target.value)}
               placeholder="토론 주제를 입력하세요"
               className="w-full p-3 text-sm border rounded-lg focus:outline-none focus:ring-2 
-                bg-violet-50/30 border-violet-100 focus:border-violet-300 focus:ring-violet-200"
+                bg-amber-50/30 border-amber-100 focus:border-amber-300 focus:ring-amber-200"
             />
-            
+
             {/* 설명 입력 */}
             <textarea
               value={description}
@@ -174,19 +188,30 @@ export default function DiscussionBoxTemplate({
               placeholder="자세한 설명을 입력하세요"
               rows={3}
               className="w-full p-3 text-sm border rounded-lg focus:outline-none focus:ring-2 
-                bg-violet-50/30 border-violet-100 focus:border-violet-300 focus:ring-violet-200
+                bg-amber-50/30 border-amber-100 focus:border-amber-300 focus:ring-amber-200
                 resize-none"
             />
 
             {/* 생성 버튼 */}
             <button
               onClick={() => createDiscussion()}
-              className="w-full p-2.5 bg-violet-50 text-violet-800 rounded-lg
-                hover:bg-violet-100 transition-colors cursor-pointer
+              className="w-full p-2.5 bg-amber-50 text-amber-800 rounded-lg
+                hover:bg-amber-100 transition-colors cursor-pointer
                 flex items-center justify-center gap-2"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               토론 시작하기
             </button>
