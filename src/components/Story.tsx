@@ -1,9 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
-import { UserStoryLayer, Color } from '@/lib/types';
+import { UserStoryLayer } from '@/lib/types';
 import { useMutation, useSelf } from '@/liveblocks.config';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface UserStoryProps {
   id: string;
@@ -20,24 +21,10 @@ export default function UserStory({
   selectionColor,
   isSelected,
 }: UserStoryProps) {
-  const {
-    x,
-    y,
-    width,
-    height,
-    who,
-    goal,
-    action,
-    task,
-    borderColor,
-    fontStyle,
-    iconUrl,
-  } = layer;
+  const { x, y, width, height, who, goal, action, task, iconUrl } = layer;
   const contentRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const me = useSelf();
 
-  // 텍스트 업데이트를 위한 mutation
   const updateContent = useMutation(
     ({ storage }, field: keyof UserStoryLayer, newValue: string) => {
       const liveLayers = storage.get('layers');
@@ -51,7 +38,7 @@ export default function UserStory({
     },
     [],
   );
-  // 표시할 필드 결정 (who, goal, action, task 중 하나만 표시)
+
   const fieldToDisplay = who
     ? 'who'
     : goal
@@ -88,20 +75,41 @@ export default function UserStory({
     [isEditing],
   );
 
-  const getBackgroundColor = (field: string) => {
-    switch (field) {
-      case 'who':
-        return 'bg-blue-100';
-      case 'goal':
-        return 'bg-green-100';
-      case 'action':
-        return 'bg-purple-100';
-      case 'task':
-        return 'bg-[#FF99CB]';
-      default:
-        return 'bg-gray-100';
-    }
+  const getStylesByType = (field: string) => {
+    const styles = {
+      who: {
+        bg: 'bg-gradient-to-br from-blue-50 to-blue-100',
+        border: 'border-blue-200',
+        text: 'text-blue-800',
+        badge: 'bg-blue-500',
+        shadow: 'shadow-blue-100',
+      },
+      goal: {
+        bg: 'bg-gradient-to-br from-green-50 to-green-100',
+        border: 'border-green-200',
+        text: 'text-green-800',
+        badge: 'bg-green-500',
+        shadow: 'shadow-green-100',
+      },
+      action: {
+        bg: 'bg-gradient-to-br from-purple-50 to-purple-100',
+        border: 'border-purple-200',
+        text: 'text-purple-800',
+        badge: 'bg-purple-500',
+        shadow: 'shadow-purple-100',
+      },
+      task: {
+        bg: 'bg-gradient-to-br from-pink-50 to-pink-100',
+        border: 'border-pink-200',
+        text: 'text-pink-800',
+        badge: 'bg-pink-500',
+        shadow: 'shadow-pink-100',
+      },
+    };
+    return styles[field as keyof typeof styles] || styles.who;
   };
+
+  const currentStyles = getStylesByType(fieldToDisplay);
 
   return (
     <motion.g
@@ -114,37 +122,61 @@ export default function UserStory({
         y={y}
         width={width}
         height={height}
-        onPointerDown={(e) => !isEditing && onPointerDown(e, id)} // isEditing이 true일 때 포인터 이벤트 차단
+        onPointerDown={(e) => !isEditing && onPointerDown(e, id)}
       >
         <div
-          className={`h-full ${getBackgroundColor(
-            fieldToDisplay,
-          )} backdrop-blur-md rounded-2xl shadow-xl p-4 border border-indigo-100`}
+          className={cn(
+            'h-full w-full rounded-xl shadow-lg backdrop-blur-md border-2',
+            'transition-all duration-200',
+            currentStyles.bg,
+            currentStyles.border,
+            currentStyles.shadow,
+            isSelected ? 'ring-2 ring-offset-2 ring-violet-400' : '',
+          )}
         >
-          {/* 표시할 필드에 대한 메모지 */}
-          <div className="flex flex-col items-center gap-2 mb-2">
-            <span className="bg-gray-500 text-white px-2 py-1 rounded capitalize">
-              {fieldToDisplay}
-            </span>
+          <div className="flex flex-col h-full p-3 gap-2">
+            <div className="flex justify-between items-center">
+              <span
+                className={cn(
+                  'px-2.5 py-1 rounded-full text-xs font-medium text-white capitalize',
+                  currentStyles.badge,
+                )}
+              >
+                {fieldToDisplay}
+              </span>
+
+              {iconUrl && (
+                <div className="relative w-6 h-6">
+                  <Image
+                    src={iconUrl}
+                    alt="User"
+                    fill
+                    sizes="24px"
+                    className="rounded-full border-2 border-white shadow-sm object-cover"
+                    priority
+                  />
+                </div>
+              )}
+            </div>
+
             <ContentEditable
               innerRef={contentRef}
               html={fieldValue || ''}
-              disabled={!isEditing} // 수정 가능 상태를 isEditing에 의해 제어
+              disabled={!isEditing}
               onChange={handleContentChange}
               onDoubleClick={handleDoubleClick}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
               className={cn(
-                'flex-1 p-2 rounded-lg transition-all',
-                isEditing ? 'bg-white/20' : 'bg-transparent',
+                'flex-1 p-2 rounded-lg transition-all text-sm',
+                currentStyles.text,
+                isEditing ? 'bg-white/50 backdrop-blur-sm' : 'bg-transparent',
+                'focus:outline-none',
               )}
               style={{
-                color: '#1A202C',
+                minHeight: '2.5rem',
                 cursor: isEditing ? 'text' : 'pointer',
-                // fontFamily: fontStyle || "'Poppins', 'Cute Font', sans-serif",
-                fontSize: '1rem',
-                textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-                boxShadow: isSelected ? `0 0 0 2px ${selectionColor}` : 'none',
+                wordBreak: 'break-word',
               }}
             />
           </div>
