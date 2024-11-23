@@ -71,8 +71,7 @@ export default function IceBreakingArea({ camera }: IceBreakingAreaProps) {
                    </h2>
                  </div>
                  <p className="text-xs text-gray-500">
-                   팀원들과 함께 자유롭게 자신을 표현하며 서로를 알아가는
-                   시간을 가져보세요
+                   팀 리더를 결정하고, 툴을 이용하여 자유롭게 자신을 표현해주세요
                  </p>
                </div>
 
