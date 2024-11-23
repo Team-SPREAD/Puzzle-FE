@@ -38,7 +38,7 @@ export default function Persona({ camera }: PersonaProps) {
                     <h2 className="font-semibold text-gray-800">페르소나</h2>
                   </div>
                   <p className="text-xs text-gray-500">
-                    서비스의 주 사용자층을 구체화해보세요
+                    서비스의 주 사용자층을 구체화해보고 몰입해보세요
                   </p>
                 </div>
 
