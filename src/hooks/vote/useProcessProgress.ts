@@ -5,6 +5,13 @@ import axiosInstance from '@/app/api/axiosInstance';
 export const useProcessProgress = (boardId: string) => {
   const { boardProgress, setBoardProgress } = useProcessStore();
 
+  const getHeaders = () => ({
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      'Liveblocks-Token': localStorage.getItem('roomToken')
+    },
+  });
+
   const initializeBoardProgress = (
     initialStep: number = 1,
     hostId?: string,
@@ -30,7 +37,6 @@ export const useProcessProgress = (boardId: string) => {
 
   const isStepAccessible = (step: number) => {
     const boardState = boardProgress[boardId];
-
     if (!boardState) return step === 1;
     if (boardState.isLocked) return false;
 
@@ -42,9 +48,8 @@ export const useProcessProgress = (boardId: string) => {
     try {
       const response = await axiosInstance.patch(
         `/api/board/currentStep/${boardId}`,
-        {
-          currentStep: step,
-        },
+        { currentStep: step },
+        getHeaders(),
       );
 
       if (response.status === 200) {
@@ -76,9 +81,8 @@ export const useProcessProgress = (boardId: string) => {
     try {
       const response = await axiosInstance.patch(
         `/api/board/currentStep/${boardId}`,
-        {
-          currentStep: step,
-        },
+        { currentStep: step },
+        getHeaders(),
       );
 
       if (response.status === 200) {

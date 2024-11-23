@@ -27,31 +27,38 @@ export default function Persona({
   const contentRef = useRef<HTMLDivElement>(null);
 
   const personaEmoji = getPersonaEmoji(layer.age, layer.gender);
+
   const addTrait = useMutation(
     ({ storage }) => {
-      if (!newTrait.trim()) return;
+      const trimmedTrait = newTrait.trim();
+      if (!trimmedTrait) return;
 
       const layers = storage.get('layers');
       const currentLayer = layers.get(id);
 
       if (!currentLayer) return;
 
-      // LiveObject를 PersonaLayer로 타입 캐스팅
       const personaLayer = currentLayer as unknown as LiveObject<PersonaLayer>;
-
-      // 현재 traits 가져오기
       const currentTraits = personaLayer.get('traits') || [];
+      
+      // 중복 체크
+      const isDuplicate = currentTraits.some(
+        trait => trait.category === currentTab && trait.value === trimmedTrait
+      );
 
-      // 새로운 trait 추가
+      if (isDuplicate) {
+        setNewTrait('');
+        return;
+      }
+
       const updatedTraits = [
         ...currentTraits,
         {
           category: currentTab,
-          value: newTrait,
+          value: trimmedTrait,
         },
       ];
 
-      // traits 업데이트
       personaLayer.update({
         traits: updatedTraits,
       });
@@ -60,6 +67,14 @@ export default function Persona({
     },
     [newTrait, currentTab],
   );
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      addTrait();
+    }
+  };
 
   const handleContentScroll = (e: React.WheelEvent) => {
     if (contentRef.current) {
@@ -199,13 +214,7 @@ export default function Persona({
                     }
                     className="flex-1 px-3 py-2 text-sm bg-white/50 border rounded-lg 
                       focus:outline-none focus:ring-1 focus:ring-indigo-300"
-                    onKeyDown={(e) => {
-                      e.stopPropagation();
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        addTrait();
-                      }
-                    }}
+                    onKeyDown={handleKeyDown}
                   />
                   <button
                     onClick={(e) => {

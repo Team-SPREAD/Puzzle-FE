@@ -11,10 +11,8 @@ export const useProcessStore = create<ProcessState>()(
       isModalOpen: false,
 
       setModalOpen: (status: boolean) => set({ isModalOpen: status }),
-
       setVotingCompleted: (status: boolean) =>
         set({ isVotingCompleted: status }),
-
       setBoardProgress: (boardProgress: BoardProgress) =>
         set({ boardProgress }),
 
@@ -37,9 +35,7 @@ export const useProcessStore = create<ProcessState>()(
           const liveblocksToken = localStorage.getItem('roomToken');
           const response = await axiosInstance.patch(
             `/api/board/currentStep/${boardId}`,
-            {
-              currentStep: step,
-            },
+            { currentStep: step },
             {
               headers: {
                 'Liveblocks-Token': liveblocksToken,
@@ -100,9 +96,7 @@ export const useProcessStore = create<ProcessState>()(
           const liveblocksToken = localStorage.getItem('roomToken');
           const response = await axiosInstance.patch(
             `/api/board/currentStep/${boardId}`,
-            {
-              currentStep: step,
-            },
+            { currentStep: step },
             {
               headers: {
                 'Liveblocks-Token': liveblocksToken,

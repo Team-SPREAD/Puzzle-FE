@@ -48,12 +48,12 @@ const ProcessNav: React.FC<ProcessNavProps> = ({
 
 
   useEffect(() => {
-    console.log('Opening guide modal');
+    
     openModal('GUIDE_MODAL');
   }, [openModal]);
   
   const handleGuideClick = () => {
-    console.log('Guide button clicked');
+    
     openModal('GUIDE_MODAL');
   };
 

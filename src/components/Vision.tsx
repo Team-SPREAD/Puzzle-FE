@@ -20,23 +20,25 @@ export default function Vision({
   selectionColor,
   isSelected,
 }: VisionBoxProps) {
-  const { x, y, width, height, value } = layer;
+  const { x, y, width, height, value, author } = layer;
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   
   const me = useSelf();
-  const userName = me?.info?.name || '익명';
+  const currentUser = me?.info?.name || '익명';
 
   const updateText = useMutation(({ storage }, newValue: string) => {
     const liveLayers = storage.get('layers');
     const layer = liveLayers.get(id);
+    
     if (layer) {
       layer.update({
         value: newValue,
-        author: userName
+        author: currentUser, // 수정 시에만 작성자 업데이트
+        lastEditedBy: currentUser // 마지막 수정자 정보 추가
       });
     }
-  }, [userName]);
+  }, [currentUser]);
 
   const handleContentChange = useCallback(
     (e: ContentEditableEvent) => {
@@ -84,7 +86,7 @@ export default function Vision({
             fontFamily: "'Nanum Myeongjo', serif",
             fontSize: '0.9rem' 
           }}>
-            - {layer.author || userName}
+            - {author || '익명'} {layer.lastEditedBy && layer.lastEditedBy !== author && `(수정: ${layer.lastEditedBy})`}
           </div>
         </div>
       </foreignObject>

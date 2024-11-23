@@ -118,3 +118,17 @@ export const getRoomToken = async (roomId: string) => {
     roomId,
   });
 };
+
+//현재 currentStep 불러오기
+export const getCurrentStep = async (boardId: string, token: string) => {
+  const response = await axiosInstance.get('/api/board', {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+ 
+  const board = response.data.find((board: any) => board._id === boardId);
+  if (!board) throw new Error('Board not found');
+ 
+  return board.currentStep;
+ };

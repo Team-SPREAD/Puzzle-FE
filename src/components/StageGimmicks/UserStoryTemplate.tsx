@@ -5,7 +5,9 @@ import { LayerType, UserStoryLayer } from '@/lib/types';
 import { UserStoryProps } from './types';
 import { LiveObject } from '@liveblocks/client';
 import { STAGE_GIMMICKS } from './configs';
-import { useSelf } from '@liveblocks/react'; // 현재 사용자 정보 가져오기 위한 import
+import { useSelf } from '@liveblocks/react';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 export default function UserStoryTemplate({
   id,
@@ -16,38 +18,33 @@ export default function UserStoryTemplate({
   const [action, setAction] = useState('');
   const [goal, setGoal] = useState('');
   const [task, setTask] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(true); // 박스 접힘 상태 관리
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
-  // 현재 사용자 정보 가져오기
   const me = useSelf();
-
   const userName = me?.info?.name || '익명 사용자';
   const avatar = me?.info?.avatar;
 
-  // 내용 업데이트 mutation
   const updateContent = useMutation(
     ({ storage }) => {
       const userStoryBox = storage.get('layers').get(id);
       if (userStoryBox) {
         userStoryBox.update({
-          who: `${who}`,
-          action: `${action}`,
-          goal: `${goal}`,
-          task: `${task}`,
-        }); // 포맷된 내용 업데이트
+          who: who,
+          action: action,
+          goal: goal,
+          task: task,
+        });
       }
     },
     [who, action, goal, task],
   );
 
-  // 박스 복제 mutation (현재 단계의 위치에 생성)
   const duplicateBox = useMutation(
     ({ storage }, type) => {
       const layers = storage.get('layers');
       const layerIds = storage.get('layerIds');
       const newId = `user-story-${Date.now()}`;
 
-      // 현재 단계의 위치 정보를 가져와서 새로운 박스의 위치 설정
       const currentStage = 8;
       const stageGimmick = STAGE_GIMMICKS[currentStage];
       if (!stageGimmick) {
@@ -55,31 +52,28 @@ export default function UserStoryTemplate({
         return;
       }
 
-      // 새로운 박스를 기존 박스의 위치에서 조금 옮겨서 생성
       const basePosition = stageGimmick.boxes[0].position;
       const newX = basePosition.x + 450;
       const newY = basePosition.y + 7100;
 
-      // 색상 설정 (Who, Goal, Action, Task에 따라 다르게 적용)
       let fillColor;
       switch (type) {
         case 'who':
-          fillColor = { r: 135, g: 206, b: 235 }; // 하늘색
+          fillColor = { r: 135, g: 206, b: 235 };
           break;
         case 'goal':
-          fillColor = { r: 144, g: 238, b: 144 }; // 연두색
+          fillColor = { r: 144, g: 238, b: 144 };
           break;
         case 'action':
-          fillColor = { r: 221, g: 160, b: 221 }; // 보라색
+          fillColor = { r: 221, g: 160, b: 221 };
           break;
         case 'task':
-          fillColor = { r: 255, g: 182, b: 193 }; // 분홍색
+          fillColor = { r: 255, g: 182, b: 193 };
           break;
         default:
           fillColor = color;
       }
 
-      // 새로운 UserStoryLayer 추가
       const newLayer: UserStoryLayer = {
         type: LayerType.UserStory,
         x: newX,
@@ -93,17 +87,13 @@ export default function UserStoryTemplate({
         fill: fillColor,
         borderColor: { r: 255, g: 223, b: 120 },
         fontStyle: "'Cute Font', 'Nanum Pen Script', cursive",
-        iconUrl: avatar, // 현재 사용자의 아바타 URL 사용
+        iconUrl: avatar,
       };
 
-      // LiveObject로 새로운 Layer 생성
       const newLiveLayer = new LiveObject(newLayer);
-
-      // Liveblocks storage에 추가
       layers.set(newId, newLiveLayer);
       layerIds.push(newId);
 
-      // 입력 필드 초기화
       switch (type) {
         case 'who':
           setWho('');
@@ -117,8 +107,6 @@ export default function UserStoryTemplate({
         case 'task':
           setTask('');
           break;
-        default:
-          break;
       }
     },
     [who, action, goal, task, color, avatar],
@@ -128,142 +116,135 @@ export default function UserStoryTemplate({
     updateContent();
   }, [who, action, goal, task, updateContent]);
 
-  // 박스 접힘 상태를 토글하는 함수
-  const toggleCollapse = () => {
-    setIsCollapsed((prev) => !prev);
-  };
-
   return (
     <motion.div
       drag
       dragMomentum={false}
-      className="absolute bg-white/90 backdrop-blur-sm rounded-xl shadow-lg"
+      className="absolute bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-gray-200/50"
       animate={{
         x: position.x,
         y: position.y,
-        height: isCollapsed ? '50px' : 'auto',
-        width: isCollapsed ? '180px' : '400px',
+        height: isCollapsed ? '48px' : 'auto',
+        width: isCollapsed ? '200px' : '380px',
       }}
       initial={{
-        height: isCollapsed ? '50px' : 'auto',
-        width: isCollapsed ? '180px' : '400px',
+        height: isCollapsed ? '48px' : 'auto',
+        width: isCollapsed ? '200px' : '380px',
       }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       style={{ position: 'absolute', zIndex: 30 }}
     >
-      <div className={`p-4 ${isCollapsed ? 'px-3 py-2' : ''}`}>
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-base font-medium text-gray-700 flex items-center">
-              사용자 스토리
-            </span>
+      <div className="p-3">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">
+                유저 스토리
+              </span>
+
+              {avatar && (
+                <div className="relative w-6 h-6">
+                  <Image
+                    src={avatar}
+                    alt={userName}
+                    fill
+                    sizes="24px"
+                    className="rounded-full border border-gray-200 object-cover"
+                    priority
+                  />
+                </div>
+              )}
+            </div>
             <button
-              onClick={toggleCollapse}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-50 rounded-lg transition-colors"
             >
               {isCollapsed ? (
                 <svg
-                  width="20"
-                  height="20"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
-                  fill="currentColor"
+                  fill="none"
+                  stroke="currentColor"
                 >
-                  <rect
-                    x="4"
-                    y="4"
-                    width="16"
-                    height="16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 8h16M4 16h16"
                   />
                 </svg>
               ) : (
                 <svg
-                  width="20"
-                  height="20"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
-                  fill="currentColor"
+                  fill="none"
+                  stroke="currentColor"
                 >
-                  <rect x="4" y="11" width="16" height="2" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               )}
             </button>
           </div>
-          {/* 입력폼, 접혀 있을 때 숨김 */}
+
           {!isCollapsed && (
-            <>
-              <div className="flex flex-col items-start gap-4">
-                <div className="flex gap-2 items-center w-full">
-                  <span className="bg-blue-500 text-white px-3 py-1 rounded-md">
-                    Who
-                  </span>
-                  <input
-                    value={who}
-                    onChange={(e) => setWho(e.target.value)}
-                    placeholder="사용자 (예: 사용자)"
-                    className="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 border-blue-100 focus:border-blue-300 focus:ring-blue-200"
-                  />
-                  <button
-                    onClick={() => duplicateBox('who')}
-                    className="bg-blue-500 text-white px-3 py-1 rounded-md ml-2"
+            <div className="flex flex-col gap-3">
+              {[
+                { type: 'who', color: 'blue', value: who, setValue: setWho },
+                {
+                  type: 'goal',
+                  color: 'green',
+                  value: goal,
+                  setValue: setGoal,
+                },
+                {
+                  type: 'action',
+                  color: 'purple',
+                  value: action,
+                  setValue: setAction,
+                },
+                { type: 'task', color: 'pink', value: task, setValue: setTask },
+              ].map(({ type, color, value, setValue }) => (
+                <div key={type} className="flex gap-2 items-center">
+                  <div
+                    className={`flex-1 flex gap-2 p-2 rounded-lg bg-${color}-50 border border-${color}-100`}
                   >
-                    Add
+                    <span
+                      className={`flex-shrink-0 bg-${color}-500 text-white text-xs font-medium px-2.5 py-1 rounded-full capitalize`}
+                    >
+                      {type}
+                    </span>
+                    <input
+                      value={value}
+                      onChange={(e) => setValue(e.target.value)}
+                      placeholder={`Enter ${type}...`}
+                      className={cn(
+                        'flex-1 bg-transparent border-none text-sm',
+                        'placeholder:text-gray-400',
+                        'focus:outline-none focus:ring-0',
+                        `text-${color}-700`,
+                      )}
+                    />
+                  </div>
+                  <button
+                    onClick={() => duplicateBox(type)}
+                    className={cn(
+                      'p-2 rounded-lg transition-colors',
+                      `bg-${color}-500 hover:bg-${color}-600`,
+                      'text-white text-sm font-medium',
+                    )}
+                  >
+                    추가
                   </button>
                 </div>
-                <div className="flex gap-2 items-center w-full">
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-md">
-                    Goal
-                  </span>
-                  <input
-                    value={goal}
-                    onChange={(e) => setGoal(e.target.value)}
-                    placeholder="목적 (예: 목적을 달성하기 위해)"
-                    className="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 border-green-100 focus:border-green-300 focus:ring-green-200"
-                  />
-                  <button
-                    onClick={() => duplicateBox('goal')}
-                    className="bg-green-500 text-white px-3 py-1 rounded-md ml-2"
-                  >
-                    Add
-                  </button>
-                </div>
-                <div className="flex gap-2 items-center w-full">
-                  <span className="bg-purple-500 text-white px-3 py-1 rounded-md">
-                    Action
-                  </span>
-                  <input
-                    value={action}
-                    onChange={(e) => setAction(e.target.value)}
-                    placeholder="활동/작업 (예: ~기능을 사용한다)"
-                    className="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 border-purple-100 focus:border-purple-300 focus:ring-purple-200"
-                  />
-                  <button
-                    onClick={() => duplicateBox('action')}
-                    className="bg-purple-500 text-white px-3 py-1 rounded-md ml-2"
-                  >
-                    Add
-                  </button>
-                </div>
-                <div className="flex gap-2 items-center w-full">
-                  <span className="bg-pink-500 text-white px-3 py-1 rounded-md">
-                    Task
-                  </span>
-                  <input
-                    value={task}
-                    onChange={(e) => setTask(e.target.value)}
-                    placeholder="세부 작업 (예: 특정 작업을 수행한다)"
-                    className="w-full p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 border-pink-100 focus:border-pink-300 focus:ring-pink-200"
-                  />
-                  <button
-                    onClick={() => duplicateBox('task')}
-                    className="bg-pink-500 text-white px-3 py-1 rounded-md ml-2"
-                  >
-                    Add
-                  </button>
-                </div>
-              </div>
-            </>
+              ))}
+            </div>
           )}
         </div>
       </div>
