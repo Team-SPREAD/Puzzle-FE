@@ -38,10 +38,10 @@ export function Avatar({
   src = '',
   name = '',
   color = ['', ''],
-  size = 52,
+  size = 36,
   statusColor = '',
   outlineColor = '',
-  outlineWidth = 3,
+  outlineWidth = 2,
   borderRadius = 9999,
   className = '',
   style = {},
@@ -60,7 +60,7 @@ export function Avatar({
         borderRadius,
         ...style,
       }}
-      className={classNames('avatar', className)}
+      className={classNames('avatar text-sm', className)}
       data-tooltip={name}
     >
       {innerVariant === 'more' && (
@@ -81,7 +81,10 @@ export function Avatar({
       )}
 
       {statusColor && (
-        <span style={{ backgroundColor: statusColor }} className="status" />
+        <span
+          style={{ backgroundColor: statusColor }}
+          className="status w-2 h-2"
+        />
       )}
     </div>
   );
