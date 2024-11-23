@@ -16,6 +16,8 @@ import DeleteTeamModal from '@/components/DashBoard/Modals/DeleteTeamModal';
 import { Loading } from '@/components/Loading';
 import EditBoardModal from '@/components/DashBoard/Modals/EditBoardModal';
 import DeleteBoardModal from '@/components/DashBoard/Modals/DeleteBoardModal';
+
+
 // 유틸
 import { generateRandomColor } from '@/utils/getRandomColor';
 
@@ -27,6 +29,7 @@ import { useDarkMode } from '@/store/useDarkModeStore';
 
 // API
 import { getUserInfo, getMyTeams } from '@/app/api/dashboard-axios';
+import PricingPage from '@/components/DashBoard/Pricing';
 
 const pageVariants = {
   initial: { opacity: 0 },
@@ -51,7 +54,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [boardView, setBoardView] = useState<
-    'MyBoards' | 'FavoriteBoards' | 'TeamBoards'
+    'MyBoards' | 'FavoriteBoards' | 'TeamBoards'| 'Pricing'
   >('MyBoards');
 
   // 랜덤 색상 설정
@@ -155,20 +158,36 @@ export default function DashboardPage() {
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <DashboardHeader
-            title={dashboardTitle}
+            title={boardView === 'Pricing' ? '요금제 안내' : dashboardTitle}
             teamId={selectedTeamId}
             buttonColor={buttonColor}
             token={userInfo.token}
           />
 
           <div className="flex-1 overflow-auto">
-            <BoardGrid
-              buttonColor={buttonColor}
-              teamId={selectedTeamId}
-              token={userInfo.token}
-              searchTerm={searchTerm}
-              boardView={boardView}
-            />
+            {boardView === 'Pricing' ? (
+              <div className="h-full overflow-y-auto">
+                <div
+                  className={`p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <PricingPage />
+                  </motion.div>
+                </div>
+              </div>
+            ) : (
+              <BoardGrid
+                buttonColor={buttonColor}
+                teamId={selectedTeamId}
+                token={userInfo.token}
+                searchTerm={searchTerm}
+                boardView={boardView}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -115,14 +115,14 @@ export default function PersonaBoxTemplate({
       >
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-full bg-rose-50 flex items-center justify-center">
               <svg
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                className="text-indigo-500"
+                className="text-rose-500"
               >
                 <path
                   strokeLinecap="round"
@@ -164,7 +164,7 @@ export default function PersonaBoxTemplate({
                 onPointerDown={(e) => e.stopPropagation()}
                 placeholder="이름"
                 className="w-full p-3 text-sm border rounded-lg focus:outline-none focus:ring-2 
-                  bg-indigo-50/30 border-indigo-100 focus:border-indigo-300 focus:ring-indigo-200"
+                  bg-rose-50/30 border-rose-100 focus:border-rose-300 focus:ring-rose-200"
               />
 
               <div className="grid grid-cols-2 gap-3">
@@ -178,7 +178,7 @@ export default function PersonaBoxTemplate({
                   placeholder="나이"
                   type="number"
                   className="w-full p-3 text-sm border rounded-lg focus:outline-none focus:ring-2 
-                    bg-indigo-50/30 border-indigo-100 focus:border-indigo-300 focus:ring-indigo-200"
+                    bg-rose-50/30 border-rose-100 focus:border-rose-300 focus:ring-rose-200"
                 />
                 <select
                   value={personaData.gender}
@@ -188,7 +188,7 @@ export default function PersonaBoxTemplate({
                   onKeyDown={handleInputKeyDown}
                   onPointerDown={(e) => e.stopPropagation()}
                   className="w-full p-3 text-sm border rounded-lg focus:outline-none focus:ring-2 
-                    bg-indigo-50/30 border-indigo-100 focus:border-indigo-300 focus:ring-indigo-200"
+                    bg-rose-50/30 border-rose-100 focus:border-rose-300 focus:ring-rose-200"
                 >
                   <option value="">성별 선택</option>
                   <option value="male">남성</option>
@@ -206,7 +206,7 @@ export default function PersonaBoxTemplate({
                 onPointerDown={(e) => e.stopPropagation()}
                 placeholder="직업"
                 className="w-full p-3 text-sm border rounded-lg focus:outline-none focus:ring-2 
-                  bg-indigo-50/30 border-indigo-100 focus:border-indigo-300 focus:ring-indigo-200"
+                  bg-rose-50/30 border-rose-100 focus:border-rose-300 focus:ring-rose-200"
               />
               <textarea
                 value={personaData.quote}
@@ -218,7 +218,7 @@ export default function PersonaBoxTemplate({
                 placeholder="대표 발언 (ex: '시간이 부족해서 운동할 여유가 없어요')"
                 rows={2}
                 className="w-full p-3 text-sm border rounded-lg focus:outline-none focus:ring-2 
-                  bg-indigo-50/30 border-indigo-100 focus:border-indigo-300 focus:ring-indigo-200
+                  bg-rose-50/30 border-rose-100 focus:border-rose-300 focus:ring-rose-200
                   resize-none"
               />
             </div>
@@ -229,8 +229,8 @@ export default function PersonaBoxTemplate({
                 createPersona();
               }}
               onPointerDown={(e) => e.stopPropagation()}
-              className="w-full p-2.5 bg-indigo-50 text-indigo-800 rounded-lg
-                hover:bg-indigo-100 transition-colors cursor-pointer
+              className="w-full p-2.5 bg-rose-50 text-rose-800 rounded-lg
+                hover:bg-rose-100 transition-colors cursor-pointer
                 flex items-center justify-center gap-2"
             >
               <svg

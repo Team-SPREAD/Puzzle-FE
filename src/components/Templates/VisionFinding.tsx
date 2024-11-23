@@ -14,7 +14,7 @@ export default function VisionFinding({ camera }: StageTwoProps) {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="absolute left-5 top-20 z-30"
+        className="absolute left-5 top-[90px] z-30"
       >
         <motion.div
           animate={{ width: isCollapsed ? '48px' : '500px' }}
@@ -35,11 +35,11 @@ export default function VisionFinding({ camera }: StageTwoProps) {
                       Step 2
                     </span>
                     <h2 className="font-semibold text-gray-800">
-                      팀 목표 설정
+                      비전 설정 및 팀 목표 설정
                     </h2>
                   </div>
                   <p className="text-xs text-gray-500">
-                    우리 팀의 목표와 방향성을 함께 정해보세요
+                    나의 비전과 팀의 목표를 함께 정해보세요
                   </p>
                 </div>
 

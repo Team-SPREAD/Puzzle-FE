@@ -40,10 +40,11 @@ export default function Persona({
 
       const personaLayer = currentLayer as unknown as LiveObject<PersonaLayer>;
       const currentTraits = personaLayer.get('traits') || [];
-      
+
       // 중복 체크
       const isDuplicate = currentTraits.some(
-        trait => trait.category === currentTab && trait.value === trimmedTrait
+        (trait) =>
+          trait.category === currentTab && trait.value === trimmedTrait,
       );
 
       if (isDuplicate) {
@@ -98,14 +99,14 @@ export default function Persona({
           className={cn(
             'h-full flex flex-col',
             'bg-white/90 backdrop-blur-sm rounded-xl shadow-lg',
-            'border-2 border-indigo-200',
+            'border-2 border-rose-200',
           )}
         >
           {/* 헤더 */}
           <div className="flex-shrink-0 p-4 border-b">
             <div className="flex justify-between items-start mb-2">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-2xl">
+                <div className="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-2xl">
                   {personaEmoji}
                 </div>
                 <div>
@@ -138,7 +139,7 @@ export default function Persona({
               </button>
             </div>
             {layer.quote && (
-              <div className="mt-2 p-3 bg-indigo-50/50 rounded-lg">
+              <div className="mt-2 p-3 bg-rose-50/50 rounded-lg">
                 <p className="text-sm text-gray-600 italic">{layer.quote}</p>
               </div>
             )}
@@ -164,7 +165,7 @@ export default function Persona({
                     className={cn(
                       'flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                       currentTab === tab.id
-                        ? 'bg-indigo-100 text-indigo-700'
+                        ? 'bg-rose-100 text-rose-700'
                         : 'hover:bg-gray-100 text-gray-600',
                     )}
                   >
@@ -187,7 +188,7 @@ export default function Persona({
                         key={index}
                         className="p-2 bg-white rounded-lg border border-gray-100 flex items-center gap-2"
                       >
-                        <span className="w-2 h-2 rounded-full bg-indigo-400" />
+                        <span className="w-2 h-2 rounded-full bg-rose-400" />
                         <span className="text-sm text-gray-700">
                           {trait.value}
                         </span>
@@ -213,7 +214,7 @@ export default function Persona({
                             : '새로운 행동 패턴 추가...'
                     }
                     className="flex-1 px-3 py-2 text-sm bg-white/50 border rounded-lg 
-                      focus:outline-none focus:ring-1 focus:ring-indigo-300"
+                      focus:outline-none focus:ring-1 focus:ring-rose-300"
                     onKeyDown={handleKeyDown}
                   />
                   <button
@@ -222,8 +223,8 @@ export default function Persona({
                       addTrait();
                     }}
                     onPointerDown={(e) => e.stopPropagation()}
-                    className="px-4 py-2 text-sm font-medium text-indigo-600 
-                      bg-indigo-50 hover:bg-indigo-100 rounded-lg 
+                    className="px-4 py-2 text-sm font-medium text-rose-600 
+                      bg-rose-50 hover:bg-rose-100 rounded-lg 
                       transition-colors relative overflow-hidden group"
                   >
                     추가

@@ -24,20 +24,20 @@ const SECTIONS = [
   },
   {
     step: 'STEP 2',
-    title: '스프린트 계획',
-    description: '2주 단위로 달성 가능한 목표를 설정하고 작업을 분배하세요',
+    title: '실시간 협업',
+    description: '실시간으로 소통하고, 아이디어를 확장하세요',
     image: '/gifs/project_start.gif',
   },
   {
     step: 'STEP 3',
-    title: '실시간 협업',
-    description: '팀원들과 함께 아이디어를 공유하고 발전시켜보세요',
+    title: '다양한 기믹과 투표 시스템',
+    description: '다양한 기믹들로 가이드라인을 제시하고 투표를 통해 결정하세요',
     image: '/gifs/project_start.gif',
   },
   {
     step: 'STEP 4',
-    title: '진행 상황 확인',
-    description: '프로젝트의 진행 상황을 실시간으로 모니터링하세요',
+    title: '결과와 단계를 모니터링',
+    description: 'Process를 확인하고 마지막 결과를 확인해보세요',
     image: '/gifs/project_start.gif',
   },
 ];

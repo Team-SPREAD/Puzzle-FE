@@ -195,7 +195,7 @@ export default function Discussion({
               <div className="flex-shrink-0 p-4 bg-white/30 border-b">
                 {layer.status === 'completed' ? (
                   <div className="text-center">
-                    <span className="text-green-600 font-medium">완료됨</span>
+                    <span className="text-green-600 font-medium">찬성 완료</span>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -219,7 +219,7 @@ export default function Discussion({
                             categoryStyles[layer.category].textColor,
                           )}
                         >
-                          다음 단계로
+                          찬성?
                         </button>
                       </div>
                     )}

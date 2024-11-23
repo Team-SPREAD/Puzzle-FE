@@ -13,6 +13,7 @@ import {
   Star,
   Handshake,
   ChevronDown,
+  Tag,
 } from 'lucide-react';
 import useModalStore from '@/store/useModalStore';
 import { useDarkMode } from '@/store/useDarkModeStore';
@@ -125,8 +126,10 @@ interface SidebarProps {
   buttonColor: string;
   teams: { _id: string; teamName: string }[];
   userInfo: UserInfo;
-  boardView: 'MyBoards' | 'FavoriteBoards' | 'TeamBoards';
-  setBoardView: (view: 'MyBoards' | 'FavoriteBoards' | 'TeamBoards') => void;
+  boardView: 'MyBoards' | 'FavoriteBoards' | 'TeamBoards' | 'Pricing'; // 여기에 'Pricing' 추가
+  setBoardView: (
+    view: 'MyBoards' | 'FavoriteBoards' | 'TeamBoards' | 'Pricing',
+  ) => void; // 여기도 'Pricing' 추가
   favoriteProjects: { id: string; name: string; isFavorite: boolean }[];
 }
 
@@ -358,6 +361,20 @@ export default function Sidebar({
 
             {/* Bottom Navigation */}
             <div className="pt-2 pb-4 space-y-2 border-t mt-auto">
+              <NavItem
+                isExpanded={isExpanded}
+                icon={Tag}
+                label="Pricing"
+                isActive={boardView === 'Pricing'}
+                onClick={() => {
+                  setBoardView('Pricing');
+                  setSelectedTeamId(null);
+                  closeModal();
+                }}
+                isDarkMode={isDarkMode}
+                closeOnClick={true}
+                setIsExpanded={setIsExpanded}
+              />
               <NavItem
                 isExpanded={isExpanded}
                 icon={FileText}

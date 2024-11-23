@@ -97,7 +97,7 @@ export default function Result({ camera, boardId }: ResultProps) {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="absolute left-5 top-20 z-30"
+        className="absolute left-5 top-[90px] z-30"
       >
         <motion.div
           animate={{ width: isCollapsed ? '48px' : '500px' }}
@@ -121,7 +121,7 @@ export default function Result({ camera, boardId }: ResultProps) {
                     <h2 className="font-semibold text-white">결과 마무리</h2>
                   </div>
                   <p className="text-xs text-gray-400">
-                    프로젝트 마무리를 위해 요구사항 명세성과 확인 작업을
+                    프로젝트 마무리를 위해 README.md와 최종 검토를
                     진행하세요
                   </p>
                 </div>
@@ -138,9 +138,9 @@ export default function Result({ camera, boardId }: ResultProps) {
                     }}
                   >
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">
-                      <span>📝</span> 요구사항 명세서
+                      <span>📝</span> README.md
                     </h3>
-                    <p className="text-xs text-gray-400">요구사항 확인하기</p>
+                    <p className="text-xs text-gray-400">결과 확인하기</p>
                   </div>
                   <div className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer">
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">

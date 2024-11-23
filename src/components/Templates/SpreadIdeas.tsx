@@ -4,7 +4,6 @@ import { Camera, UserInfo } from '@/lib/types';
 
 interface SpreadIdeasProps {
   camera: Camera;
- 
 }
 
 export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
@@ -15,7 +14,7 @@ export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="absolute left-5 top-20 z-30"
+        className="absolute left-5 top-[90px] z-30"
       >
         <motion.div
           animate={{ width: isCollapsed ? '48px' : '500px' }}
@@ -33,7 +32,7 @@ export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
                 {/* 단계 설명 */}
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full font-medium">
+                    <span className="bg-purple-100 text-purple-600 text-xs px-2 py-0.5 rounded-full font-medium">
                       Step 4
                     </span>
                     <h2 className="font-semibold text-gray-800">스프레드</h2>
@@ -45,23 +44,23 @@ export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
 
                 {/* 카드 그리드 */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-blue-800 mb-1 text-sm flex items-center gap-1">
+                  <div className="bg-purple-50 rounded-lg p-3 hover:bg-purple-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-purple-800 mb-1 text-sm flex items-center gap-1">
                       <span>🌟</span> 핵심 기능
                     </h3>
-                    <p className="text-xs text-blue-600">필수 기능 정리</p>
+                    <p className="text-xs text-purple-600">필수 기능 정리</p>
                   </div>
-                  <div className="bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-blue-800 mb-1 text-sm flex items-center gap-1">
+                  <div className="bg-purple-50 rounded-lg p-3 hover:bg-purple-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-purple-800 mb-1 text-sm flex items-center gap-1">
                       <span>🎨</span> UI/UX
                     </h3>
-                    <p className="text-xs text-blue-600">디자인 구상하기</p>
+                    <p className="text-xs text-purple-600">디자인 구상하기</p>
                   </div>
-                  <div className="bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-blue-800 mb-1 text-sm flex items-center gap-1">
+                  <div className="bg-purple-50 rounded-lg p-3 hover:bg-purple-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-purple-800 mb-1 text-sm flex items-center gap-1">
                       <span>⚡</span> 확장성
                     </h3>
-                    <p className="text-xs text-blue-600">추가 기능 검토</p>
+                    <p className="text-xs text-purple-600">추가 기능 검토</p>
                   </div>
                 </div>
               </motion.div>
@@ -77,7 +76,7 @@ export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
                   whileHover={{ scale: 1.2 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                 >
-                  <span className="text-blue-500">
+                  <span className="text-purple-500">
                     <svg
                       width="24"
                       height="24"
@@ -93,7 +92,7 @@ export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
                       <path d="M12 8h.01" />
                     </svg>
                   </span>
-                  <span className="text-xs font-medium text-blue-600">
+                  <span className="text-xs font-medium text-purple-600">
                     Step 4
                   </span>
                 </motion.div>
@@ -109,7 +108,7 @@ export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsCollapsed(true)}
-                className="absolute right-0 top-0 h-full w-12 hover:bg-gray-100/50 transition-colors flex items-center justify-center"
+                className="absolute right-0 top-0 h-full w-12 hover:bg-purple-50/50 transition-colors flex items-center justify-center"
               >
                 <svg
                   width="20"
@@ -117,7 +116,7 @@ export default function SpreadIdeas({ camera }: SpreadIdeasProps) {
                   viewBox="0 0 20 20"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="text-gray-400"
+                  className="text-purple-400"
                 >
                   <path
                     d="M14 4L8 10L14 16"
