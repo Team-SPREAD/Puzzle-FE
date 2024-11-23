@@ -3,15 +3,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { setCookie } from 'nookies';
-import Image from 'next/image';
 import { Trash2, Star, Edit3, Info, ChevronLeft } from 'lucide-react';
 import Lottie from 'lottie-react';
 import starAnimation from '~/lotties/star.json';
 import { BoardInfo } from '@/lib/types';
 import { likeBoard, getRoomToken } from '@/app/api/dashboard-axios';
-import EditBoardModal from './Modals/EditBoardModal';
-import DeleteBoardModal from './Modals/DeleteBoardModal';
 import { useDarkMode } from '@/store/useDarkModeStore';
+import useModalStore from '@/store/useModalStore';
 
 interface BoardCardProps {
   board: BoardInfo;
@@ -33,6 +31,23 @@ const BoardCard: React.FC<BoardCardProps> = ({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { isDarkMode } = useDarkMode();
+
+  const { openModal } = useModalStore();
+
+  const handleEditBoard = () => {
+    openModal('EDIT_BOARD', {
+      boardId: board._id,
+      currentBoardName: board.boardName,
+      currentDescription: board.description,
+    });
+  };
+
+  const handleDeleteBoard = () => {
+    openModal('DELETE_BOARD', {
+      boardId: board._id,
+      currentBoardName: board.boardName,
+    });
+  };
 
   const cardVariants = {
     initial: { scale: 0.95, opacity: 0 },
@@ -226,7 +241,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className={`w-full p-4 rounded-lg flex items-center gap-3 ${cardHover}`}
-                onClick={() => setIsEditModalOpen(true)}
+                onClick={handleEditBoard}
               >
                 <Edit3 size={20} />
                 <span>보드 수정</span>
@@ -240,7 +255,7 @@ const BoardCard: React.FC<BoardCardProps> = ({
                     ? 'text-red-400 hover:bg-red-500/20'
                     : 'text-red-600 hover:bg-red-50'
                 }`}
-                onClick={() => setIsDeleteModalOpen(true)}
+                onClick={handleDeleteBoard}
               >
                 <Trash2 size={20} />
                 <span>보드 삭제</span>
@@ -265,29 +280,6 @@ const BoardCard: React.FC<BoardCardProps> = ({
           )}
         </AnimatePresence>
       </motion.div>
-
-      {/* Modals */}
-      <AnimatePresence>
-        {isEditModalOpen && (
-          <EditBoardModal
-            isOpen={isEditModalOpen}
-            onClose={() => setIsEditModalOpen(false)}
-            boardId={board._id}
-            currentBoardName={board.boardName}
-            currentDescription={board.description}
-          />
-        )}
-
-        {isDeleteModalOpen && (
-          <DeleteBoardModal
-            isOpen={isDeleteModalOpen}
-            onClose={() => setIsDeleteModalOpen(false)}
-            boardId={board._id}
-            currentBoardName={board.boardName}
-            boardName={board.boardName}
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 };

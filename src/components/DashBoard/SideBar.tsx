@@ -2,16 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { Settings, LogOut, Moon, Sun, FileText, HardDrive } from 'lucide-react';
+import {
+  Settings,
+  LogOut,
+  Moon,
+  Sun,
+  FileText,
+  HardDrive,
+  House,
+  Star,
+  Handshake,
+  ChevronDown,
+} from 'lucide-react';
 import useModalStore from '@/store/useModalStore';
 import { useDarkMode } from '@/store/useDarkModeStore';
-
-// Image imports
-import star from '~/images/star.svg';
-import projects from '~/images/projects.svg';
-import house from '~/images/house.svg';
-import arrowBottom from '~/images/arrow-bottom.svg';
 
 // Component imports
 import UserSelectModal from './Modals/UserSelectModal';
@@ -92,16 +96,7 @@ const NavItem: React.FC<NavItemProps> = ({
             : 'bg-gray-100'
         } flex items-center justify-center`}
       >
-        {typeof Icon === 'object' && Icon.src ? (
-          <Image
-            src={Icon.src}
-            width={20}
-            height={20}
-            alt={label.toLowerCase()}
-          />
-        ) : (
-          Icon && typeof Icon === 'function' && <Icon size={20} />
-        )}
+        <Icon size={20} />
       </div>
       {isExpanded && (
         <motion.div
@@ -115,7 +110,7 @@ const NavItem: React.FC<NavItemProps> = ({
               animate={{ rotate: showChildren ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <Image src={arrowBottom} width={12} height={12} alt="expand" />
+              <ChevronDown size={20} />
             </motion.div>
           )}
         </motion.div>
@@ -130,8 +125,8 @@ interface SidebarProps {
   buttonColor: string;
   teams: { _id: string; teamName: string }[];
   userInfo: UserInfo;
-  boardView: 'MyBoards' | 'FavoriteBoards';
-  setBoardView: (view: 'MyBoards' | 'FavoriteBoards') => void;
+  boardView: 'MyBoards' | 'FavoriteBoards' | 'TeamBoards';
+  setBoardView: (view: 'MyBoards' | 'FavoriteBoards' | 'TeamBoards') => void;
   favoriteProjects: { id: string; name: string; isFavorite: boolean }[];
 }
 
@@ -171,7 +166,7 @@ export default function Sidebar({
 
   const handleTeamSelect = (teamId: string | null) => {
     setSelectedTeamId(teamId);
-    setBoardView('MyBoards');
+    setBoardView('TeamBoards');
     closeModal();
     setIsExpanded(false);
   };
@@ -214,7 +209,7 @@ export default function Sidebar({
             <div className="flex-1 space-y-2">
               <NavItem
                 isExpanded={isExpanded}
-                icon={projects}
+                icon={House}
                 label="Home"
                 isActive={boardView === 'MyBoards'}
                 onClick={() => {
@@ -228,7 +223,7 @@ export default function Sidebar({
 
               <NavItem
                 isExpanded={isExpanded}
-                icon={star}
+                icon={Star}
                 label="Favorites"
                 isActive={boardView === 'FavoriteBoards'}
                 onClick={() => {
@@ -243,9 +238,12 @@ export default function Sidebar({
               <div>
                 <NavItem
                   isExpanded={isExpanded}
-                  icon={house}
+                  icon={Handshake}
                   label="Teams"
-                  isActive={modalType === 'DROPDOWN_TEAM_SELECT'}
+                  isActive={
+                    modalType === 'DROPDOWN_TEAM_SELECT' ||
+                    boardView === 'TeamBoards'
+                  }
                   onClick={() => {
                     if (!isExpanded) {
                       setIsExpanded(true);
@@ -259,7 +257,7 @@ export default function Sidebar({
                   closeOnClick={false}
                   setIsExpanded={setIsExpanded}
                 />
-                {modalType === 'DROPDOWN_TEAM_SELECT' && (
+                {modalType === 'DROPDOWN_TEAM_SELECT' && isExpanded && (
                   <AnimatePresence>
                     <motion.div
                       initial={{ height: 0 }}
