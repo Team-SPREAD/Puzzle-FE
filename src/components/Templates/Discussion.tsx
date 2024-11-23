@@ -32,35 +32,35 @@ export default function Discussion({ camera }: DiscussionProps) {
                 {/* 단계 설명 */}
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-violet-100 text-violet-600 text-xs px-2 py-0.5 rounded-full font-medium">
+                    <span className="bg-amber-100 text-amber-600 text-xs px-2 py-0.5 rounded-full font-medium">
                       Step 5
                     </span>
                     <h2 className="font-semibold text-gray-800">토론하기</h2>
                   </div>
                   <p className="text-xs text-gray-500">
-                    팀원들과 함께 아이디어를 발전시켜 보세요
+                    팀원들과 함께 다양한 아이디어를 토론해보고 찬성률 70%를 만들어보세요
                   </p>
                 </div>
 
                 {/* 카드 그리드 */}
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-violet-50 rounded-lg p-3 hover:bg-violet-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-violet-800 mb-1 text-sm flex items-center gap-1">
-                      <span>💭</span> 브레인스토밍
+                  <div className="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
+                      <span>⏱️</span> 타이머
                     </h3>
-                    <p className="text-xs text-violet-600">아이디어 공유</p>
+                    <p className="text-xs text-amber-600">타이머를 이용하기</p>
                   </div>
-                  <div className="bg-violet-50 rounded-lg p-3 hover:bg-violet-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-violet-800 mb-1 text-sm flex items-center gap-1">
-                      <span>🔄</span> 피드백
+                  <div className="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
+                      <span>🔄</span> 상의
                     </h3>
-                    <p className="text-xs text-violet-600">의견 주고받기</p>
+                    <p className="text-xs text-amber-600">의견 주고받기</p>
                   </div>
-                  <div className="bg-violet-50 rounded-lg p-3 hover:bg-violet-100 transition-colors cursor-pointer">
-                    <h3 className="font-medium text-violet-800 mb-1 text-sm flex items-center gap-1">
+                  <div className="bg-amber-50 rounded-lg p-3 hover:bg-amber-100 transition-colors cursor-pointer">
+                    <h3 className="font-medium text-amber-800 mb-1 text-sm flex items-center gap-1">
                       <span>✨</span> 결론
                     </h3>
-                    <p className="text-xs text-violet-600">방향성 정하기</p>
+                    <p className="text-xs text-amber-600">방향성 정하기</p>
                   </div>
                 </div>
               </motion.div>
@@ -76,7 +76,7 @@ export default function Discussion({ camera }: DiscussionProps) {
                   whileHover={{ scale: 1.2 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 10 }}
                 >
-                  <span className="text-violet-500">
+                  <span className="text-amber-500">
                     <svg
                       width="24"
                       height="24"
@@ -92,7 +92,7 @@ export default function Discussion({ camera }: DiscussionProps) {
                       <path d="M12 8h.01" />
                     </svg>
                   </span>
-                  <span className="text-xs font-medium text-violet-600">
+                  <span className="text-xs font-medium text-amber-600">
                     Step 5
                   </span>
                 </motion.div>
@@ -108,7 +108,7 @@ export default function Discussion({ camera }: DiscussionProps) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsCollapsed(true)}
-                className="absolute right-0 top-0 h-full w-12 hover:bg-gray-100/50 transition-colors flex items-center justify-center"
+                className="absolute right-0 top-0 h-full w-12 hover:bg-amber-50/50 transition-colors flex items-center justify-center"
               >
                 <svg
                   width="20"
@@ -116,7 +116,7 @@ export default function Discussion({ camera }: DiscussionProps) {
                   viewBox="0 0 20 20"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
-                  className="text-gray-400"
+                  className="text-amber-400"
                 >
                   <path
                     d="M14 4L8 10L14 16"
@@ -130,7 +130,6 @@ export default function Discussion({ camera }: DiscussionProps) {
             )}
           </AnimatePresence>
 
-          {/* 접힌 상태에서는 전체 영역이 클릭 가능 */}
           {isCollapsed && (
             <motion.button
               onClick={() => setIsCollapsed(false)}
