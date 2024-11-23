@@ -13,7 +13,7 @@ const BOX_CONFIG = {
     description: '현재 상황을 정의해주세요',
     icon: '❓',
     color: 'bg-blue-50 border-blue-200 text-blue-600',
-    maxCount: 5,
+    maxCount: 3,
     minLength: 20,
     guideQuestions: [
       '어떤 문제가 있나요?',
@@ -39,7 +39,7 @@ const BOX_CONFIG = {
     description: '해결 방안을 제시해주세요',
     icon: '💡',
     color: 'bg-green-50 border-green-200 text-green-600',
-    maxCount: 1,
+    maxCount: 3,
     minLength: 40,
     guideQuestions: [
       '어떻게 해결할 수 있을까요?',
@@ -97,9 +97,9 @@ export default function SolvingProblemBoxTemplate({
       const newId = nanoid();
 
       // 기본 위치 설정
-      const baseX = position.x + (boxType === 'define' ? 0 : 
+      const baseX = position.x + (boxType === 'define' ? 450 : 
                                 boxType === 'analyze' ? 600 : 1200);
-      const baseY = position.y + 6350;
+      const baseY = position.y + 6050;
       
       let newX = baseX;
       let newY = baseY;
@@ -114,7 +114,7 @@ export default function SolvingProblemBoxTemplate({
       });
 
       // Y축으로 배치 (같은 타입끼리는 아래로 쌓임)
-      const offsetY = 400;
+      const offsetY = 200;
       let i = 0;
       while (existingPositions.has(`${newX},${newY}`)) {
         i++;
@@ -136,7 +136,7 @@ export default function SolvingProblemBoxTemplate({
         x: newX,
         y: newY,
         width: 320,
-        height: 400,
+        height: 250,
         fill: color,
         boxType,
         content: '',
