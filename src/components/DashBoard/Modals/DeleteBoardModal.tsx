@@ -9,7 +9,6 @@ interface DeleteBoardModalProps {
   onClose: () => void;
   boardId: string;
   currentBoardName: string;
-  boardName: string;
 }
 
 const DeleteBoardModal: React.FC<DeleteBoardModalProps> = ({
@@ -17,7 +16,6 @@ const DeleteBoardModal: React.FC<DeleteBoardModalProps> = ({
   onClose,
   boardId,
   currentBoardName,
-  boardName,
 }) => {
   const [boardNameInput, setBoardNameInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,7 +97,7 @@ const DeleteBoardModal: React.FC<DeleteBoardModalProps> = ({
                 isIncorrect ? 'text-red-600' : 'text-gray-600'
               }`}
             >
-              {`확인하려면 아래 상자에 "${boardName}"을 입력하세요`}
+              {`확인하려면 아래 상자에 "${currentBoardName}"을 입력하세요`}
             </p>
             <input
               type="text"
@@ -138,8 +136,8 @@ const DeleteBoardModal: React.FC<DeleteBoardModalProps> = ({
             window.location.reload();
           }}
           lottieAnimationData={trash}
-          title={'삭제 완료'}
-          description={'새로운 보드로 만나요'}
+          title={'보드 삭제 완료'}
+          description={'새로운 보드를 만들어 보아요'}
         />
       )}
     </>

@@ -14,7 +14,8 @@ import InviteTeamModal from '@/components/DashBoard/Modals/InviteTeamModal';
 import EditTeamModal from '@/components/DashBoard/Modals/EditTeamModal';
 import DeleteTeamModal from '@/components/DashBoard/Modals/DeleteTeamModal';
 import { Loading } from '@/components/Loading';
-
+import EditBoardModal from '@/components/DashBoard/Modals/EditBoardModal';
+import DeleteBoardModal from '@/components/DashBoard/Modals/DeleteBoardModal';
 // 유틸
 import { generateRandomColor } from '@/utils/getRandomColor';
 
@@ -41,7 +42,7 @@ export default function DashboardPage() {
   // Store hooks
   const userInfo = useUserStore((state) => state.userInfo);
   const setUser = useUserStore((state) => state.setUserInfo);
-  const { modalType, closeModal } = useModalStore();
+  const { modalType, closeModal, modalProps } = useModalStore();
   const { setTeams, setCurrentTeam, teams } = useTeamsStore();
 
   // Local state
@@ -49,9 +50,9 @@ export default function DashboardPage() {
   const [buttonColor, setButtonColor] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [boardView, setBoardView] = useState<'MyBoards' | 'FavoriteBoards'>(
-    'MyBoards',
-  );
+  const [boardView, setBoardView] = useState<
+    'MyBoards' | 'FavoriteBoards' | 'TeamBoards'
+  >('MyBoards');
 
   // 랜덤 색상 설정
   useEffect(() => {
@@ -114,9 +115,12 @@ export default function DashboardPage() {
   }, [selectedTeamId, setCurrentTeam]);
 
   const dashboardTitle =
-    selectedTeamId === null
-      ? 'HOME 대시보드'
-      : teams.find((t) => t._id === selectedTeamId)?.teamName || '팀 대시보드';
+    boardView === 'FavoriteBoards'
+      ? 'Favorite Boards'
+      : selectedTeamId === null
+        ? 'HOME 대시보드'
+        : teams.find((t) => t._id === selectedTeamId)?.teamName ||
+          '팀 대시보드';
 
   if (isLoading) {
     return <Loading />;
@@ -205,6 +209,24 @@ export default function DashboardPage() {
             teamId={selectedTeamId}
             currentTeamName={dashboardTitle}
             teamName={dashboardTitle}
+          />
+        )}
+        {modalType === 'EDIT_BOARD' && modalProps && (
+          <EditBoardModal
+            isOpen={true}
+            onClose={closeModal}
+            boardId={modalProps.boardId}
+            currentBoardName={modalProps.currentBoardName}
+            currentDescription={modalProps.currentDescription}
+          />
+        )}
+
+        {modalType === 'DELETE_BOARD' && modalProps && (
+          <DeleteBoardModal
+            isOpen={true}
+            onClose={closeModal}
+            boardId={modalProps.boardId}
+            currentBoardName={modalProps.currentBoardName}
           />
         )}
       </AnimatePresence>

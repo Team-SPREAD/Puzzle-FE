@@ -7,7 +7,6 @@ import { Settings } from 'lucide-react';
 import useModalStore from '@/store/useModalStore';
 import { useDarkMode } from '@/store/useDarkModeStore';
 import { getTeamMembers } from '@/app/api/dashboard-axios';
-import arrowBottom from '~/images/arrow-bottom.svg';
 import TeamSettingModal from './Modals/TeamSettingsModal';
 
 interface DashboardHeaderProps {
@@ -161,7 +160,7 @@ export default function DashboardHeader({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   className="absolute right-16 -mt-[83px] z-30 transform-gpu"
-                  style={{ minWidth: '200px' }} 
+                  style={{ minWidth: '200px' }}
                 >
                   <TeamSettingModal onClose={closeModal} />
                 </motion.div>

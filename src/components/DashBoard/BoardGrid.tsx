@@ -15,7 +15,7 @@ interface BoardGridProps {
   teamId: string | null;
   token: string;
   searchTerm: string;
-  boardView: 'MyBoards' | 'FavoriteBoards';
+  boardView: 'MyBoards' | 'FavoriteBoards' | 'TeamBoards';
 }
 
 export default function BoardGrid({
