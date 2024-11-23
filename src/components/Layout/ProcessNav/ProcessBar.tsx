@@ -23,6 +23,8 @@ import { motion } from 'framer-motion';
 import { useColorStore } from '@/store/vote/colorStore';
 import { useProcessStore } from '@/store/vote/processStore';
 import { ColorState } from '@/store/vote/types';
+import { useOthers, useSelf } from '@/liveblocks.config';
+import Image from 'next/image';
 
 const icons = [
   Star,
@@ -49,6 +51,77 @@ interface ProcessBarProps {
   updateCurrentProcess: (step: number) => void;
 }
 
+interface StepUsersProps {
+  step: number;
+  userInfo: {
+    _id: string;
+    name: string;
+    avatar: string;
+  };
+}const StepUsers: React.FC<StepUsersProps> = ({ step, userInfo }) => {
+  const others = useOthers();
+  const currentUser = useSelf();
+ 
+  const DEFAULT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIGZpbGw9IiNFNUU3RUIiLz48Y2lyY2xlIGN4PSI4IiBjeT0iNiIgcj0iMyIgZmlsbD0iI0E0QTdBRiIvPjxwYXRoIGQ9Ik0xNSAxNlY5QzE1IDkgMTEuODY2IDExIDggMTFDNC4xMzQwMSAxMSAxIDkgMSA5VjE2SDE1WiIgZmlsbD0iI0E0QTdBRiIvPjwvc3ZnPg==";
+  
+  const usersInStep = others.filter(
+    (user) => user.presence?.currentProcess === step
+  );
+  
+  const isSelfInStep = currentUser?.presence?.currentProcess === step;
+  const totalCount = (isSelfInStep ? 1 : 0) + usersInStep.length;
+
+  if (!isSelfInStep && usersInStep.length === 0) return null;
+
+  return (
+    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 flex -space-x-1">
+      {/* 현재 사용자가 있을 경우 첫 번째로 표시 */}
+      {isSelfInStep && (
+        <div className="relative">
+          <div className="relative w-4 h-4 rounded-full overflow-hidden border border-white shadow-sm">
+            <Image
+              src={userInfo.avatar || DEFAULT_AVATAR}
+              alt={userInfo.name}
+              width={16}
+              height={16}
+              className="object-cover"
+              unoptimized
+            />
+            <div className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 bg-green-500 rounded-full border border-white" />
+          </div>
+        </div>
+      )}
+
+      {/* 다른 사용자들 (최대 1명 또는 현재 사용자가 없는 경우 2명) */}
+      {usersInStep.slice(0, isSelfInStep ? 1 : 2).map((user) => (
+        <div key={user.connectionId} className="relative">
+          <div className="relative w-4 h-4 rounded-full overflow-hidden border border-white shadow-sm">
+            <Image
+              src={user.info?.avatar || DEFAULT_AVATAR}
+              alt={user.info?.name || 'Unknown user'}
+              width={16}
+              height={16}
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+        </div>
+      ))}
+
+      {/* 추가 인원이 있는 경우 +N 표시 */}
+      {totalCount > (isSelfInStep ? 2 : 2) && (
+        <div className="relative">
+          <div className="w-4 h-4 rounded-full bg-gray-100 border border-white shadow-sm flex items-center justify-center">
+            <span className="text-[8px] font-medium text-gray-600">
+              +{totalCount - (isSelfInStep ? 2 : 2)}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ProcessBar: React.FC<ProcessBarProps> = ({
   processes,
   currentStep,
@@ -61,7 +134,6 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
     ? params.boardId[0]
     : params.boardId;
 
-  // useColorStore를 타입과 함께 사용
   const progressColor = useColorStore(
     (state: ColorState) => state.progressColor,
   );
@@ -69,7 +141,6 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
     (state: ColorState) => state.setProgressColor,
   );
 
-  // ProcessStore 사용
   const { getCompletedSteps, isStepAccessible, setCurrentStep } =
     useProcessStore();
   const { toast } = useToast();
@@ -140,14 +211,13 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
 
         return (
           <React.Fragment key={process.step}>
+            {/* 연결선 */}
             {index > 0 && (
               <div className="relative w-8 mx-2">
                 <div className="absolute top-1/2 -translate-y-1/2 w-full h-[2px] bg-gray-200" />
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{
-                    width: isCompleted ? '100%' : '0%',
-                  }}
+                  animate={{ width: isCompleted ? '100%' : '0%' }}
                   className="absolute top-1/2 -translate-y-1/2 h-[2px]"
                   style={{ backgroundColor: progressColor }}
                   transition={{ duration: 0.3 }}
@@ -155,7 +225,10 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
               </div>
             )}
 
+            {/* 단계 버튼과 사용자 아바타들 */}
             <div className="relative group">
+              <StepUsers step={process.step} userInfo={userInfo} />
+
               {isCurrent && (
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
@@ -171,6 +244,7 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
                   className="absolute inset-0 rounded-full bg-slate-400 -m-1"
                 />
               )}
+
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -186,18 +260,18 @@ const ProcessBar: React.FC<ProcessBarProps> = ({
                           : undefined
                       }
                       className={`
-                       relative w-9 h-9 rounded-full flex items-center justify-center 
-                       transition-all duration-200
-                       ${
-                         isCompleted
-                           ? 'hover:brightness-110'
-                           : isCurrent
-                             ? 'bg-indigo-500 text-white'
-                             : isAccessible
-                               ? 'bg-white text-gray-600 hover:bg-blue-500 hover:text-white'
-                               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                       }
-                     `}
+                        relative w-9 h-9 rounded-full flex items-center justify-center 
+                        transition-all duration-200
+                        ${
+                          isCompleted
+                            ? 'hover:brightness-110'
+                            : isCurrent
+                              ? 'bg-indigo-500 text-white'
+                              : isAccessible
+                                ? 'bg-white text-gray-600 hover:bg-blue-500 hover:text-white'
+                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        }
+                      `}
                       onClick={() => handleStepClick(process)}
                       disabled={!isCompleted && !isAccessible}
                     >
