@@ -1,14 +1,13 @@
 'use client';
-import { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Camera, UserInfo } from '@/lib/types';
-import { useBroadcastEvent, useEventListener } from '@/liveblocks.config';
-import MarkdownEditor from '../MarkdownEditor';
-import '@/styles/markdown.css';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Camera } from '@/lib/types';
+import { useMarkdownStore } from '@/store/useMarkdownStore';
+import ModalContent from '@/components/AniModals/MarkDownModal';
 import { stepResult } from '@/app/api/canvas-axios';
-// import jsPDF from 'jspdf';
-// import { marked } from 'marked';
+import Image from 'next/image';
+import NotionIcon from '~/images/logo/Notion.png';
+import FigmaIcon from '~/images/logo/Figma.png';
 
 interface ResultProps {
   camera: Camera;
@@ -17,27 +16,18 @@ interface ResultProps {
 
 export default function Result({ camera, boardId }: ResultProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const broadcast = useBroadcastEvent();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [markdown, setMarkdown] = useState<string>('# 요구사항 명세서');
-  const [copied, setCopied] = useState(false);
-
-  // Liveblocks 이벤트 수신
-  useEventListener(({ event }) => {
-    if (event.type === 'FINAL_MODAL') {
-      setIsModalOpen(true); // FINAL_MODAL 이벤트로 모달 열기
-    }
-  });
+  const { markdown, setMarkdown } = useMarkdownStore();
 
   // 컴포넌트 마운트 시 결과를 가져옴
   const fetchResult = async () => {
     try {
-      const liveblocksToken = localStorage.getItem('roomToken'); // Liveblocks 토큰 가져오기
+      const liveblocksToken = localStorage.getItem('roomToken');
 
       const resultResponse = await stepResult(boardId, liveblocksToken);
 
       if (resultResponse) {
-        setMarkdown(resultResponse.data.result); // 결과 데이터를 MarkdownEditor에 설정
+        setMarkdown(resultResponse.data.result);
         console.log('결과 데이터 가져오기 성공');
       }
     } catch (error) {
@@ -45,52 +35,13 @@ export default function Result({ camera, boardId }: ResultProps) {
     }
   };
 
-  // 클립보드 복사 함수
-  const handleCopyMarkdown = () => {
-    navigator.clipboard.writeText(markdown).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+  const handleNotionClick = () => {
+    window.open('https://www.notion.so', '_blank');
   };
 
-  // PDF 내보내기 함수
-  // const handleExportPDF = () => {
-  //   // HTML로 변환
-  //   const htmlContent = `
-  //   <style>
-  //   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
-  //     body { font-family: 'Noto Sans KR', sans-serif; }
-  //     h1, h2, h3 { font-weight: bold; color: #333; }
-  //     ul { padding-left: 20px; }
-  //     li { margin-bottom: 8px; }
-  //     img { max-width: 100%; height: auto; display: block; margin-bottom: 8px; }
-  //     pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
-  //   </style>
-  //   ${marked.parse(markdown)}
-  // `;
-
-  //   // PDF 생성
-  //   const doc = new jsPDF({
-  //     orientation: 'p',
-  //     unit: 'mm',
-  //     format: 'a4',
-  //   });
-
-  //   // // 폰트 설정 (기본 폰트)
-  //   doc.setFont('helvetica');
-
-  //   // HTML을 PDF로 변환 (마진 설정)
-  //   doc.html(htmlContent, {
-  //     callback: function (doc) {
-  //       console.log(doc);
-  //       doc.save('puzzle_result.pdf');
-  //     },
-  //     x: 10,
-  //     y: 10,
-  //     width: 190, // A4 페이지 폭에 맞춤
-  //     windowWidth: 190,
-  //   });
-  // };
+  const handleFigmaClick = () => {
+    window.open('https://www.figma.com', '_blank');
+  };
 
   return (
     <>
@@ -112,7 +63,6 @@ export default function Result({ camera, boardId }: ResultProps) {
                 exit={{ opacity: 0, x: -20 }}
                 className="p-4 pr-12"
               >
-                {/* 단계 설명 */}
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="bg-gray-800 text-gray-400 text-xs px-2 py-0.5 rounded-full font-medium">
@@ -121,20 +71,17 @@ export default function Result({ camera, boardId }: ResultProps) {
                     <h2 className="font-semibold text-white">결과 마무리</h2>
                   </div>
                   <p className="text-xs text-gray-400">
-                    프로젝트 마무리를 위해 README.md와 최종 검토를
-                    진행하세요
+                    프로젝트 마무리를 위해 README.md와 최종 검토를 진행하세요
                   </p>
                 </div>
 
-                {/* 카드 그리드 */}
                 <div className="grid grid-cols-3 gap-3">
                   <div
                     className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer"
                     onClick={() => {
-                      broadcast({ type: 'FINAL_MODAL' });
                       setIsModalOpen(true);
                       setIsCollapsed(true);
-                      (() => fetchResult())();
+                      fetchResult();
                     }}
                   >
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">
@@ -142,17 +89,67 @@ export default function Result({ camera, boardId }: ResultProps) {
                     </h3>
                     <p className="text-xs text-gray-400">결과 확인하기</p>
                   </div>
-                  <div className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer">
+                  <div
+                    onClick={handleNotionClick}
+                    className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer group"
+                  >
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">
-                      <span>🔍</span> 마무리 검토
+                      <span>
+                        <Image
+                          src={NotionIcon}
+                          alt="notion"
+                          width={16}
+                          height={16}
+                        />
+                      </span>
+                      Notion
+                      <svg
+                        className="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
                     </h3>
-                    <p className="text-xs text-gray-400">결과물을 점검하세요</p>
+                    <p className="text-xs text-gray-400">기획 정리 하러가기</p>
                   </div>
-                  <div className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer">
+                  <div
+                    onClick={handleFigmaClick}
+                    className="bg-gray-800 rounded-lg p-3 hover:bg-gray-700 transition-colors cursor-pointer group"
+                  >
                     <h3 className="font-medium text-white mb-1 text-sm flex items-center gap-1">
-                      <span>✅</span> 최종 확인
+                      <span>
+                        <Image
+                          src={FigmaIcon}
+                          alt="figma"
+                          width={16}
+                          height={16}
+                        />
+                      </span>
+                      Figma
+                      <svg
+                        className="w-3 h-3 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity ml-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
                     </h3>
-                    <p className="text-xs text-gray-400">완료되었는지 확인</p>
+                    <p className="text-xs text-gray-400">
+                      이어서 디자인 하러가기
+                    </p>
                   </div>
                 </div>
               </motion.div>
@@ -192,7 +189,6 @@ export default function Result({ camera, boardId }: ResultProps) {
             )}
           </AnimatePresence>
 
-          {/* 접기/펼치기 버튼 - 펼쳐진 상태에서만 보임 */}
           <AnimatePresence>
             {!isCollapsed && (
               <motion.button
@@ -222,7 +218,6 @@ export default function Result({ camera, boardId }: ResultProps) {
             )}
           </AnimatePresence>
 
-          {/* 접힌 상태에서는 전체 영역이 클릭 가능 */}
           {isCollapsed && (
             <motion.button
               onClick={() => setIsCollapsed(false)}
@@ -231,7 +226,7 @@ export default function Result({ camera, boardId }: ResultProps) {
           )}
         </motion.div>
       </motion.div>
-      {/* 모달 */}
+
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -246,119 +241,7 @@ export default function Result({ camera, boardId }: ResultProps) {
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-white w-full max-w-5xl rounded-xl shadow-2xl overflow-hidden relative"
             >
-              {/* Close Button */}
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 z-10 text-gray-500 hover:text-gray-800 transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-
-              {/* Modal Content */}
-              <div className="p-6 pt-12">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                  단계 결과
-                </h2>
-                {/* 버튼들 */}
-                <div className="flex gap-2 mb-2">
-                  {/* PDF 내보내기 버튼 */}
-                  {/* <button
-                    onClick={handleExportPDF}
-                    className="bg-[#E20001] text-white px-3 py-1 rounded-md text-sm hover:bg-[#BD0000] transition-colors flex items-center gap-1"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" />
-                      <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    PDF
-                  </button> */}
-
-                  {/* 클립보드 복사 버튼 */}
-                  <button
-                    onClick={handleCopyMarkdown}
-                    className={`text-white px-3 py-1 rounded-md text-sm transition-colors flex items-center gap-1 ${
-                      copied
-                        ? 'bg-green-500 hover:bg-green-600'
-                        : 'bg-blue-500 hover:bg-blue-600'
-                    }`}
-                  >
-                    {copied ? (
-                      <>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                        복사됨
-                      </>
-                    ) : (
-                      <>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <rect
-                            x="9"
-                            y="9"
-                            width="13"
-                            height="13"
-                            rx="2"
-                            ry="2"
-                          />
-                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                        </svg>
-                        복사
-                      </>
-                    )}
-                  </button>
-                </div>
-                <MarkdownEditor
-                  value={markdown}
-                  onChange={(value) => setMarkdown(value || '')}
-                  height={500}
-                  placeholder="요구사항을 입력하세요..."
-                  className="markdown-editor"
-                />
-              </div>
+              <ModalContent onClose={() => setIsModalOpen(false)} />
             </motion.div>
           </motion.div>
         )}

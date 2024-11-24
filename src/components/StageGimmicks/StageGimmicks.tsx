@@ -5,7 +5,7 @@ import {
   SparedBoxTemplate,
   DiscussionBoxTemplate,
   PersonaBoxTemplate,
-  ProblemSolvingBoxTemplate
+  ProblemSolvingBoxTemplate,
 } from '.';
 import { STAGE_GIMMICKS } from './configs';
 import { motion } from 'framer-motion';

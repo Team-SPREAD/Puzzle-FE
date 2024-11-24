@@ -1,5 +1,3 @@
-
-
 export interface StageGimmick {
   boxes: {
     id: string;
@@ -85,7 +83,7 @@ export const STAGE_GIMMICKS: { [key: number]: StageGimmick } = {
     title: '단계별 문제해결',
     description: 'How를 통해 문제를 단계별로 해결해보세요',
   },
-  
+
   8: {
     boxes: [
       {
@@ -126,7 +124,6 @@ export const getPersonaEmoji = (age: number, gender: string) => {
   return '🧑';
 };
 
-
 export const BOX_CONFIG = {
   define: {
     title: 'How Bad?',
@@ -138,8 +135,8 @@ export const BOX_CONFIG = {
     guideQuestions: [
       '어떤 문제가 있나요?',
       '문제의 심각성은 어느 정도인가요?',
-      '누구에게 영향을 미치나요?'
-    ]
+      '누구에게 영향을 미치나요?',
+    ],
   },
   analyze: {
     title: 'How Come?',
@@ -151,8 +148,8 @@ export const BOX_CONFIG = {
     guideQuestions: [
       '왜 이 문제가 발생했나요?',
       '어떤 요인들이 영향을 미쳤나요?',
-      '근본적인 원인은 무엇인가요?'
-    ]
+      '근본적인 원인은 무엇인가요?',
+    ],
   },
   solve: {
     title: 'How To?',
@@ -164,7 +161,7 @@ export const BOX_CONFIG = {
     guideQuestions: [
       '어떻게 해결할 수 있을까요?',
       '필요한 자원은 무엇인가요?',
-      '실현 가능한 방법은 무엇인가요?'
-    ]
-  }
+      '실현 가능한 방법은 무엇인가요?',
+    ],
+  },
 } as const;
