@@ -19,10 +19,10 @@ const RightNav = memo(({ roomId }: GroupCallProps) => {
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="absolute right-3 top-40 z-30" // 위치 조정
+        className="absolute right-5 top-40 z-30" // 위치 조정
       >
         <motion.div
-          animate={{ width: isCollapsed ? '80px' : '250px' }} // 너비 감소
+          animate={{ width: isCollapsed ? '100px' : '250px' }} // 너비 감소
           transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
           className="relative bg-white/90 backdrop-blur-sm rounded-lg shadow-lg pointer-events-auto overflow-hidden" // rounded-xl -> rounded-lg
         >
