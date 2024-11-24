@@ -1,0 +1,23 @@
+/* Markdown Editor Background Color */
+.markdown-editor {
+  background-color: #f9f9f9; /* 배경색 */
+  color: #333333;
+}
+
+/* Toolbar Background */
+.markdown-editor .w-md-editor-bar {
+  background-color: #4a90e2; /* 툴바 배경색 */
+  color: #ffffff; /* 툴바 글자색 */
+}
+
+/* Active Toolbar Button */
+.markdown-editor .w-md-editor-bar button.active {
+  background-color: #ffffff; /* 활성화된 버튼 배경색 */
+  color: #4a90e2; /* 활성화된 버튼 글자색 */
+}
+
+/* Markdown Preview Background */
+.markdown-preview {
+  background-color: #ffffff; /* 미리보기 배경색 */
+  color: #333333; /* 미리보기 글자색 */
+}

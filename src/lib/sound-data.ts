@@ -1,9 +1,9 @@
-import { SoundType } from './type';
+import { SoundType } from './types';
 
 export const SoundData: SoundType[] = [
   {
     id: 1,
-    name: 'Duck Sound',
+    name: 'Duck',
     imgUrl: 'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/duck.svg',
     url: 'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/duck.mp3',
   },
@@ -35,7 +35,7 @@ export const SoundData: SoundType[] = [
   },
   {
     id: 6,
-    name: 'ba dum tss',
+    name: 'ba drum',
     imgUrl:
       'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/bassDrum.svg',
     url: 'https://aws-file-uploder.s3.ap-northeast-2.amazonaws.com/bassDrum.mp3',

@@ -1,18 +1,19 @@
 import Room from "@/components/Room";
+// import Header from "@/components/Board/Header";
 
-const BoardIdPage = ({
+const BoardPage = ({
     params,
 }: {
     params: {
         boardId: string;
     };
 }) => {
-    console.log("searchParams", params.boardId);
     return (
-        <main className="w-full h-full relative bg-surface-canvas touch-none">
+        <main className="relative h-full w-full touch-none bg-surface-canvas">
+            {/* <Header projectName={params.boardId} /> */}
             <Room roomId={params.boardId} />
         </main>
     );
 };
 
-export default BoardIdPage;
+export default BoardPage;

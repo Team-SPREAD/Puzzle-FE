@@ -1,45 +1,103 @@
-"use client";
+'use client';
 
-import { ClientSideSuspense, RoomProvider } from "@liveblocks/react/suspense";
-import { useSearchParams } from "next/navigation";
-import { ReactNode, useMemo } from "react";
-import { LiveMap } from "@liveblocks/core";
-import { Loading } from "@/components/Loading";
-import { defaultUserPreferences, Tldraw } from "tldraw";
-import { StorageTldraw } from "./StorageTldraw";
+import { ReactNode, useEffect, useState } from 'react';
+import { RoomProvider } from '@/liveblocks.config';
+import { ClientSideSuspense } from '@liveblocks/react';
+import { LiveList, LiveMap, LiveObject } from '@liveblocks/client';
+import { Layer } from '@/lib/types';
+import { Loading } from '@/components/Loading';
+import Canvas from '@/components/Canvas/Canvas';
+import { steps } from '@/lib/process-data';
+import { SerializableNode } from '@/lib/types';
+import { getCurrentStep } from '@/app/api/dashboard-axios';
+import { useProcessProgress } from '@/hooks/vote/useProcessProgress';
 
 interface RoomProps {
   roomId: string;
 }
 
 const Room = ({ roomId }: RoomProps) => {
-  const exampleRoomId = useExampleRoomId(roomId);
+  const [token, setToken] = useState<string | null>(null);
+  const [initialStep, setInitialStep] = useState<number>(1);
+  const { initializeBoardProgress } = useProcessProgress(roomId);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const init = async () => {
+      const storedToken = localStorage.getItem('token');
+      if (!storedToken || !isMounted) return;
+      
+      setToken(storedToken);
+
+      try {
+        const currentStep = await getCurrentStep(roomId, storedToken);
+        
+        // currentStep이 유효한 숫자인지 확인
+        if (typeof currentStep === 'number' && isMounted) {
+          const adjustedStep = Math.max(1, currentStep - 1); // 음수가 되지 않도록 보호
+          setInitialStep(adjustedStep);
+          initializeBoardProgress(adjustedStep);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          // 404 에러인 경우 기본값 사용
+          if (error.message.includes('찾을 수 없습니다')) {
+            console.warn('보드를 찾을 수 없어 초기 단계를 1로 설정합니다.');
+            setInitialStep(1);
+            initializeBoardProgress(1);
+          } else {
+            console.error('단계 조회 중 오류 발생:', error.message);
+          }
+        }
+      }
+    };
+
+    init();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [roomId, initializeBoardProgress]);
+
+  if (!token) return <Loading />;
 
   return (
     <RoomProvider
-      id={exampleRoomId}
-      initialPresence={{ presence: undefined }}
-      initialStorage={{ records: new LiveMap() }}
+      id={roomId}
+      initialPresence={{
+        selection: [],
+        cursor: null,
+        pencilDraft: null,
+        penColor: null,
+        currentProcess: initialStep,
+      }}
+      initialStorage={{
+        time: new LiveObject({ time: 300 }),
+        process: new LiveList(steps),
+        groupCall: new LiveObject({
+          roomId: '',
+          activeUsers: new LiveList([]),
+        }),
+        layers: new LiveMap<string, LiveObject<Layer>>(),
+        layerIds: new LiveList([]),
+        person: new LiveObject({ name: '' }),
+        nodes: new LiveMap<string, LiveObject<SerializableNode>>(),
+        edges: [],
+        host: new LiveObject({ userId: '' }),
+        voting: new LiveObject({
+          votes: {},
+          currentStep: initialStep,
+          isCompleted: false,
+          showCompletionModal: false,
+        }),
+      }}
     >
-      <ClientSideSuspense fallback={<Loading />}>{()=><StorageTldraw />}</ClientSideSuspense>
+      <ClientSideSuspense fallback={<Loading />}>
+        {() => <Canvas />}
+      </ClientSideSuspense>
     </RoomProvider>
   );
 };
 
 export default Room;
-
-/**
- * This function is used when deploying an example on liveblocks.io.
- * You can ignore it completely if you run the example locally.
- */
-function useExampleRoomId(roomId: string) {
-  const params = useSearchParams();
-  const exampleId = params?.get("exampleId");
-
-  const exampleRoomId = useMemo(() => {
-    return exampleId ? `${roomId}-${exampleId}` : roomId;
-  }, [roomId, exampleId]);
-
-  return exampleRoomId;
-}
