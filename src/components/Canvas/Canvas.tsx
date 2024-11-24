@@ -76,7 +76,9 @@ import { RoomEvent } from '@/liveblocks.config';
 import useModalStore from '@/store/useModalStore';
 import VotingModal from '../Layout/Vote/Modal/VotingModal';
 import GuideModal from '../Layout/Modal/GuildModal';
-
+import ResultModal from '../AniModals/ResultModal';
+import { stepResult } from '@/app/api/canvas-axios';
+import { useMarkdownStore } from '@/store/useMarkdownStore';
 const MAX_LAYERS = 500;
 
 const Canvas = () => {
@@ -714,6 +716,41 @@ const Canvas = () => {
     }),
     [penSize],
   );
+
+  //Result Modal 컴포넌트에 관한 것들
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showResultModal, setShowResultModal] = useState(false);
+  const { markdown, setMarkdown } = useMarkdownStore();
+
+  useEffect(() => {
+    if (currentStep === 10) {
+      setShowResultModal(true);
+    }
+  }, [currentStep]);
+
+  const handleClose = () => {
+    setShowResultModal(false);
+    setIsGenerating(false);
+  };
+  const fetchResult = async () => {
+    try {
+      const liveblocksToken = localStorage.getItem('roomToken'); // Liveblocks 토큰 가져오기
+
+      const resultResponse = await stepResult(boardId, liveblocksToken);
+
+      if (resultResponse) {
+        setMarkdown(resultResponse.data.result); // 결과 데이터를 MarkdownEditor에 설정
+        console.log('결과 데이터 가져오기 성공');
+      }
+    } catch (error) {
+      console.error('Failed to fetch result:', error);
+    }
+  };
+  const handleConfirm = async () => {
+    setIsGenerating(true);
+    fetchResult();
+  };
+
   return (
     <div
       id={'canvas-element'}
@@ -826,6 +863,13 @@ const Canvas = () => {
         <RightNav roomId={groupCall.roomId} />
       </div>
       {modalType === 'GUIDE_MODAL' && <GuideModal />} {/* 추가 */}
+      {showResultModal && (
+        <ResultModal
+          onClose={handleClose}
+          onConfirm={handleConfirm}
+          isGenerating={isGenerating}
+        />
+      )}
     </div>
   );
 };
