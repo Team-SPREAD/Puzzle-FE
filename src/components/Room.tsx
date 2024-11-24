@@ -32,12 +32,24 @@ const Room = ({ roomId }: RoomProps) => {
 
       try {
         const currentStep = await getCurrentStep(roomId, storedToken);
-        if (currentStep && currentStep !== initialStep && isMounted) {
-          setInitialStep(currentStep-1); // 초기 단계에 -1을 해야지 단계 완료되는 오류 해결
-          initializeBoardProgress(currentStep-1);
+        
+        // currentStep이 유효한 숫자인지 확인
+        if (typeof currentStep === 'number' && isMounted) {
+          const adjustedStep = Math.max(1, currentStep - 1); // 음수가 되지 않도록 보호
+          setInitialStep(adjustedStep);
+          initializeBoardProgress(adjustedStep);
         }
       } catch (error) {
-        console.error('Error fetching initial step:', error);
+        if (error instanceof Error) {
+          // 404 에러인 경우 기본값 사용
+          if (error.message.includes('찾을 수 없습니다')) {
+            console.warn('보드를 찾을 수 없어 초기 단계를 1로 설정합니다.');
+            setInitialStep(1);
+            initializeBoardProgress(1);
+          } else {
+            console.error('단계 조회 중 오류 발생:', error.message);
+          }
+        }
       }
     };
 
@@ -46,7 +58,7 @@ const Room = ({ roomId }: RoomProps) => {
     return () => {
       isMounted = false;
     };
-  }, [roomId, initializeBoardProgress, initialStep]);
+  }, [roomId, initializeBoardProgress]);
 
   if (!token) return <Loading />;
 
@@ -69,7 +81,6 @@ const Room = ({ roomId }: RoomProps) => {
         }),
         layers: new LiveMap<string, LiveObject<Layer>>(),
         layerIds: new LiveList([]),
-        // Storage 타입에 맞게 person 객체 추가
         person: new LiveObject({ name: '' }),
         nodes: new LiveMap<string, LiveObject<SerializableNode>>(),
         edges: [],
