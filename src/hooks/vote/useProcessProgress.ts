@@ -4,11 +4,10 @@ import axiosInstance from '@/app/api/axiosInstance';
 
 export const useProcessProgress = (boardId: string) => {
   const { boardProgress, setBoardProgress } = useProcessStore();
-
   const getHeaders = () => ({
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      'Liveblocks-Token': localStorage.getItem('roomToken')
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+      'Liveblocks-Token': localStorage.getItem('roomToken'),
     },
   });
 
