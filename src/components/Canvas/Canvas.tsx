@@ -79,6 +79,7 @@ import GuideModal from '../Layout/Modal/GuildModal';
 import ResultModal from '../AniModals/ResultModal';
 import { stepResult } from '@/app/api/canvas-axios';
 import { useMarkdownStore } from '@/store/useMarkdownStore';
+import ProgressModal from '../AniModals/ProgressModal';
 const MAX_LAYERS = 500;
 
 const Canvas = () => {
@@ -734,7 +735,7 @@ const Canvas = () => {
   };
   const fetchResult = async () => {
     try {
-      const liveblocksToken = localStorage.getItem('roomToken'); // Liveblocks 토큰 가져오기
+      const liveblocksToken = localStorage.getItem(`roomToken:${boardId}`); // Liveblocks 토큰 가져오기
 
       const resultResponse = await stepResult(boardId, liveblocksToken);
 
@@ -870,6 +871,7 @@ const Canvas = () => {
           isGenerating={isGenerating}
         />
       )}
+      <ProgressModal />
     </div>
   );
 };

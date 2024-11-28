@@ -112,40 +112,6 @@ export default function LandingPage() {
 
   return (
     <div className="relative h-screen w-full overflow-hidden">
-      {/* Header */}
-      {/* <header 
-        className={`fixed top-0 left-0 w-full h-16 z-50 bg-white/80 backdrop-blur-sm border-b transition-transform duration-300 ${
-          isHeaderVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}
-      >
-        <div className="container mx-auto px-4 h-full flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              PUZZLE
-            </span>
-            <nav className="hidden md:flex items-center gap-6">
-              <a href="#" className="text-gray-600 hover:text-gray-900">
-                Home
-              </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">
-                Features
-              </a>
-              <a href="#" className="text-gray-600 hover:text-gray-900">
-                About
-              </a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="text-gray-600 hover:text-gray-900">
-              Sign In
-            </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Get Started
-            </button>
-          </div>
-        </div>
-      </header> */}
-
       {/* Fixed Get Puzzle Button */}
       <div
         className={`fixed top-6 right-8 z-50 transition-all duration-500 ${

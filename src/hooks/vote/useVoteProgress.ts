@@ -11,6 +11,7 @@ import useModalStore from '@/store/useModalStore';
 import { captureAndUpload } from '@/app/api/canvas-axios';
 import { useEffect, useState } from 'react';
 import { getTeamMembers } from '@/app/api/dashboard-axios';
+import useProgressModalStore from '@/store/useProgressModalStore'; // Progress Modal Store 사용
 
 export const useVoteProgress = (
   boardId: string,
@@ -85,19 +86,23 @@ export const useVoteProgress = (
           return;
         }
 
-        const liveblocksToken = localStorage.getItem('roomToken');
+        const liveblocksToken = localStorage.getItem(`roomToken:${boardId}`);
+        console.log(localStorage.getItem(`roomToken:${boardId}`));
         if (!liveblocksToken) {
           console.error('Liveblocks token is missing.');
           return;
         }
 
         try {
+          const modalStore = useProgressModalStore.getState(); // Progress Modal Store 사용
+          modalStore.openModal(); // Progress 모달 열기
           await captureAndUpload(
             canvasRef.current,
             boardId,
             currentStep,
             liveblocksToken,
           );
+          modalStore.closeModal(); // 에러 발생 시 모달 닫기
         } catch (captureError) {
           console.error(
             'Failed to capture and upload the canvas:',

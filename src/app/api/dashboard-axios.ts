@@ -122,15 +122,17 @@ export const getRoomToken = async (roomId: string) => {
 //현재 currentStep 불러오기
 export const getCurrentStep = async (boardId: string, token: string) => {
   try {
-    const response = await axiosInstance.get(`/api/board/${boardId}/currentStep`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
+    const response = await axiosInstance.get(
+      `/api/board/${boardId}/currentStep`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
 
     // API 응답이 { currentStep: number } 형태로 옴
     return response.data.currentStep;
-    
   } catch (error: any) {
     if (error.response?.status === 404) {
       throw new Error('보드를 찾을 수 없습니다.');

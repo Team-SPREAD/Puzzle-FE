@@ -17,7 +17,6 @@ import { Loading } from '@/components/Loading';
 import EditBoardModal from '@/components/DashBoard/Modals/EditBoardModal';
 import DeleteBoardModal from '@/components/DashBoard/Modals/DeleteBoardModal';
 
-
 // 유틸
 import { generateRandomColor } from '@/utils/getRandomColor';
 
@@ -54,7 +53,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [boardView, setBoardView] = useState<
-    'MyBoards' | 'FavoriteBoards' | 'TeamBoards'| 'Pricing'
+    'MyBoards' | 'FavoriteBoards' | 'TeamBoards' | 'Pricing'
   >('MyBoards');
 
   // 랜덤 색상 설정
@@ -68,7 +67,7 @@ export default function DashboardPage() {
       const token = localStorage.getItem('token');
       if (!token) {
         console.error('로컬스토리지에 토큰이 없습니다.');
-        router.push('/login');
+        router.push('/');
         return;
       }
 
@@ -101,7 +100,7 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.error('API 요청 실패:', error);
-        router.push('/login');
+        router.push('/');
       } finally {
         setIsLoading(false);
       }

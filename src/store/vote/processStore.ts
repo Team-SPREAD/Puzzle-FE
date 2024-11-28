@@ -32,7 +32,7 @@ export const useProcessStore = create<ProcessState>()(
 
       addCompletedStep: async (boardId: string, step: number) => {
         try {
-          const liveblocksToken = localStorage.getItem('roomToken');
+          const liveblocksToken = localStorage.getItem(`roomToken:${boardId}`);
           const response = await axiosInstance.patch(
             `/api/board/currentStep/${boardId}`,
             { currentStep: step },
@@ -93,7 +93,7 @@ export const useProcessStore = create<ProcessState>()(
 
       setCurrentStep: async (boardId: string, step: number) => {
         try {
-          const liveblocksToken = localStorage.getItem('roomToken');
+          const liveblocksToken = localStorage.getItem(`roomToken:${boardId}`);
           const response = await axiosInstance.patch(
             `/api/board/currentStep/${boardId}`,
             { currentStep: step },
