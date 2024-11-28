@@ -60,7 +60,7 @@ const ResultModal: React.FC<ResultModalProps> = ({
     if (showConfetti) {
       const timer = setTimeout(() => {
         setShowConfetti(false);
-      }, 3000); // 3초 후에 confetti 숨기기
+      }, 1000); // 3초 후에 confetti 숨기기
 
       return () => clearTimeout(timer);
     }
