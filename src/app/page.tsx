@@ -20,7 +20,7 @@ const SECTIONS = [
     step: 'STEP 1',
     title: '프로젝트 시작하기',
     description: '팀을 구성하고 프로젝트의 목표와 방향성을 설정하세요',
-    image: '/gifs/project_start.gif',
+    image: '/gifs/createTeam.gif',
   },
   {
     step: 'STEP 2',
@@ -228,6 +228,7 @@ export default function LandingPage() {
                   src={section.image}
                   alt={section.title}
                   fill
+                  unoptimized
                   className="rounded-lg shadow-xl object-cover"
                 />
               </div>
