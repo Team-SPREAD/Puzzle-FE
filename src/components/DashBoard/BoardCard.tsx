@@ -88,8 +88,8 @@ const BoardCard: React.FC<BoardCardProps> = ({
       const response = await getRoomToken(board._id);
       if (response.status === 201 && response.data?.token) {
         const { token } = response.data;
-        localStorage.setItem('roomToken', token);
-        setCookie(null, 'roomToken', token, {
+        localStorage.setItem(`roomToken:${board._id}`, token);
+        setCookie(null, `roomToken:${board._id}`, token, {
           maxAge: 3600,
           path: '/',
         });

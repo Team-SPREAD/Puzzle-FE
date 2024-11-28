@@ -735,7 +735,7 @@ const Canvas = () => {
   };
   const fetchResult = async () => {
     try {
-      const liveblocksToken = localStorage.getItem('roomToken'); // Liveblocks 토큰 가져오기
+      const liveblocksToken = localStorage.getItem(`roomToken:${boardId}`); // Liveblocks 토큰 가져오기
 
       const resultResponse = await stepResult(boardId, liveblocksToken);
 

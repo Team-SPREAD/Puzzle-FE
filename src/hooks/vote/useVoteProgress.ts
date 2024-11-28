@@ -86,7 +86,8 @@ export const useVoteProgress = (
           return;
         }
 
-        const liveblocksToken = localStorage.getItem('roomToken');
+        const liveblocksToken = localStorage.getItem(`roomToken:${boardId}`);
+        console.log(localStorage.getItem(`roomToken:${boardId}`));
         if (!liveblocksToken) {
           console.error('Liveblocks token is missing.');
           return;
