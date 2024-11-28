@@ -163,7 +163,6 @@ export default function Sidebar({
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('roomToken');
     window.location.href = '/';
   };
 
