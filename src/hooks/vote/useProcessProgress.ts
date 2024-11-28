@@ -7,7 +7,7 @@ export const useProcessProgress = (boardId: string) => {
   const getHeaders = () => ({
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
-      'Liveblocks-Token': localStorage.getItem('roomToken'),
+      'Liveblocks-Token': localStorage.getItem(`roomToken:${boardId}`),
     },
   });
 
