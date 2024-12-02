@@ -4,7 +4,7 @@ const token =
   typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
 const axiosInstance = axios.create({
-  baseURL: 'https://kim-sun-woo.com:3000', // 베이스 URL 설정
+  baseURL: 'https://kim-sun-woo.com', // 베이스 URL 설정
   headers: {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
