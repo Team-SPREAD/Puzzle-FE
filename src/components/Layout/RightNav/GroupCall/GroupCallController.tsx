@@ -33,18 +33,6 @@ export default function GroupCallController(groupCallId: TypeGroupCallId) {
   const authOption = { userId: userInfo._id, accessToken: userInfo.token };
   useSendBirdInit(authOption);
 
-  //필요시 사용
-  // const updateRoomId = useMutation(({ storage }, roomId: string) => {
-  //   const groupCallId = storage.get('groupCall') as
-  //     | LiveObject<{ roomId: string; activeUsers: LiveList<ActiveUserInfo> }>
-  //     | undefined;
-  //   if (!groupCallId) {
-  //     console.error('groupCall 객체를 찾을 수 없습니다.');
-  //     return;
-  //   }
-  //   groupCallId.set('roomId', roomId);
-  // }, []);
-
   //그룹에 참가한 유저를 liveblocks storage에 추가
   const addToActiveUsers = useMutation(({ storage }, user: ActiveUserInfo) => {
     const groupCall = storage.get('groupCall') as
