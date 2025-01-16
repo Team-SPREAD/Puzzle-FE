@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMarkdownStore } from '@/store/useMarkdownStore';
-import MarkdownEditor from '../MarkdownEditor';
+import MarkdownEditor from '../Canvas/MarkdownEditor';
 
 interface ModalContentProps {
   onClose: () => void;

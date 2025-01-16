@@ -40,15 +40,15 @@ import {
   pointerEventToCanvasPoint,
   resizeBounds,
 } from '@/lib/utils';
-import SelectionBox from '@/components/SelectionBox';
-import LayerComponent from '@/components/LayerComponent';
-import SelectionTools from '@/components/SelectionTools';
+import SelectionBox from '@/components/Canvas/SelectionBox';
+import LayerComponent from '@/components/Canvas/LayerComponent';
+import SelectionTools from '@/components/Canvas/SelectionTools';
 import useDisableScrollBounce from '@/hooks/useDisableScrollBounce';
 import useDeleteLayers from '@/hooks/useDeleteLayers';
-import Drafts from '@/components/Drafts';
-import Path from '@/components/Path';
+import Drafts from '@/components/Canvas/Drafts';
+import Path from '@/components/Canvas/Path';
 import ToolsBar from '@/components/ToolsBar';
-import Cursors from '@/components/Cursors';
+import Cursors from '@/components/Canvas/Cursors';
 import useUserInfoStore from '@/hooks/useUserInfoStore';
 import RightNav from '../Layout/RightNav';
 import ProcessNav from '@/components/Layout/ProcessNav/Index';

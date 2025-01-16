@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useMutation } from '@/liveblocks.config';
 import { PersonaLayer } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { getPersonaEmoji } from './StageGimmicks';
+import { getPersonaEmoji } from '../StageGimmicks';
 import { LiveObject } from '@liveblocks/client';
 
 interface PersonaProps {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useOthers, useSelf } from '../liveblocks.config';
+import { useOthers, useSelf } from '../../liveblocks.config';
 import Image from 'next/image';
 
 const Avatar: React.FC = () => {
