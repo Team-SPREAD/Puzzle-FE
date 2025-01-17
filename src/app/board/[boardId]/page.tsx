@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Room from '@/components/Room';
+import Room from '@/components/Canvas/Room';
 import axiosInstance from '@/app/api/axiosInstance';
 import { Loading } from '@/components/Loading';
 const BoardPage = ({
@@ -14,7 +14,7 @@ const BoardPage = ({
 }) => {
   const router = useRouter();
   const [roomToken, setRoomToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false); // 테스트 시 false 빌드 시 true
 
   useEffect(() => {
     const fetchRoomToken = async () => {

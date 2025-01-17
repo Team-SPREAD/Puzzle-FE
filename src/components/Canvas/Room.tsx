@@ -6,11 +6,11 @@ import { ClientSideSuspense } from '@liveblocks/react';
 import { LiveList, LiveMap, LiveObject } from '@liveblocks/client';
 import { Layer } from '@/lib/types';
 import { Loading } from '@/components/Loading';
-import Canvas from '@/components/Canvas/Canvas';
 import { steps } from '@/lib/process-data';
 import { SerializableNode } from '@/lib/types';
 import { getCurrentStep } from '@/app/api/dashboard-axios';
 import { useProcessProgress } from '@/hooks/vote/useProcessProgress';
+import Canvas from './Canvas';
 
 interface RoomProps {
   roomId: string;

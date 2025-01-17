@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import IconButton from '../IconButton';
+import IconButton from '../Canvas/IconButton';
 import { Color } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 

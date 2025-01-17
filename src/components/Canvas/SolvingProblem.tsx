@@ -4,7 +4,7 @@ import { useMutation, useSelf, useStorage } from '@/liveblocks.config';
 import { LayerType, SolvingProblemLayer } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { BOX_CONFIG } from './StageGimmicks';
+import { BOX_CONFIG } from '../StageGimmicks';
 
 interface SolvingProblemProps {
   id: string;

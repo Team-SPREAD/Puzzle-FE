@@ -16,7 +16,6 @@ import {
   useOthersMapped,
   useCanUndo,
   useCanRedo,
-  useMyPresence,
   useUpdateMyPresence,
   useEventListener,
 } from '@/liveblocks.config';
@@ -40,15 +39,15 @@ import {
   pointerEventToCanvasPoint,
   resizeBounds,
 } from '@/lib/utils';
-import SelectionBox from '@/components/SelectionBox';
-import LayerComponent from '@/components/LayerComponent';
-import SelectionTools from '@/components/SelectionTools';
+import SelectionBox from '@/components/Canvas/SelectionBox';
+import LayerComponent from '@/components/Canvas/LayerComponent';
+import SelectionTools from '@/components/Canvas/SelectionTools';
 import useDisableScrollBounce from '@/hooks/useDisableScrollBounce';
 import useDeleteLayers from '@/hooks/useDeleteLayers';
-import Drafts from '@/components/Drafts';
-import Path from '@/components/Path';
+import Drafts from '@/components/Canvas/Drafts';
+import Path from '@/components/Canvas/Path';
 import ToolsBar from '@/components/ToolsBar';
-import Cursors from '@/components/Cursors';
+import Cursors from '@/components/Canvas/Cursors';
 import useUserInfoStore from '@/hooks/useUserInfoStore';
 import RightNav from '../Layout/RightNav';
 import ProcessNav from '@/components/Layout/ProcessNav/Index';
@@ -72,7 +71,6 @@ import useUserStore from '@/store/useUserStore';
 import useTeamsStore from '@/store/useTeamsStore';
 import { useProcessStore } from '@/store/vote/processStore';
 import { useParams } from 'next/navigation';
-import { RoomEvent } from '@/liveblocks.config';
 import useModalStore from '@/store/useModalStore';
 import VotingModal from '../Layout/Vote/Modal/VotingModal';
 import GuideModal from '../Layout/Modal/GuildModal';
@@ -83,16 +81,11 @@ import ProgressModal from '../AniModals/ProgressModal';
 const MAX_LAYERS = 500;
 
 const Canvas = () => {
-  const userInfoReal = useUserStore((state) => state.userInfo);
-  const teams = useTeamsStore((state) => state.teams);
   const groupCall = useStorage((root) => root.groupCall);
   const userInfo = useUserInfoStore(); //이거 목데이터라 수정해야함
   const [showVoteModal, setShowVoteModal] = useState(false); //투표 모달
   const layerIds = useStorage((root) => root.layerIds);
-  const nodes = useStorage((root) => root.nodes);
-  const edges = useStorage((root) => root.edges);
   const cursorPanel = useRef(null);
-  const reactFlowCanvas = useRef(null); //테스트
   const { setCurrentStep: setBoardStep, getCurrentStep } = useProcessStore();
   const { setCurrentStep: setGlobalCurrentStep } = useProcessStore();
 
@@ -100,7 +93,7 @@ const Canvas = () => {
   const { modalType, closeModal } = useModalStore();
 
   //투표 상태 관리
-  const voting = useStorage((root) => root.voting);
+  
   const hostId = useStorage((root) => root?.host?.userId);
   const self = useSelf();
   const isHost = hostId === self.id;
@@ -148,7 +141,7 @@ const Canvas = () => {
 
   const [penSize, setPenSize] = useState(8); //펜 사이즈 use
   const pencilDraft = useSelf((me) => me.presence.pencilDraft);
-  const [selectedLayerId, setSelectedLayerId] = useState<string | undefined>(); //text 컬러 상태관리
+  
   const [canvasState, setState] = useState<CanvasState>({
     mode: CanvasMode.None,
   });
