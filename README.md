@@ -6,7 +6,7 @@
 
 
  - Puzzle github: [Team-SPREAD](https://github.com/Team-SPREAD)   
- - 배포 URL : [Puzzle](http://Puzzle.io)   
+ - 배포 URL : [http://Puzzle.io](https://spread-puzzle.io/)(서버 중지)
 
 ## 프로젝트 소개
 - **Puzzle**은 에자일 방법론, 브레인 스토밍에 기반하고, 소프트웨어 설계 가이드라인을 제공하여 실시간으로 아이디어를 기획하고 협업할 수 있는 플랫폼 입니다.
@@ -159,6 +159,13 @@ const { cursor } = useMyPresence();
   
 
 ## 5. 트러블 슈팅
+
+- 빌드 및 프레임 워크 호환성 오류 (tldraw, liveblocks, Next14)
+- 각 단계 기믹 구현
+- UI/UX
+- git 오류
+- sendbird 만료된 api 오류
+- 투표를 통한 레이스 컨디션을 조절 해야하는 트러블
 
 ## 6. 개발 기간 및 관리
 
